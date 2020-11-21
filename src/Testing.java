@@ -13,7 +13,7 @@ public class Testing {
 //        if (node != null) System.out.println("Next hop is " + node.getNodeID());
 //        else System.out.println("Current Node is the Root Node " + rt.getLocalNode().getNodeID());
 
-       rt.getRTTMergerTable("TestRoutingTable.xml");
+       //rt.getRTTMergerTable("TestRoutingTable.xml");
 
 
     }
