@@ -20,6 +20,11 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+/**
+ * Created by S/L Umesh U Nair
+ * <br>Aim is to create an Routing Manager API for Brehaspati-4
+ */
 public class RoutingManager {
     private static RoutingManager routingManager;
     private final B4_Node[][] localBaseRoutingTable;
@@ -30,6 +35,15 @@ public class RoutingManager {
     private B4_Node[][] mergerRoutingTable;
     private B4_Node localNode;
 
+    /**
+     * Constructor
+     * <br>Main job of constructor are as follows:-
+     * <br>Check routing table and neighbour table exist from the previous login(ie to check RoutingTable.xml is available in the path).
+     * <br>If RT exists then data is taken from the xml file and added to the localBaseRoutingTable(which is the routingTable for current node)
+     * and to the localBaseNeighbourTable(which is the neighbourTable for current node).
+     * <br>If not available then create a routing table(localBaseRoutingTable) and neighbour table (localBaseNeighbourTable).
+     * <br>Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of B4_Node with only bootstrap node entry.
+     */
     private RoutingManager() {
         setLocalNode();
         localBaseRoutingTable = new B4_Node[40][3];
@@ -41,6 +55,13 @@ public class RoutingManager {
         if (access) init("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
     }
 
+    /**
+     * @param rtFileName <br>@param routingTable
+     *                   <br>@param neighbourTable
+     *                   <br>All the initialisation w.r.t routing Manager will be performed here.
+     *                   <br>This function is called by the constuctor for initialisation of routing manager.
+     *                   <br>Initialisation includes creating routingTable and neighbour table,creating a routing table file for future references etc.
+     */
     private void init(String rtFileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         boolean rtExists;
         File rtFile = new File(rtFileName + ".xml");
@@ -130,6 +151,11 @@ public class RoutingManager {
         }
     }
 
+    /**
+     * @return RoutingManger Object
+     * <br>This method is required to create an instance of RoutingManager.
+     * <br>Instance of RoutingManager will be obtained by calling this function.
+     */
     public static synchronized RoutingManager getInstance() {
         if (routingManager == null) {
             routingManager = new RoutingManager();
@@ -137,14 +163,32 @@ public class RoutingManager {
         return routingManager;
     }
 
+    /**
+     * This method is used for setting Local Node information.
+     * <br>Presently it is hardcoded (will be ammended later).
+     */
     private void setLocalNode() {
         localNode = new B4_Node("4589ABAA1234ABC1234591111ABCDFE123456789", "192.168.0.105", "6666", "TCP");
     }
 
+    /**
+     * @return B4_Node Object
+     * <br>This method is used for getting Local Node Information.
+     * <br>This method can be called by any function to get complete information about the current Node.
+     */
     public B4_Node getLocalNode() {
         return localNode;
     }
 
+    /**
+     * @param mergerTableDataFile
+     * @param layerID             <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
+     *                            <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
+     *                            <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
+     *                            <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
+     *                            Array at which the data is to be updated.
+     *                            <br>Based on the algorithm the B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
+     */
     public void mergeRoutingTable(String mergerTableDataFile, int layerID) {
 
         B4_Node[][] routingTableLayer = null;
@@ -155,18 +199,7 @@ public class RoutingManager {
         }
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
         mergerRoutingTable = getMergerRoutingTable(mergerTableDataFile);
-        /**
-         This function (ie nibbleComparison()) perform nibble wise comparison between the mergerNodeID (from the mergerRoutingTable, here now it is selfNodeIdOfMergerTable) and localNodeID.
-         For more info about the function refer nibbleComparison() function.
-         */
 
-        /**
-         * 1. Obtain the merger Routing Table (ie the routing table which needs to be merged with the localBaseRoutingTable
-         * 2. Obtain the localNodeID.
-         * 3. Get first nodeId from the mergerTable and compare it with the localNode Id and obtain the first character which mismatches.
-         * 4. This will give the column in localBaseRoutingTable which needs to be updated.
-         * 5. nibbleComparison() is used for nibble wise comparison
-         */
         mergerRT(selfNodeOfMergerTable, routingTableLayer);
         for (int i = 0; i < 40; i++) {
             for (int j = 0; j < 3; j++) {
@@ -183,6 +216,10 @@ public class RoutingManager {
         }
     }
 
+    /**
+     * @param mergerTableDataFile
+     * @param layerID
+     */
     public void mergeNeighbourTable(String mergerTableDataFile, int layerID) {
         B4_Node[] neighbourTable = null;
         if (layerID == 0) {
@@ -297,6 +334,9 @@ public class RoutingManager {
         }
     }
 
+    /**
+     * @param mergerTableDataFile
+     */
     public void getRTTMergerTable(String mergerTableDataFile) {
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
         B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile);
@@ -368,6 +408,14 @@ public class RoutingManager {
 
     }
 
+    /**
+     * @param hashID
+     * @param layerID
+     * @return null if next hop is selfNode else return B4_Node object
+     * 1. This method is used to find the nextHop for a hashID/NodeID which is received as a query.
+     * 2. Initially check whether the hashId/nodeId is equal to localNodeID.
+     * 3. Thereafter check whether the localNode is the root node for the given hashId/NodeId.
+     */
     public B4_Node findNextHop(String hashID, int layerID) {
         B4_Node[][] routingTable = null;
         if (layerID == 0) {
@@ -384,8 +432,8 @@ public class RoutingManager {
 
             /**
              * Nibble wise comparison is made and the first nibble mismatch between hashId and LocalNodeId is identified.
-             * This will give value of k (i.e column at which we start looking for next hop).
-             * IF this column is not empty check predecessor successor and middle row one by one based on the logic defined to get the next hop.
+             * <br>This will give value of k (i.e column at which we start looking for next hop).
+             * <br>IF this column is not empty check predecessor successor and middle row one by one based on the logic defined to get the next hop.
              */
         } else {
             for (int k = 0; k < 40; k++) {
@@ -484,21 +532,37 @@ public class RoutingManager {
         return null;
     }
 
+    /**
+     * @param mergerFile
+     * @return B4_RoutingTable Object
+     */
     private B4_Node[][] getMergerRoutingTable(String mergerFile) {
         B4_RoutingTables mergerTable = new B4_RoutingTables(mergerFile);
         return mergerTable.getRoutingTable();
     }
 
+    /**
+     * @param mergerFile
+     * @return B4_RoutingTable Object
+     */
     private B4_Node[] getMergerNeighbourTable(String mergerFile) {
         B4_RoutingTables mergerTable = new B4_RoutingTables(mergerFile);
         return mergerTable.getNeighbourTable();
     }
 
+    /**
+     * @param mergerFile
+     * @return B4_Node Object
+     */
     private B4_Node getSelfNodeOfMergerTable(String mergerFile) {
         B4_RoutingTables mergerTable = new B4_RoutingTables(mergerFile);
         return mergerTable.getSelfNodeID();
     }
 
+    /**
+     * @param mergerNode
+     * @param routingTable All the algorithm for merging the routing and neighbour table is defined in this function.
+     */
     private void mergerRT(B4_Node mergerNode, B4_Node[][] routingTable) {
         int preNodeIdInHex;
         int sucNodeIdInHex;
@@ -685,6 +749,9 @@ public class RoutingManager {
         }
     }
 
+    /**
+     * @return B4_Node object
+     */
     private B4_Node getBootStrapNodeID() {
         B4_Node bootStrapNode = null;
         try {
@@ -697,11 +764,18 @@ public class RoutingManager {
             String bootStrapAddress = properties.getProperty("BootstrapAddress");
             bootStrapNode = new B4_Node(bootStrapID, bootStrapIP, bootStrapPort, bootStrapAddress);
         } catch (IOException e) {
-            System.out.println("Config file not Found or Issue in config file fetching");;
+            System.out.println("Config file not Found or Issue in config file fetching");
+            ;
         }
         return bootStrapNode;
     }
 
+    /**
+     * @param fileHeading
+     * @param routingTable
+     * @param neighbourTable <br>This function is used to convert the Routing Table in the form of an array to xml format
+     *                       <br>Here XML parsing is used.
+     */
     private void localBaseTablesToXML(String fileHeading, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         String selfNodeId = localNode.getNodeID();
         String selfIPAddress = localNode.getIpAddress();
@@ -784,6 +858,10 @@ public class RoutingManager {
         }
     }
 
+    /**
+     * @param serviceName
+     * @return boolean
+     */
     private boolean serviceAccess(String serviceName) {
         boolean access = false;
         FileReader reader;
