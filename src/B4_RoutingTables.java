@@ -8,7 +8,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,10 +19,12 @@ public class B4_RoutingTables {
     private final String mergerFile;
     private B4_Node selfNodeID;
     private B4_Node[] neighbourTable;
+    private final int rt_dimension;
 
     public B4_RoutingTables(String mergerRTFile) {
+        rt_dimension=getRT_length();
         this.mergerFile = mergerRTFile;
-        routingTable = new B4_Node[40][3];
+        routingTable = new B4_Node[rt_dimension][3];
         neighbourTable = new B4_Node[16];
         String selfNodeID;
         String selfIPAddress;
@@ -141,5 +145,21 @@ public class B4_RoutingTables {
 
     public void setNeighbourTable(B4_Node[] neighbourTable) {
         this.neighbourTable = neighbourTable;
+    }
+
+    private int getRT_length() {
+        int routingTable_length = 0;
+        FileReader reader;
+        try {
+            reader = new FileReader("config.properties");
+            Properties properties = new Properties();
+            properties.load(reader);
+            String value = properties.getProperty("RT_length");
+            routingTable_length = Integer.parseInt(value);
+
+        } catch (IOException e) {
+            System.out.println("RT_length parameter not found in config file\n"+e);
+        }
+        return routingTable_length;
     }
 }

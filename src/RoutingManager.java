@@ -34,6 +34,7 @@ public class RoutingManager {
     private B4_Node[] mergerNeighbourTable;
     private B4_Node[][] mergerRoutingTable;
     private B4_Node localNode;
+    private final int rt_dimension;
 
     /**
      * Constructor
@@ -45,10 +46,11 @@ public class RoutingManager {
      * <br>Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of B4_Node with only bootstrap node entry.
      */
     private RoutingManager() {
+        rt_dimension = getRT_length();
         setLocalNode();
-        localBaseRoutingTable = new B4_Node[40][3];
+        localBaseRoutingTable = new B4_Node[rt_dimension][3];
         localBaseNeighbourTable = new B4_Node[16];
-        storageRoutingTable = new B4_Node[40][30];
+        storageRoutingTable = new B4_Node[rt_dimension][30];
         storageNeighbourTable = new B4_Node[16];
         init("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
         boolean access = serviceAccess("StorageAccess");
@@ -70,7 +72,7 @@ public class RoutingManager {
         if (!rtExists) {
 
             /* Routing Table */
-            for (int i = 0; i < 40; i++) {
+            for (int i = 0; i < rt_dimension; i++) {
                 for (int j = 0; j < 3; j++) {
                     routingTable[i][j] = new B4_Node("", "", "", "");
                 }
@@ -201,7 +203,7 @@ public class RoutingManager {
         mergerRoutingTable = getMergerRoutingTable(mergerTableDataFile);
 
         mergerRT(selfNodeOfMergerTable, routingTableLayer);
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < rt_dimension; i++) {
             for (int j = 0; j < 3; j++) {
                 mergerRT(mergerRoutingTable[i][j], routingTableLayer);
             }
@@ -436,7 +438,7 @@ public class RoutingManager {
              * <br>IF this column is not empty check predecessor successor and middle row one by one based on the logic defined to get the next hop.
              */
         } else {
-            for (int k = 0; k < 40; k++) {
+            for (int k = 0; k < rt_dimension; k++) {
                 if (hashIdC[k] != localNodeIdC[k]) {
                     //System.out.println("k :" + k);
                     String hashIdChar = Character.toString(hashID.charAt(k));
@@ -460,8 +462,8 @@ public class RoutingManager {
                          * Hence return Null.
                          */
                         if (preNodeIdHex <= hashIdHex && hashIdHex < localNodeIdInHex || preNodeIdHex > localNodeIdInHex && preNodeIdHex - 16 <= hashIdHex && hashIdHex < localNodeIdInHex || preNodeIdHex > localNodeIdInHex && preNodeIdHex - 16 <= hashIdHex - 16 && hashIdHex - 16 < localNodeIdInHex - 16) {
-                            if (k != 39) {
-                                for (int i = k + 1; i < 40; i++) {
+                            if (k != rt_dimension-1) {
+                                for (int i = k + 1; i < rt_dimension; i++) {
                                     if (!routingTable[i][0].getNodeID().isEmpty()) {
                                         String nxtPreNodeIdChar = Character.toString(routingTable[i][0].getNodeID().charAt(i));
                                         String nxtHashIdChar = Character.toString(hashID.charAt(i));
@@ -474,7 +476,7 @@ public class RoutingManager {
                                         int nxtSucNodeIdHex = Integer.parseInt(nxtSucNodeIdChar, 16);
 
                                         if (nxtPreNodeIdHex <= nxtHashIdHex && nxtHashIdHex < nxtLocalNodeIdInHex || nxtPreNodeIdHex > nxtLocalNodeIdInHex && nxtPreNodeIdHex - 16 <= nxtHashIdHex && nxtHashIdHex < nxtLocalNodeIdInHex || nxtPreNodeIdHex > nxtLocalNodeIdInHex && nxtPreNodeIdHex - 16 <= nxtHashIdHex - 16 && nxtHashIdHex - 16 < nxtLocalNodeIdInHex - 16) {
-                                            if (i != 39) continue;
+                                            if (i != rt_dimension-1) continue;
                                             else return null;
                                         } else if (nxtSucNodeIdHex >= nxtHashIdHex && nxtHashIdHex > nxtLocalNodeIdInHex || nxtSucNodeIdHex < nxtLocalNodeIdInHex && nxtSucNodeIdHex + 16 >= nxtHashIdHex && nxtHashIdHex > nxtLocalNodeIdInHex || nxtSucNodeIdHex < nxtLocalNodeIdInHex && nxtSucNodeIdHex + 16 >= nxtHashIdHex + 16 && nxtHashIdHex + 16 > nxtLocalNodeIdInHex) {
                                             return routingTable[i][1];
@@ -489,7 +491,7 @@ public class RoutingManager {
                                         } else if (routingTable[i][2].getNodeID().isEmpty()) {
                                             return routingTable[i][1];
                                         }
-                                        if (i == 39) return null;
+                                        if (i == rt_dimension-1) return null;
                                     }
                                 }
                             } else return null;
@@ -581,7 +583,7 @@ public class RoutingManager {
          * 5. Second condition is mergerNodeId lies between the localNodeId and existing SuccessorNodeId
          * 6. Third condition is if mergerNodeId lies between successor and predecessor.
          */
-        for (int k = 0; k < 40; k++) {
+        for (int k = 0; k < rt_dimension; k++) {
             //System.out.println(k);
             char[] preNodeIdCharArray = routingTable[k][0].getNodeID().toCharArray();
             char[] sucNodeIdCharArray = routingTable[k][1].getNodeID().toCharArray();
@@ -614,7 +616,7 @@ public class RoutingManager {
                     if (preNodeIdInHex <= mergerNodeIdInHex && mergerNodeIdInHex < localNodeIdInHex) {
                         //System.out.println("In Predecessor:First part");
                         if (preNodeIdInHex == mergerNodeIdInHex) {
-                            for (int i = k + 1; i < 40; i++) {
+                            for (int i = k + 1; i < rt_dimension; i++) {
                                 if (mergerNodeidInCharArray[i] != preNodeIdCharArray[i]) {
                                     String nxtPreIdInChar = Character.toString(routingTable[k][0].getNodeID().charAt(i));
                                     String nxtMergerIdChar = Character.toString(mergerNodeID.charAt(i));
@@ -651,7 +653,7 @@ public class RoutingManager {
                             break;
 
                         } else if (preNodeIdInHex == mergerNodeIdInHex) {
-                            for (int i = k + 1; i < 40; i++) {
+                            for (int i = k + 1; i < rt_dimension; i++) {
                                 if (mergerNodeidInCharArray[i] != preNodeIdCharArray[i]) {
                                     String nxtPreIdInChar = Character.toString(routingTable[k][0].getNodeID().charAt(i));
                                     String nxtMergerIdChar = Character.toString(mergerNodeID.charAt(i));
@@ -674,7 +676,7 @@ public class RoutingManager {
                     if (sucNodeIdInHex >= mergerNodeIdInHex && mergerNodeIdInHex > localNodeIdInHex) {
                         //System.out.println("In successor : Ist Part");
                         if (sucNodeIdInHex == mergerNodeIdInHex) {
-                            for (int i = k + 1; i < 40; i++) {
+                            for (int i = k + 1; i < rt_dimension; i++) {
                                 if (mergerNodeidInCharArray[i] != sucNodeIdCharArray[i]) {
                                     String nxtSucIdInChar = Character.toString(routingTable[k][1].getNodeID().charAt(i));
                                     String nxtMergerIdChar = Character.toString(mergerNodeID.charAt(i));
@@ -710,7 +712,7 @@ public class RoutingManager {
                             routingTable[k][1] = mergerNode;
                             break;
                         } else if (sucNodeIdInHex == mergerNodeIdInHex) {
-                            for (int i = k + 1; i < 40; i++) {
+                            for (int i = k + 1; i < rt_dimension; i++) {
                                 if (mergerNodeidInCharArray[i] != sucNodeIdCharArray[i]) {
                                     String nxtSucIdInChar = Character.toString(routingTable[k][1].getNodeID().charAt(i));
                                     String nxtMergerIdChar = Character.toString(mergerNodeID.charAt(i));
@@ -795,7 +797,7 @@ public class RoutingManager {
             root.setAttribute("SELF_PORT_ADDRESS", selfPortAddress);
             root.setAttribute("SELF_TRANSPORT", selfTransport);
 
-            for (int i = 0; i < 40; i++) {
+            for (int i = 0; i < rt_dimension; i++) {
                 for (int j = 0; j < 3; j++) {
                     Element row = doc.createElement("B4_Node");
                     root.appendChild(row);
@@ -873,9 +875,25 @@ public class RoutingManager {
             if (value.contentEquals("yes")) access = true;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Service Not found in Config file\n"+e);
         }
         return access;
+    }
+
+    private int getRT_length() {
+        int routingTable_length = 0;
+        FileReader reader;
+        try {
+            reader = new FileReader("config.properties");
+            Properties properties = new Properties();
+            properties.load(reader);
+            String value = properties.getProperty("RT_length");
+            routingTable_length = Integer.parseInt(value);
+
+        } catch (IOException e) {
+            System.out.println("RT_length parameter not found in config file\n"+e);
+        }
+        return routingTable_length;
     }
 
 
