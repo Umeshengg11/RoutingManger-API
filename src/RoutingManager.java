@@ -16,6 +16,8 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -462,7 +464,7 @@ public class RoutingManager {
                          * Hence return Null.
                          */
                         if (preNodeIdHex <= hashIdHex && hashIdHex < localNodeIdInHex || preNodeIdHex > localNodeIdInHex && preNodeIdHex - 16 <= hashIdHex && hashIdHex < localNodeIdInHex || preNodeIdHex > localNodeIdInHex && preNodeIdHex - 16 <= hashIdHex - 16 && hashIdHex - 16 < localNodeIdInHex - 16) {
-                            if (k != rt_dimension-1) {
+                            if (k != rt_dimension - 1) {
                                 for (int i = k + 1; i < rt_dimension; i++) {
                                     if (!routingTable[i][0].getNodeID().isEmpty()) {
                                         String nxtPreNodeIdChar = Character.toString(routingTable[i][0].getNodeID().charAt(i));
@@ -476,7 +478,7 @@ public class RoutingManager {
                                         int nxtSucNodeIdHex = Integer.parseInt(nxtSucNodeIdChar, 16);
 
                                         if (nxtPreNodeIdHex <= nxtHashIdHex && nxtHashIdHex < nxtLocalNodeIdInHex || nxtPreNodeIdHex > nxtLocalNodeIdInHex && nxtPreNodeIdHex - 16 <= nxtHashIdHex && nxtHashIdHex < nxtLocalNodeIdInHex || nxtPreNodeIdHex > nxtLocalNodeIdInHex && nxtPreNodeIdHex - 16 <= nxtHashIdHex - 16 && nxtHashIdHex - 16 < nxtLocalNodeIdInHex - 16) {
-                                            if (i != rt_dimension-1) continue;
+                                            if (i != rt_dimension - 1) continue;
                                             else return null;
                                         } else if (nxtSucNodeIdHex >= nxtHashIdHex && nxtHashIdHex > nxtLocalNodeIdInHex || nxtSucNodeIdHex < nxtLocalNodeIdInHex && nxtSucNodeIdHex + 16 >= nxtHashIdHex && nxtHashIdHex > nxtLocalNodeIdInHex || nxtSucNodeIdHex < nxtLocalNodeIdInHex && nxtSucNodeIdHex + 16 >= nxtHashIdHex + 16 && nxtHashIdHex + 16 > nxtLocalNodeIdInHex) {
                                             return routingTable[i][1];
@@ -491,7 +493,7 @@ public class RoutingManager {
                                         } else if (routingTable[i][2].getNodeID().isEmpty()) {
                                             return routingTable[i][1];
                                         }
-                                        if (i == rt_dimension-1) return null;
+                                        if (i == rt_dimension - 1) return null;
                                     }
                                 }
                             } else return null;
@@ -875,7 +877,7 @@ public class RoutingManager {
             if (value.contentEquals("yes")) access = true;
 
         } catch (IOException e) {
-            System.out.println("Service Not found in Config file\n"+e);
+            System.out.println("Service Not found in Config file\n" + e);
         }
         return access;
     }
@@ -891,10 +893,98 @@ public class RoutingManager {
             routingTable_length = Integer.parseInt(value);
 
         } catch (IOException e) {
-            System.out.println("RT_length parameter not found in config file\n"+e);
+            System.out.println("RT_length parameter not found in config file\n" + e);
         }
         return routingTable_length;
     }
 
+    /**
+     * @param rtFileName         0     * @param routingTableName
+     * @param neighbourTableName
+     */
+    public void purgeRTEntry(String rtFileName, B4_Node[][] routingTableName, B4_Node[] neighbourTableName) {
+        int[][] counter_rtable = new int[rt_dimension][3];
+        int[] counter_neighbour = new int[16];
+        long currentTime = System.currentTimeMillis();
+        long incrementTime = 0;
+        Thread purgeThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int count = 1;
+                int dataPurged = 0;
+                while (count == 4) {
+                    for (int i = 0; i < rt_dimension; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            String ipAddressBase = routingTableName[i][j].getIpAddress();
+                            if (!ipAddressBase.isEmpty()) {
+                                try {
+                                    InetAddress ping = InetAddress.getByName(ipAddressBase);
+                                    if (ping.isReachable(1000)) {
+                                        System.out.println("Host is Reachable");
+                                        counter_rtable[i][j] = 0;
+                                    } else {
+                                        System.out.println("Not reachable");
+                                        counter_rtable[i][j] = counter_rtable[i][j] + 1;
+                                    }
+                                } catch (UnknownHostException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            if (counter_rtable[i][j] == 4) {
+                                routingTableName[i][j] = new B4_Node("", "", "", "");
+                                counter_rtable[i][j] = 0;
+                            }
+                        }
+                    }
+                    for (int k = 0; k < 16; k++) {
+                        String ipAddressNeighbour = neighbourTableName[k].getIpAddress();
+                        if (!ipAddressNeighbour.isEmpty()) {
+                            try {
+                                InetAddress ping = InetAddress.getByName(ipAddressNeighbour);
+                                if (ping.isReachable(1000)) {
+                                    System.out.println("Host is Reachable");
+                                    counter_neighbour[k] = 0;
+                                } else {
+                                    System.out.println("Not reachable");
+                                    counter_neighbour[k] = counter_neighbour[k] + 1;
+                                }
+                            } catch (UnknownHostException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if (counter_neighbour[k] == 4) {
+                            neighbourTableName[k] = new B4_Node("", "", "", "", -1);
+                            System.out.println("Data is purged");
+                            dataPurged = dataPurged + 1;
+                            counter_neighbour[k] = 0;
+                        }
+                    }
+                    localBaseTablesToXML(rtFileName, routingTableName, neighbourTableName);
+                }
+                if (dataPurged == 0) {
+                    try {
+                        Thread.sleep(1800000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        Thread.sleep(180000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+
+        purgeThread.start();
+
+
+    }
 
 }
