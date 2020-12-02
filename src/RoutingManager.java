@@ -37,6 +37,8 @@ public class RoutingManager {
     private B4_Node[][] mergerRoutingTable;
     private B4_Node localNode;
     private final int rt_dimension;
+    private long incrementTime = 900000;
+    private long sleepTime = 1800000;
 
     /**
      * Constructor
@@ -903,15 +905,21 @@ public class RoutingManager {
      * @param neighbourTableName
      */
     public void purgeRTEntry(String rtFileName, B4_Node[][] routingTableName, B4_Node[] neighbourTableName) {
+        //Two counter arrays were created to keep track of no of failed ping.
         int[][] counter_rtable = new int[rt_dimension][3];
         int[] counter_neighbour = new int[16];
         long currentTime = System.currentTimeMillis();
-        long incrementTime = 0;
+
+        // New thread is created
         Thread purgeThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                //count will decide the number of times the while loop will run.
+                //I have choosen count value four here.It can be changed to any other value depending on the requirment
                 int count = 1;
-                int dataPurged = 0;
+                int dataPurged_RT = 0;
+                int dataPurged_Neighbour = 0;
+                long sleepingTime;
                 while (count == 4) {
                     for (int i = 0; i < rt_dimension; i++) {
                         for (int j = 0; j < 3; j++) {
@@ -934,6 +942,8 @@ public class RoutingManager {
                             }
                             if (counter_rtable[i][j] == 4) {
                                 routingTableName[i][j] = new B4_Node("", "", "", "");
+                                System.out.println("Data is purged");
+                                dataPurged_RT = dataPurged_RT + 1;
                                 counter_rtable[i][j] = 0;
                             }
                         }
@@ -959,32 +969,29 @@ public class RoutingManager {
                         if (counter_neighbour[k] == 4) {
                             neighbourTableName[k] = new B4_Node("", "", "", "", -1);
                             System.out.println("Data is purged");
-                            dataPurged = dataPurged + 1;
+                            dataPurged_Neighbour = dataPurged_Neighbour + 1;
                             counter_neighbour[k] = 0;
                         }
                     }
                     localBaseTablesToXML(rtFileName, routingTableName, neighbourTableName);
                 }
-                if (dataPurged == 0) {
+                if (dataPurged_RT == 0 && dataPurged_Neighbour == 0) {
                     try {
-                        Thread.sleep(1800000);
+                        sleepingTime = sleepTime + incrementTime;
+                        Thread.sleep(sleepingTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 } else {
                     try {
-                        Thread.sleep(180000);
+                        sleepingTime = sleepTime;
+                        Thread.sleep(sleepingTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-
             }
         });
-
         purgeThread.start();
-
-
     }
-
 }

@@ -21,9 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="995d29c0-2f21-4f28-b5c1-234591841a40" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/RoutingManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RoutingManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Testing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Testing.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,6 +92,10 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="415" y="207" width="525" height="323" key="#Notifications" timestamp="1606917927229">
+      <screen x="0" y="0" width="1366" height="768" />
+    </state>
+    <state x="415" y="207" width="525" height="323" key="#Notifications/0.0.1366.768@0.0.1366.768" timestamp="1606917927229" />
     <state x="466" y="92" width="424" height="553" key="FileChooserDialogImpl" timestamp="1605972501469">
       <screen x="0" y="0" width="1366" height="768" />
     </state>
@@ -152,7 +154,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/RoutingManager.java</url>
-          <line>450</line>
+          <line>452</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
