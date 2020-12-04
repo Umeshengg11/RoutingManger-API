@@ -37,8 +37,8 @@ public class RoutingManager {
     private B4_Node[][] mergerRoutingTable;
     private B4_Node localNode;
     private final int rt_dimension;
-    private long incrementTime = 900000;
-    private long sleepTime = 1800000;
+    private long incrementTime = 10000;
+    private long sleepTime = 30000;
 
     /**
      * Constructor
@@ -909,30 +909,60 @@ public class RoutingManager {
         int[][] counter_rtable = new int[rt_dimension][3];
         int[] counter_neighbour = new int[16];
         long currentTime = System.currentTimeMillis();
+        System.out.println("I am in main Thread");
 
         // New thread is created
         Thread purgeThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                System.out.println("Thread is started");
                 //count will decide the number of times the while loop will run.
                 //I have choosen count value four here.It can be changed to any other value depending on the requirment
-                int count = 1;
+                int count = 0;
                 int dataPurged_RT = 0;
                 int dataPurged_Neighbour = 0;
-                long sleepingTime;
-                while (count == 4) {
-                    for (int i = 0; i < rt_dimension; i++) {
-                        for (int j = 0; j < 3; j++) {
-                            String ipAddressBase = routingTableName[i][j].getIpAddress();
-                            if (!ipAddressBase.isEmpty()) {
+                long sleepingTime =0;
+                while (true) {
+                    while (!(count >= 4)) {
+                        for (int i = 0; i < rt_dimension; i++) {
+                            for (int j = 0; j < 3; j++) {
+                                String ipAddressBase = routingTableName[i][j].getIpAddress();
+                                System.out.println(ipAddressBase);
+                                if (!ipAddressBase.isEmpty()) {
+                                    try {
+                                        InetAddress ping = InetAddress.getByName(ipAddressBase);
+                                        if (ping.isReachable(1000)) {
+                                            System.out.println("Host is Reachable");
+                                            counter_rtable[i][j] = 0;
+                                        } else {
+                                            System.out.println("Not reachable");
+                                            counter_rtable[i][j] = counter_rtable[i][j] + 1;
+                                        }
+                                    } catch (UnknownHostException e) {
+                                        e.printStackTrace();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (counter_rtable[i][j] == 4) {
+                                    routingTableName[i][j] = new B4_Node("", "", "", "");
+                                    System.out.println("Data is purged");
+                                    dataPurged_RT = dataPurged_RT + 1;
+                                    counter_rtable[i][j] = 0;
+                                }
+                            }
+                        }
+                        for (int k = 0; k < 16; k++) {
+                            String ipAddressNeighbour = neighbourTableName[k].getIpAddress();
+                            if (!ipAddressNeighbour.isEmpty()) {
                                 try {
-                                    InetAddress ping = InetAddress.getByName(ipAddressBase);
+                                    InetAddress ping = InetAddress.getByName(ipAddressNeighbour);
                                     if (ping.isReachable(1000)) {
                                         System.out.println("Host is Reachable");
-                                        counter_rtable[i][j] = 0;
+                                        counter_neighbour[k] = 0;
                                     } else {
                                         System.out.println("Not reachable");
-                                        counter_rtable[i][j] = counter_rtable[i][j] + 1;
+                                        counter_neighbour[k] = counter_neighbour[k] + 1;
                                     }
                                 } catch (UnknownHostException e) {
                                     e.printStackTrace();
@@ -940,58 +970,59 @@ public class RoutingManager {
                                     e.printStackTrace();
                                 }
                             }
-                            if (counter_rtable[i][j] == 4) {
-                                routingTableName[i][j] = new B4_Node("", "", "", "");
+                            if (counter_neighbour[k] == 4) {
+                                neighbourTableName[k] = new B4_Node("", "", "", "", -1);
                                 System.out.println("Data is purged");
-                                dataPurged_RT = dataPurged_RT + 1;
-                                counter_rtable[i][j] = 0;
+                                dataPurged_Neighbour = dataPurged_Neighbour + 1;
+                                counter_neighbour[k] = 0;
                             }
                         }
+                        localBaseTablesToXML(rtFileName, routingTableName, neighbourTableName);
+                        count = count + 1;
                     }
-                    for (int k = 0; k < 16; k++) {
-                        String ipAddressNeighbour = neighbourTableName[k].getIpAddress();
-                        if (!ipAddressNeighbour.isEmpty()) {
-                            try {
-                                InetAddress ping = InetAddress.getByName(ipAddressNeighbour);
-                                if (ping.isReachable(1000)) {
-                                    System.out.println("Host is Reachable");
-                                    counter_neighbour[k] = 0;
-                                } else {
-                                    System.out.println("Not reachable");
-                                    counter_neighbour[k] = counter_neighbour[k] + 1;
-                                }
-                            } catch (UnknownHostException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                    count = 0;
+                    System.out.println(dataPurged_Neighbour);
+                    System.out.println(dataPurged_RT);
+                    if (dataPurged_RT == 0 && dataPurged_Neighbour == 0) {
+                        try {
+                            sleepingTime = sleepingTime + incrementTime;
+                            System.out.println("going for sleeping for " + sleepingTime);
+                            Thread.sleep(sleepingTime);
+                            dataPurged_Neighbour=0;
+                            dataPurged_RT=0;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                        if (counter_neighbour[k] == 4) {
-                            neighbourTableName[k] = new B4_Node("", "", "", "", -1);
-                            System.out.println("Data is purged");
-                            dataPurged_Neighbour = dataPurged_Neighbour + 1;
-                            counter_neighbour[k] = 0;
+                    } else {
+                        try {
+                            sleepingTime = sleepTime;
+                            System.out.println("going for sleeping for " + sleepingTime);
+                            Thread.sleep(sleepingTime);
+                            dataPurged_Neighbour=0;
+                            dataPurged_RT=0;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    }
-                    localBaseTablesToXML(rtFileName, routingTableName, neighbourTableName);
-                }
-                if (dataPurged_RT == 0 && dataPurged_Neighbour == 0) {
-                    try {
-                        sleepingTime = sleepTime + incrementTime;
-                        Thread.sleep(sleepingTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        sleepingTime = sleepTime;
-                        Thread.sleep(sleepingTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                 }
             }
         });
         purgeThread.start();
+    }
+
+    public B4_Node[][] getLocalBaseRoutingTable() {
+        return localBaseRoutingTable;
+    }
+
+    public B4_Node[] getLocalBaseNeighbourTable() {
+        return localBaseNeighbourTable;
+    }
+
+    public B4_Node[][] getStorageRoutingTable() {
+        return storageRoutingTable;
+    }
+
+    public B4_Node[] getStorageNeighbourTable() {
+        return storageNeighbourTable;
     }
 }

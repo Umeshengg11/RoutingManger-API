@@ -4,10 +4,10 @@ public class Testing {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();
 
-//        rt.mergeRoutingTable("TestRoutingTable.xml", 0);
-//        rt.mergeNeighbourTable("TestRoutingTable.xml", 0);
-//        rt.mergeRoutingTable("TestStorageLayerRT.xml", 1);
-//        rt.mergeNeighbourTable("TestStorageLayerRT.xml", 1);
+       rt.mergeRoutingTable("TestRoutingTable.xml", 0);
+       rt.mergeNeighbourTable("TestRoutingTable.xml", 0);
+       rt.mergeRoutingTable("TestStorageLayerRT.xml", 1);
+       rt.mergeNeighbourTable("TestStorageLayerRT.xml", 1);
 //
 //        B4_Node node = rt.findNextHop("6588DBAA1286821A9B66AEDA0CA7BBA29DEA9C9C", 0);
 //        if (node != null) System.out.println("Next hop is " + node.getNodeID());
@@ -15,6 +15,8 @@ public class Testing {
 
 //        rt.getRTTMergerTable("TestRoutingTable.xml");
 //        rt.rt_length();
+
+        rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());
 
     }
 }
