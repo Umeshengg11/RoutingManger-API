@@ -37,8 +37,9 @@ public class RoutingManager {
     private B4_Node[][] mergerRoutingTable;
     private B4_Node localNode;
     private final int rt_dimension;
-    private long incrementTime = 10000;
-    private long sleepTime = 30000;
+    private final int nt_dimension;
+    private long incrementTime;
+    private long sleepTime;
 
     /**
      * Constructor
@@ -51,11 +52,14 @@ public class RoutingManager {
      */
     private RoutingManager() {
         rt_dimension = getRT_length();
+        nt_dimension = getNT_length();
+        incrementTime = getIncrementTime();
+        sleepTime = getSleepTime();
         setLocalNode();
         localBaseRoutingTable = new B4_Node[rt_dimension][3];
-        localBaseNeighbourTable = new B4_Node[16];
-        storageRoutingTable = new B4_Node[rt_dimension][30];
-        storageNeighbourTable = new B4_Node[16];
+        localBaseNeighbourTable = new B4_Node[nt_dimension];
+        storageRoutingTable = new B4_Node[rt_dimension][3];
+        storageNeighbourTable = new B4_Node[nt_dimension];
         init("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
         boolean access = serviceAccess("StorageAccess");
         if (access) init("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
@@ -85,7 +89,7 @@ public class RoutingManager {
             mergerRT(bootStrapNode, routingTable);
 
             /* Neighbour Table */
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < nt_dimension; i++) {
                 neighbourTable[i] = new B4_Node("", "", "", "", -1);
             }
             localBaseTablesToXML(rtFileName, routingTable, neighbourTable);
@@ -235,7 +239,7 @@ public class RoutingManager {
         }
 
         boolean rttFileExists;
-        mergerNeighbourTable = new B4_Node[16];
+        mergerNeighbourTable = new B4_Node[nt_dimension];
         B4_Node selfMergerNode = null;
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
         String mergerNodeID = selfNodeOfMergerTable.getNodeID();
@@ -288,7 +292,7 @@ public class RoutingManager {
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 e.printStackTrace();
             }
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < nt_dimension; i++) {
                 assert selfMergerNode != null;
                 if (selfMergerNode.getRtt() == -1) break;
                 assert neighbourTable != null;
@@ -298,14 +302,14 @@ public class RoutingManager {
                 } else if (neighbourTable[i].getRtt() <= selfMergerNode.getRtt()) {
                     continue;
                 } else {
-                    for (int j = 15; j >= i + 1; j--) {
+                    for (int j = nt_dimension-1; j >= i + 1; j--) {
                         neighbourTable[j] = neighbourTable[j - 1];
                     }
                     neighbourTable[i] = selfMergerNode;
                 }
             }
-            for (int i = 0; i < 16; i++) {
-                for (int j = 0; j < 16; j++) {
+            for (int i = 0; i < nt_dimension; i++) {
+                for (int j = 0; j < nt_dimension; j++) {
                     if (mergerNeighbourTable[i].getRtt() == -1) break;
                     assert neighbourTable != null;
                     if (neighbourTable[j].getRtt() == -1) {
@@ -314,7 +318,7 @@ public class RoutingManager {
                     } else if (mergerNeighbourTable[i].getRtt() >= neighbourTable[j].getRtt()) {
                         continue;
                     } else {
-                        for (int k = 15; k >= j + 1; k--) {
+                        for (int k = nt_dimension-1; k >= j + 1; k--) {
                             neighbourTable[k] = neighbourTable[k - 1];
                         }
                         neighbourTable[j] = mergerNeighbourTable[i];
@@ -322,7 +326,7 @@ public class RoutingManager {
                     }
                 }
             }
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < nt_dimension; i++) {
                 assert neighbourTable != null;
                 System.out.println(neighbourTable[i].getRtt());
             }
@@ -335,8 +339,6 @@ public class RoutingManager {
                 localBaseTablesToXML("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
                 System.out.println("Storage NeighbourTable Merged successfully");
             }
-
-
         }
     }
 
@@ -368,7 +370,7 @@ public class RoutingManager {
             root.setAttribute("SELF_RTT", selfRTTMerger);
 
 
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < nt_dimension; i++) {
                 Element row1 = doc.createElement("NEIGHBOUR");
                 root.appendChild(row1);
                 row1.setAttribute("INDEX", "[" + i + "]");
@@ -824,7 +826,7 @@ public class RoutingManager {
                     row.appendChild(nodeTransport);
                 }
             }
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < nt_dimension; i++) {
                 Element row1 = doc.createElement("NEIGHBOUR");
                 root.appendChild(row1);
                 row1.setAttribute("INDEX", "[" + i + "]");
@@ -907,7 +909,7 @@ public class RoutingManager {
     public void purgeRTEntry(String rtFileName, B4_Node[][] routingTableName, B4_Node[] neighbourTableName) {
         //Two counter arrays were created to keep track of no of failed ping.
         int[][] counter_rtable = new int[rt_dimension][3];
-        int[] counter_neighbour = new int[16];
+        int[] counter_neighbour = new int[nt_dimension];
         long currentTime = System.currentTimeMillis();
         System.out.println("I am in main Thread");
 
@@ -1024,5 +1026,53 @@ public class RoutingManager {
 
     public B4_Node[] getStorageNeighbourTable() {
         return storageNeighbourTable;
+    }
+
+    private long getIncrementTime () {
+        long increment_Time = 0;
+        try {
+            FileReader reader = new FileReader("config.properties");
+            Properties properties = new Properties();
+            properties.load(reader);
+            String inc_Time = properties.getProperty("Increment_time");
+            increment_Time = Long.parseLong(inc_Time);
+
+        } catch (IOException e) {
+            System.out.println("Config file not Found or Issue in config file fetching");
+
+        }
+        return increment_Time;
+    }
+
+    private long getSleepTime () {
+        long sleep_Time = 0;
+        try {
+            FileReader reader = new FileReader("config.properties");
+            Properties properties = new Properties();
+            properties.load(reader);
+            String slp_time = properties.getProperty("Sleep_time");
+            sleep_Time = Long.parseLong(slp_time);
+
+        } catch (IOException e) {
+            System.out.println("Config file not Found or Issue in config file fetching");
+
+        }
+        return sleep_Time;
+    }
+
+    private int getNT_length() {
+        int neighbourTable_length = 0;
+        FileReader reader;
+        try {
+            reader = new FileReader("config.properties");
+            Properties properties = new Properties();
+            properties.load(reader);
+            String value = properties.getProperty("NT_length");
+            neighbourTable_length = Integer.parseInt(value);
+
+        } catch (IOException e) {
+            System.out.println("RT_length parameter not found in config file\n" + e);
+        }
+        return neighbourTable_length;
     }
 }

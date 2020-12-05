@@ -20,12 +20,14 @@ public class B4_RoutingTables {
     private B4_Node selfNodeID;
     private B4_Node[] neighbourTable;
     private final int rt_dimension;
+    private final int nt_dimension;
 
     public B4_RoutingTables(String mergerRTFile) {
         rt_dimension=getRT_length();
+        nt_dimension=getNT_length();
         this.mergerFile = mergerRTFile;
         routingTable = new B4_Node[rt_dimension][3];
-        neighbourTable = new B4_Node[16];
+        neighbourTable = new B4_Node[nt_dimension];
         String selfNodeID;
         String selfIPAddress;
         String selfPortAddress;
@@ -161,5 +163,21 @@ public class B4_RoutingTables {
             System.out.println("RT_length parameter not found in config file\n"+e);
         }
         return routingTable_length;
+    }
+
+    private int getNT_length() {
+        int neighbourTable_length = 0;
+        FileReader reader;
+        try {
+            reader = new FileReader("config.properties");
+            Properties properties = new Properties();
+            properties.load(reader);
+            String value = properties.getProperty("NT_length");
+            neighbourTable_length = Integer.parseInt(value);
+
+        } catch (IOException e) {
+            System.out.println("RT_length parameter not found in config file\n" + e);
+        }
+        return neighbourTable_length;
     }
 }
