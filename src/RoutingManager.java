@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
  */
 public class RoutingManager {
     private static RoutingManager routingManager;
+    private static ConfigData config;
     private final B4_Node[][] localBaseRoutingTable;
     private final B4_Node[] localBaseNeighbourTable;
     private final B4_Node[][] storageRoutingTable;
@@ -51,10 +52,11 @@ public class RoutingManager {
      * <br>Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of B4_Node with only bootstrap node entry.
      */
     private RoutingManager() {
-        rt_dimension = getRT_length();
-        nt_dimension = getNT_length();
-        incrementTime = getIncrementTime();
-        sleepTime = getSleepTime();
+        config = ConfigData.getInstance();
+        rt_dimension = config.getRoutingTableLength();
+        nt_dimension = config.getNeighbourTableLength();
+        incrementTime = config.getIncrementTime();
+        sleepTime = config.getSleepTime();
         setLocalNode();
         localBaseRoutingTable = new B4_Node[rt_dimension][3];
         localBaseNeighbourTable = new B4_Node[nt_dimension];
@@ -85,7 +87,7 @@ public class RoutingManager {
                     routingTable[i][j] = new B4_Node("", "", "", "");
                 }
             }
-            B4_Node bootStrapNode = getBootStrapNodeID();
+            B4_Node bootStrapNode = config.getBootStrapNode();
             mergerRT(bootStrapNode, routingTable);
 
             /* Neighbour Table */
@@ -328,16 +330,16 @@ public class RoutingManager {
             }
             for (int i = 0; i < nt_dimension; i++) {
                 assert neighbourTable != null;
-                System.out.println(neighbourTable[i].getRtt());
+                //System.out.println(neighbourTable[i].getRtt());
             }
             if (neighbourTable == localBaseNeighbourTable) {
                 localBaseTablesToXML("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
-                System.out.println("Base NeighbourTable Merged successfully");
+                //System.out.println("Base NeighbourTable Merged successfully");
             }
 
             if (neighbourTable == storageNeighbourTable) {
                 localBaseTablesToXML("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
-                System.out.println("Storage NeighbourTable Merged successfully");
+                //System.out.println("Storage NeighbourTable Merged successfully");
             }
         }
     }
@@ -1060,19 +1062,5 @@ public class RoutingManager {
         return sleep_Time;
     }
 
-    private int getNT_length() {
-        int neighbourTable_length = 0;
-        FileReader reader;
-        try {
-            reader = new FileReader("config.properties");
-            Properties properties = new Properties();
-            properties.load(reader);
-            String value = properties.getProperty("NT_length");
-            neighbourTable_length = Integer.parseInt(value);
 
-        } catch (IOException e) {
-            System.out.println("RT_length parameter not found in config file\n" + e);
-        }
-        return neighbourTable_length;
-    }
 }

@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 public class B4_RoutingTables {
     private B4_Node[][] routingTable;
+    private static ConfigData config;
     private final String mergerFile;
     private B4_Node selfNodeID;
     private B4_Node[] neighbourTable;
@@ -23,8 +24,9 @@ public class B4_RoutingTables {
     private final int nt_dimension;
 
     public B4_RoutingTables(String mergerRTFile) {
-        rt_dimension=getRT_length();
-        nt_dimension=getNT_length();
+        config = ConfigData.getInstance();
+        rt_dimension=config.getRoutingTableLength();
+        nt_dimension=config.getNeighbourTableLength();
         this.mergerFile = mergerRTFile;
         routingTable = new B4_Node[rt_dimension][3];
         neighbourTable = new B4_Node[nt_dimension];
@@ -36,17 +38,14 @@ public class B4_RoutingTables {
         DocumentBuilderFactory builderFactory;
         DocumentBuilder documentBuilder;
         Document doc;
-
         try {
             //Get Document builder
             builderFactory = DocumentBuilderFactory.newInstance();
             documentBuilder = builderFactory.newDocumentBuilder();
-
             //Load the input XML document,parse it and return an instance of Document class
             doc = documentBuilder.parse(new File(mergerFile));
             doc.getDocumentElement().normalize();
             //String rootElement = doc.getDocumentElement().getNodeName();
-
             NodeList nodeList = doc.getElementsByTagName("NODE");
             for (int i = 0; i < nodeList.getLength(); i++) {
                 // System.out.println(nodeList.getLength());
@@ -84,7 +83,6 @@ public class B4_RoutingTables {
             selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
             selfMergerNode = new B4_Node(selfNodeID, selfIPAddress, selfPortAddress, selfTransport);
 
-
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
             for (int i = 0; i < nodeList1.getLength(); i++) {
                 // System.out.println(nodeList.getLength());
@@ -114,12 +112,9 @@ public class B4_RoutingTables {
                     neighbourTable[index1] = new B4_Node(nodeID, nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                 }
             }
-
         } catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();
         }
-
-
         setRoutingTable(routingTable);
         setSelfNodeID(selfMergerNode);
         setNeighbourTable(neighbourTable);
@@ -149,35 +144,4 @@ public class B4_RoutingTables {
         this.neighbourTable = neighbourTable;
     }
 
-    private int getRT_length() {
-        int routingTable_length = 0;
-        FileReader reader;
-        try {
-            reader = new FileReader("config.properties");
-            Properties properties = new Properties();
-            properties.load(reader);
-            String value = properties.getProperty("RT_length");
-            routingTable_length = Integer.parseInt(value);
-
-        } catch (IOException e) {
-            System.out.println("RT_length parameter not found in config file\n"+e);
-        }
-        return routingTable_length;
-    }
-
-    private int getNT_length() {
-        int neighbourTable_length = 0;
-        FileReader reader;
-        try {
-            reader = new FileReader("config.properties");
-            Properties properties = new Properties();
-            properties.load(reader);
-            String value = properties.getProperty("NT_length");
-            neighbourTable_length = Integer.parseInt(value);
-
-        } catch (IOException e) {
-            System.out.println("RT_length parameter not found in config file\n" + e);
-        }
-        return neighbourTable_length;
-    }
 }

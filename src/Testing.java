@@ -4,7 +4,7 @@ public class Testing {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();
 
-       rt.mergeRoutingTable("TestRoutingTable.xml", 0);
+      rt.mergeRoutingTable("TestRoutingTable.xml", 0);
        rt.mergeNeighbourTable("TestRoutingTable.xml", 0);
        rt.mergeRoutingTable("TestStorageLayerRT.xml", 1);
        rt.mergeNeighbourTable("TestStorageLayerRT.xml", 1);
@@ -16,7 +16,7 @@ public class Testing {
 //        rt.getRTTMergerTable("TestRoutingTable.xml");
 //        rt.rt_length();
 
-        rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());
+//        rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());
 
     }
 }
