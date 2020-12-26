@@ -3,14 +3,15 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ConfigData {
-   private int neighbourTableLength;
-   private int routingTableLength;
-   private long sleepTime;
-   private long incrementTime;
-   private B4_Node bootStrapNode;
-   private static ConfigData config;
+    private static ConfigData config;
+    private int neighbourTableLength;
+    private int routingTableLength;
+    private long sleepTime;
+    private long incrementTime;
+    private boolean layerAccess;
+    private B4_Node bootStrapNode;
 
-    private ConfigData(){};
+    private ConfigData() {};
 
     public static synchronized ConfigData getInstance() {
         if (config == null) {
@@ -44,8 +45,13 @@ public class ConfigData {
         return bootStrapNode;
     }
 
+    public boolean isLayerAccess(String layerName) {
+        layerAccess = serviceAccess(layerName);
+        return layerAccess;
+    }
+
     private int servicesInt(String key) {
-        int length =0;
+        int length = 0;
         FileReader reader;
         try {
             reader = new FileReader("config.properties");
@@ -60,8 +66,8 @@ public class ConfigData {
         return length;
     }
 
-    private long servicesLong (String key) {
-        long time =0;
+    private long servicesLong(String key) {
+        long time = 0;
         try {
             FileReader reader = new FileReader("config.properties");
             Properties properties = new Properties();
@@ -88,5 +94,21 @@ public class ConfigData {
         } catch (IOException e) {
             System.out.println("Config file not Found or Issue in config file fetching");
         }
+    }
+
+    private boolean serviceAccess(String serviceName) {
+        boolean access = false;
+        FileReader reader;
+        try {
+            reader = new FileReader("config.properties");
+            Properties properties = new Properties();
+            properties.load(reader);
+            String value = properties.getProperty(serviceName);
+            if (value.contentEquals("yes")) access = true;
+
+        } catch (IOException e) {
+            System.out.println("Service Not found in Config file\n" + e);
+        }
+        return access;
     }
 }

@@ -63,7 +63,7 @@ public class RoutingManager {
         storageRoutingTable = new B4_Node[rt_dimension][3];
         storageNeighbourTable = new B4_Node[nt_dimension];
         init("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
-        boolean access = serviceAccess("StorageAccess");
+        boolean access = config.isLayerAccess("StorageAccess");
         if (access) init("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
     }
 
@@ -760,27 +760,6 @@ public class RoutingManager {
     }
 
     /**
-     * @return B4_Node object
-     */
-    private B4_Node getBootStrapNodeID() {
-        B4_Node bootStrapNode = null;
-        try {
-            FileReader reader = new FileReader("config.properties");
-            Properties properties = new Properties();
-            properties.load(reader);
-            String bootStrapID = properties.getProperty("BootstrapND");
-            String bootStrapIP = properties.getProperty("BootstrapPvtIP");
-            String bootStrapPort = properties.getProperty("BootstrapPort");
-            String bootStrapAddress = properties.getProperty("BootstrapAddress");
-            bootStrapNode = new B4_Node(bootStrapID, bootStrapIP, bootStrapPort, bootStrapAddress);
-        } catch (IOException e) {
-            System.out.println("Config file not Found or Issue in config file fetching");
-            ;
-        }
-        return bootStrapNode;
-    }
-
-    /**
      * @param fileHeading
      * @param routingTable
      * @param neighbourTable <br>This function is used to convert the Routing Table in the form of an array to xml format
@@ -866,42 +845,6 @@ public class RoutingManager {
         } catch (ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * @param serviceName
-     * @return boolean
-     */
-    private boolean serviceAccess(String serviceName) {
-        boolean access = false;
-        FileReader reader;
-        try {
-            reader = new FileReader("config.properties");
-            Properties properties = new Properties();
-            properties.load(reader);
-            String value = properties.getProperty(serviceName);
-            if (value.contentEquals("yes")) access = true;
-
-        } catch (IOException e) {
-            System.out.println("Service Not found in Config file\n" + e);
-        }
-        return access;
-    }
-
-    private int getRT_length() {
-        int routingTable_length = 0;
-        FileReader reader;
-        try {
-            reader = new FileReader("config.properties");
-            Properties properties = new Properties();
-            properties.load(reader);
-            String value = properties.getProperty("RT_length");
-            routingTable_length = Integer.parseInt(value);
-
-        } catch (IOException e) {
-            System.out.println("RT_length parameter not found in config file\n" + e);
-        }
-        return routingTable_length;
     }
 
     /**
@@ -1029,38 +972,5 @@ public class RoutingManager {
     public B4_Node[] getStorageNeighbourTable() {
         return storageNeighbourTable;
     }
-
-    private long getIncrementTime () {
-        long increment_Time = 0;
-        try {
-            FileReader reader = new FileReader("config.properties");
-            Properties properties = new Properties();
-            properties.load(reader);
-            String inc_Time = properties.getProperty("Increment_time");
-            increment_Time = Long.parseLong(inc_Time);
-
-        } catch (IOException e) {
-            System.out.println("Config file not Found or Issue in config file fetching");
-
-        }
-        return increment_Time;
-    }
-
-    private long getSleepTime () {
-        long sleep_Time = 0;
-        try {
-            FileReader reader = new FileReader("config.properties");
-            Properties properties = new Properties();
-            properties.load(reader);
-            String slp_time = properties.getProperty("Sleep_time");
-            sleep_Time = Long.parseLong(slp_time);
-
-        } catch (IOException e) {
-            System.out.println("Config file not Found or Issue in config file fetching");
-
-        }
-        return sleep_Time;
-    }
-
 
 }
