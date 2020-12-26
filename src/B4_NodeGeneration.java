@@ -17,10 +17,7 @@ import java.util.Date;
 public class B4_NodeGeneration {
     private String NodeID;
     private static PublicKey publicKey;
-    private static PrivateKey privateKey;
     private String HashID;
-    private static KeyStore keyStore;
-    private static KeyPair keyPair;
 
     public String getNodeID() {
         return NodeID;
@@ -33,6 +30,20 @@ public class B4_NodeGeneration {
     public String getHashID() {
         return HashID;
     }
+
+    public B4_NodeGeneration() {
+        NodeCryptography nodeCryptography = NodeCryptography.getInstance();
+        publicKey = nodeCryptography.getPublicKey();
+        System.out.println(publicKey);
+    }
+    //get public key and convert it into 60 bit node id
+    // hash id signed using private key
+    //next data required is public key itself.
+
+    public cd cdvoid getNodeId(){
+
+    }
+
 
 
 }

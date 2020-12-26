@@ -1,7 +1,3 @@
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
@@ -20,18 +16,33 @@ public class NodeCryptography {
     private static PublicKey publicKey;
     private static PrivateKey privateKey;
     private static KeyStore keyStore;
-    private static KeyPair keyPair;
-    private static Provider provider = new BouncyCastleProvider();
+    private static final String CERTIFICATE_ALIAS = "B4_certificate";
+    private static final String CERTIFICATE_DN = "CN = cn , O = o, L =L ,ST = i1, C = c";
+    private static final String ALGORITHM = "RSA";
+    private static final String CERTIFICATE_NAME = "Node_Certificate.cr";
+    private static NodeCryptography nodeCryptography;
 
     private NodeCryptography() {
+        Provider provider = new BouncyCastleProvider();
         Security.addProvider(provider);
+    }
+
+    public static synchronized NodeCryptography getInstance() {
+        if (nodeCryptography == null) {
+            nodeCryptography = new NodeCryptography();
+        }
+        return nodeCryptography;
+    }
+
+    public  PublicKey getPublicKey() {
+        return publicKey;
     }
 
     private static void keyPairGeneration() {
         try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM, "BC");
             keyPairGenerator.initialize(2048, new SecureRandom());
-            keyPair = keyPairGenerator.generateKeyPair();
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
             System.out.println("Key Pair Generated");
@@ -48,18 +59,12 @@ public class NodeCryptography {
             FileOutputStream fos = new FileOutputStream("KeyStore.ks");
             keyStore.store(fos, keyStorePassword);
             fos.close();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void setToKeyStore() {
+    private static void savePrivateKeyToKeyStore() {
         char[] keyPassword = "123@abc".toCharArray();
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
         X509Certificate certificate = generateCertificate();
@@ -73,71 +78,45 @@ public class NodeCryptography {
         }
     }
 
-    @SuppressWarnings("deprecation")
-    private static X509Certificate generateCertificate() {
-        // build a certificate generator
-        X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-        X500Principal dnName = new X500Principal("cn=example");
-
-        // add some options
-        certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
-        certGen.setSubjectDN(new X509Name("dc=name"));
-        certGen.setIssuerDN(dnName); // use the same
-        // yesterday
-        certGen.setNotBefore(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000));
-        // in 2 years
-        certGen.setNotAfter(new Date(System.currentTimeMillis() + 2 * 365 * 24 * 60 * 60 * 1000));
-        certGen.setPublicKey(keyPair.getPublic());
-        certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
-        certGen.addExtension(X509Extensions.ExtendedKeyUsage, true,
-                new ExtendedKeyUsage(KeyPurposeId.id_kp_timeStamping));
-
-        // finally, sign the certificate with the private key of the same KeyPair
-        X509Certificate cert = null;
-        try {
-            cert = certGen.generate(keyPair.getPrivate(), "BC");
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        }
-        return cert;
-    }
-
     private static PrivateKey getFromKeyStore() {
         char[] keyPassword = "123@abc".toCharArray();
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
         KeyStore.PrivateKeyEntry privateKeyEntry = null;
         try {
             privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("Private Key", protectionParameter);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableEntryException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
+        } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableEntryException e) {
             e.printStackTrace();
         }
-        PrivateKey pvtKey = privateKeyEntry.getPrivateKey();
-        return pvtKey;
+        assert privateKeyEntry != null;
+        return privateKeyEntry.getPrivateKey();
     }
 
-    public static void main(String[] args) {
-        new NodeCryptography();
-        PrivateKey priKey;
-        keyPairGeneration();
-        keyStoreCreation();
-        setToKeyStore();
-        priKey = getFromKeyStore();
+    @SuppressWarnings("deprecation")
+    private static X509Certificate generateCertificate() {
+        // build a certificate generator
+        X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
+        X500Principal dnName = new X500Principal(CERTIFICATE_DN);
 
-        for (byte bytes : priKey.getEncoded()) {
-            String pri = String.format("%02x", bytes);
-            System.out.print(pri);
+        // add some options
+        certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
+        certGen.setSubjectDN(dnName);
+        certGen.setIssuerDN(dnName);
+        // Set not before Yesterday
+        certGen.setNotBefore(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000));
+        // Set not after 2 years
+        certGen.setNotAfter(new Date(System.currentTimeMillis() + 2L * 365 * 24 * 60 * 60 * 1000));
+        certGen.setPublicKey(publicKey);
+        certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
+        //certGen.addExtension(X509Extensions.ExtendedKeyUsage, true,new ExtendedKeyUsage(KeyPurposeId.id_kp_timeStamping));
+
+        // Finally, sign the certificate with the private key
+        X509Certificate cert = null;
+        try {
+            cert = certGen.generate(privateKey, "BC");
+        } catch (CertificateEncodingException | InvalidKeyException | NoSuchAlgorithmException | SignatureException | NoSuchProviderException e) {
+            e.printStackTrace();
         }
+        return cert;
     }
+
 }
