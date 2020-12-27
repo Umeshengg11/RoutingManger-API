@@ -13,18 +13,20 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 public class NodeCryptography {
-    private static PublicKey publicKey;
-    private static PrivateKey privateKey;
-    private static KeyStore keyStore;
-    private static final String CERTIFICATE_ALIAS = "B4_certificate";
-    private static final String CERTIFICATE_DN = "CN = cn , O = o, L =L ,ST = i1, C = c";
-    private static final String ALGORITHM = "RSA";
-    private static final String CERTIFICATE_NAME = "Node_Certificate.cr";
+    private PublicKey publicKey;
+    private PrivateKey privateKey;
+    private KeyStore keyStore;
+    private final String CERTIFICATE_DN = "CN = cn , O = o, L =L ,ST = i1, C = c";
+    private final String ALGORITHM = "RSA";
     private static NodeCryptography nodeCryptography;
 
     private NodeCryptography() {
         Provider provider = new BouncyCastleProvider();
         Security.addProvider(provider);
+        keyPairGeneration();
+        keyStoreCreation();
+        generateCertificate();
+        savePrivateKeyToKeyStore();
     }
 
     public static synchronized NodeCryptography getInstance() {
@@ -38,20 +40,20 @@ public class NodeCryptography {
         return publicKey;
     }
 
-    private static void keyPairGeneration() {
+    private void keyPairGeneration() {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM, "BC");
-            keyPairGenerator.initialize(2048, new SecureRandom());
+            keyPairGenerator.initialize(1024, new SecureRandom());
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
-            System.out.println("Key Pair Generated");
+            //System.out.println("Key Pair Generated");
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
 
-    private static void keyStoreCreation() {
+    private void keyStoreCreation() {
         try {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             char[] keyStorePassword = "123@abc".toCharArray();
@@ -64,7 +66,7 @@ public class NodeCryptography {
         }
     }
 
-    private static void savePrivateKeyToKeyStore() {
+    private void savePrivateKeyToKeyStore() {
         char[] keyPassword = "123@abc".toCharArray();
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
         X509Certificate certificate = generateCertificate();
@@ -78,21 +80,8 @@ public class NodeCryptography {
         }
     }
 
-    private static PrivateKey getFromKeyStore() {
-        char[] keyPassword = "123@abc".toCharArray();
-        KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
-        KeyStore.PrivateKeyEntry privateKeyEntry = null;
-        try {
-            privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("Private Key", protectionParameter);
-        } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableEntryException e) {
-            e.printStackTrace();
-        }
-        assert privateKeyEntry != null;
-        return privateKeyEntry.getPrivateKey();
-    }
-
     @SuppressWarnings("deprecation")
-    private static X509Certificate generateCertificate() {
+    private X509Certificate generateCertificate() {
         // build a certificate generator
         X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
         X500Principal dnName = new X500Principal(CERTIFICATE_DN);
@@ -119,4 +108,7 @@ public class NodeCryptography {
         return cert;
     }
 
+    public  KeyStore getKeyStore() {
+        return keyStore;
+    }
 }

@@ -4,21 +4,21 @@
  * The routingTable created will be array of this class (ie Nodes)
  */
 public class B4_Node {
-    private final String nodeID;
+    private final B4_NodeTupple b4node;
     private final String ipAddress;
     private final String portAddress;
     private final String transport;
     private float rtt;
 
-    public B4_Node(String nodeID, String ipAddress, String portAddress, String transport) {
-        this.nodeID = nodeID;
+    public B4_Node(B4_NodeTupple b4node, String ipAddress, String portAddress, String transport) {
+        this.b4node = b4node;
         this.ipAddress = ipAddress;
         this.portAddress = portAddress;
         this.transport = transport;
     }
 
-    public B4_Node(String nodeID, String ipAddress, String portAddress, String transport, float rtt) {
-        this.nodeID = nodeID;
+    public B4_Node(B4_NodeTupple b4node, String ipAddress, String portAddress, String transport, float rtt) {
+        this.b4node = b4node;
         this.ipAddress = ipAddress;
         this.portAddress = portAddress;
         this.transport = transport;
@@ -29,8 +29,8 @@ public class B4_Node {
         return rtt;
     }
 
-    public String getNodeID() {
-        return nodeID;
+    public B4_NodeTupple getB4node() {
+        return b4node;
     }
 
     public String getIpAddress() {
