@@ -4,14 +4,13 @@ import java.util.Properties;
 
 public class ConfigData {
     private static ConfigData config;
-    private int neighbourTableLength;
-    private int routingTableLength;
     private long sleepTime;
-    private long incrementTime;
-    private boolean layerAccess;
     private B4_Node bootStrapNode;
+    private final NodeCryptography nodeCryptography;
 
-    private ConfigData() {};
+    private ConfigData() {
+        nodeCryptography = NodeCryptography.getInstance();
+    }
 
     public static synchronized ConfigData getInstance() {
         if (config == null) {
@@ -21,13 +20,11 @@ public class ConfigData {
     }
 
     public int getNeighbourTableLength() {
-        neighbourTableLength = servicesInt("NT_length");
-        return neighbourTableLength;
+        return servicesInt("NT_length");
     }
 
     public int getRoutingTableLength() {
-        routingTableLength = servicesInt("RT_length");
-        return routingTableLength;
+        return servicesInt("RT_length");
     }
 
     public long getSleepTime() {
@@ -36,8 +33,7 @@ public class ConfigData {
     }
 
     public long getIncrementTime() {
-        incrementTime = servicesLong("Increment_time");
-        return incrementTime;
+        return servicesLong("Increment_time");
     }
 
     public B4_Node getBootStrapNode() {
@@ -46,8 +42,7 @@ public class ConfigData {
     }
 
     public boolean isLayerAccess(String layerName) {
-        layerAccess = serviceAccess(layerName);
-        return layerAccess;
+        return serviceAccess(layerName);
     }
 
     private int servicesInt(String key) {
@@ -87,10 +82,12 @@ public class ConfigData {
             Properties properties = new Properties();
             properties.load(reader);
             String bootStrapID = properties.getProperty("BootstrapND");
+            String bootStrapPub = properties.getProperty("BootstrapPubKey");
+            String bootStrapHash = properties.getProperty("BootstrapHashID");
             String bootStrapIP = properties.getProperty("BootstrapPvtIP");
             String bootStrapPort = properties.getProperty("BootstrapPort");
             String bootStrapAddress = properties.getProperty("BootstrapAddress");
-            bootStrapNode = new B4_Node(bootStrapID, bootStrapIP, bootStrapPort, bootStrapAddress);
+            bootStrapNode = new B4_Node(new B4_NodeTupple(bootStrapID,nodeCryptography.strToPub(bootStrapPub),bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
         } catch (IOException e) {
             System.out.println("Config file not Found or Issue in config file fetching");
         }

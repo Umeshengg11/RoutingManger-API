@@ -10,14 +10,15 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 
 public class NodeCryptography {
     private PublicKey publicKey;
     private PrivateKey privateKey;
     private KeyStore keyStore;
-    private final String CERTIFICATE_DN = "CN = cn , O = o, L =L ,ST = i1, C = c";
-    private final String ALGORITHM = "RSA";
     private static NodeCryptography nodeCryptography;
 
     private NodeCryptography() {
@@ -42,6 +43,7 @@ public class NodeCryptography {
 
     private void keyPairGeneration() {
         try {
+            String ALGORITHM = "RSA";
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM, "BC");
             keyPairGenerator.initialize(1024, new SecureRandom());
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
@@ -84,6 +86,7 @@ public class NodeCryptography {
     private X509Certificate generateCertificate() {
         // build a certificate generator
         X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
+        String CERTIFICATE_DN = "CN = cn , O = o, L =L ,ST = i1, C = c";
         X500Principal dnName = new X500Principal(CERTIFICATE_DN);
 
         // add some options
@@ -110,5 +113,37 @@ public class NodeCryptography {
 
     public  KeyStore getKeyStore() {
         return keyStore;
+    }
+
+    public PublicKey strToPub(String str){
+        PublicKey publicKey = null;
+        //converting string to byte initially and then back to public key
+        byte[] bytePub1 = Base64.getDecoder().decode(str);
+        if (str.equals("")){
+            publicKey=null;
+            return publicKey;
+        }
+        KeyFactory factory;
+        try {
+            factory = KeyFactory.getInstance("RSA");
+            publicKey = factory.generatePublic(new X509EncodedKeySpec(bytePub1));
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return publicKey;
+    }
+
+    public String pubToStr(PublicKey key){
+        String strPub=null;
+        PublicKey publicKey1 = null;
+        //converting public key to byte[] and then convert it in to string
+        if(key==null){
+            strPub = "";
+            return  strPub;
+        }
+        byte[] bytePub = key.getEncoded();
+        strPub = Base64.getEncoder().encodeToString(bytePub);
+        //System.out.println("String format is   "+strPub);
+        return strPub;
     }
 }

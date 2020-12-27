@@ -1,9 +1,9 @@
 import java.security.PublicKey;
 
 public class B4_NodeTupple {
-    private String nodeID;
-    private PublicKey publicKey;
-    private String hashID;
+    private final String nodeID;
+    private final PublicKey publicKey;
+    private final String hashID;
 
     public B4_NodeTupple(String nodeID, PublicKey publicKey, String hashID) {
         this.nodeID = nodeID;
@@ -15,23 +15,12 @@ public class B4_NodeTupple {
         return nodeID;
     }
 
-    public void setNodeID(String nodeID) {
-        this.nodeID = nodeID;
-    }
-
     public PublicKey getPublicKey() {
         return publicKey;
-    }
-
-    public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
     }
 
     public String getHashID() {
         return hashID;
     }
 
-    public void setHashID(String hashID) {
-        this.hashID = hashID;
-    }
 }

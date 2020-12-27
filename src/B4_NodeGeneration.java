@@ -3,9 +3,9 @@ import java.security.*;
 
 public class B4_NodeGeneration {
     private String nodeID;
-    private PublicKey publicKey;
+    private final PublicKey publicKey;
     private String hashID;
-    private NodeCryptography nodeCryptography;
+    private final NodeCryptography nodeCryptography;
     private byte[] signatureData;
     private static B4_NodeGeneration b4_nodeGeneration;
 
