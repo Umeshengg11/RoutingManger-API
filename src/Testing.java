@@ -20,6 +20,7 @@ public class Testing {
 //        System.out.println(b4_nodeGeneration.getHashID());
 //        System.out.println(b4_nodeGeneration.getPublicKey());
 //        System.out.println(b4_nodeGeneration.getNodeID());
+       // rt.getRTTMergerTable("TestStorageLayerRT.xml",1);
 
     }
 }

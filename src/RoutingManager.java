@@ -251,7 +251,7 @@ public class RoutingManager {
         B4_Node selfMergerNode = null;
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
         String mergerNodeID = selfNodeOfMergerTable.getB4node().getNodeID();
-        String fileName = "RcvRTT_" + mergerNodeID;
+        String fileName = "RcvRTT_"+layerID+"_" + mergerNodeID;
         File rttFile = new File(fileName + ".xml");
         rttFileExists = rttFile.exists();
         if (!rttFileExists) {
@@ -357,7 +357,7 @@ public class RoutingManager {
     /**
      * @param mergerTableDataFile
      */
-    public void getRTTMergerTable(String mergerTableDataFile) {
+    public void getRTTMergerTable(String mergerTableDataFile,int layerID) {
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
         B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile);
 
@@ -397,11 +397,11 @@ public class RoutingManager {
 
                 Element nodePub = doc.createElement("PUBLICKEY");
                 nodePub.appendChild(doc.createTextNode(nodeCryptography.pubToStr(mergerNeighbourTable[i].getB4node().getPublicKey())));
-                row1.appendChild(nodeID);
+                row1.appendChild(nodePub);
 
                 Element hashID = doc.createElement("HASHID");
                 hashID.appendChild(doc.createTextNode(mergerNeighbourTable[i].getB4node().getHashID()));
-                row1.appendChild(nodeID);
+                row1.appendChild(hashID);
 
                 Element nodeIP = doc.createElement("NODEIP");
                 nodeIP.appendChild(doc.createTextNode(mergerNeighbourTable[i].getIpAddress()));
@@ -424,7 +424,7 @@ public class RoutingManager {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(doc);
 
-            StreamResult streamResult = new StreamResult(new File("GetRTT_" + selfNodeIdMerger + ".xml"));
+            StreamResult streamResult = new StreamResult(new File("GetRTT_"+layerID+"_" + selfNodeIdMerger+ ".xml"));
             transformer.transform(domSource, streamResult);
             System.out.println("getRTT File is created");
 
