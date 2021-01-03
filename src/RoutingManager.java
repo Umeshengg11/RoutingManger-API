@@ -8,17 +8,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +31,7 @@ public class RoutingManager {
     private final B4_Node[] storageNeighbourTable;
     private B4_Node localNode;
     private final NodeCryptography nodeCryptography;
-    private final B4_NodeGeneration b4_nodeGeneration;
+    private B4_NodeGeneration b4_nodeGeneration;
     private final int rt_dimension;
     private final int nt_dimension;
     private final long incrementTime;
@@ -53,7 +48,39 @@ public class RoutingManager {
      */
     private RoutingManager() {
         nodeCryptography = NodeCryptography.getInstance();
-        b4_nodeGeneration = B4_NodeGeneration.getInstance();
+
+        boolean nodeDetailsExists;
+        File nodeFile = new File("NodeDetails.txt");
+        nodeDetailsExists = nodeFile.exists();
+
+        if (!nodeDetailsExists) {
+            b4_nodeGeneration = new B4_NodeGeneration();
+            try {
+                FileWriter writer = new FileWriter("NodeDetails.txt");
+                PrintWriter printWriter = new PrintWriter(writer);
+                printWriter.println(b4_nodeGeneration.getNodeID());
+                printWriter.println(nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
+                printWriter.println(b4_nodeGeneration.getHashID());
+                printWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader("NodeDetails.txt"));
+                String[] details = new String[3];
+                String line;
+                int i = 0;
+                while ((line = bufferedReader.readLine())!=null){
+                    details[i] = line;
+                    i=i+1;
+                }
+                b4_nodeGeneration = new B4_NodeGeneration(details[0],nodeCryptography.strToPub(details[1]),details[2]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         config = ConfigData.getInstance();
         rt_dimension = config.getRoutingTableLength();
         nt_dimension = config.getNeighbourTableLength();

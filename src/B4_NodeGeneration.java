@@ -2,28 +2,35 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 public class B4_NodeGeneration {
-    private String nodeID;
+    private final String nodeID;
     private final PublicKey publicKey;
-    private String hashID;
-    private final NodeCryptography nodeCryptography;
+    private final String hashID;
+    private NodeCryptography nodeCryptography;
     private byte[] signatureData;
     private static B4_NodeGeneration b4_nodeGeneration;
 
-    private B4_NodeGeneration() {
+    public B4_NodeGeneration() {
         nodeCryptography = NodeCryptography.getInstance();
         publicKey = nodeCryptography.getPublicKey();
-        generateNodeId();
-        signNodeId();
+        nodeID = generateNodeId();
+        hashID = signNodeId();
     }
 
-    public static synchronized B4_NodeGeneration getInstance() {
-        if (b4_nodeGeneration == null) {
-            b4_nodeGeneration = new B4_NodeGeneration();
-        }
-        return b4_nodeGeneration;
+    public B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
+        this.nodeID = nodeID;
+        this.publicKey = publicKey;
+        this.hashID = hashID;
     }
 
-    private void generateNodeId() {
+//    public static synchronized B4_NodeGeneration getInstance() {
+//        if (b4_nodeGeneration == null) {
+//            b4_nodeGeneration = new B4_NodeGeneration();
+//        }
+//        return b4_nodeGeneration;
+//    }
+
+    private String generateNodeId() {
+        String node1ID=null;
         StringBuilder publicKeyToString = new StringBuilder();
         for (byte bytes : publicKey.getEncoded()) {
             publicKeyToString.append(String.format("%02x", bytes).toUpperCase());
@@ -41,14 +48,16 @@ public class B4_NodeGeneration {
                 hexString.append(String.format("%02x", bytes).toUpperCase());
             }
             //System.out.println(hexString);
-            nodeID = hexString.toString();
+            node1ID = hexString.toString();
             //System.out.println("nodeID"+nodeID);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+        return node1ID;
     }
 
-    private void signNodeId() {
+    private String signNodeId() {
+        String hash1ID = null;
         StringBuilder signData = new StringBuilder();
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
         try {
@@ -60,11 +69,12 @@ public class B4_NodeGeneration {
             for (byte bytes : signatureData) {
                 signData.append(String.format("%02x", bytes).toUpperCase());
             }
-            hashID = signData.toString();
+            hash1ID = signData.toString();
 
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
         }
+        return hash1ID;
     }
 
     private boolean verifySignature() {
