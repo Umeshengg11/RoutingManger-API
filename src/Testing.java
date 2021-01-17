@@ -1,11 +1,18 @@
+import java.io.File;
 import java.io.IOException;
 
 public class Testing {
     public static void main(String[] args) throws IOException, InterruptedException {
-        RoutingManager rt = RoutingManager.getInstance();
+        RoutingManagerBuffer buffer = RoutingManagerBuffer.getInstance();
+        CreateXMLWithEntry makeXML = new CreateXMLWithEntry();
+        buffer.addFileToBuffer(makeXML.createXML());
 
-      rt.mergeRoutingTable("TestRoutingTable.xml", 0);
-       rt.mergeNeighbourTable("TestRoutingTable.xml", 0);
+
+        RoutingManager rt = RoutingManager.getInstance();
+        File file = buffer.fetchFileFromBuffer();
+
+      rt.mergeRoutingTable(file, 0);
+       rt.mergeNeighbourTable(file, 0);
 //       rt.mergeRoutingTable("TestStorageLayerRT.xml", 1);
 //       rt.mergeNeighbourTable("TestStorageLayerRT.xml", 1);
 //        B4_Node node = rt.findNextHop("6588DBAA1286821A9B66AEDA0CA7BBA29DEA9C9C", 0);

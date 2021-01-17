@@ -13,7 +13,7 @@ public class B4_NodeGeneration {
         nodeCryptography = NodeCryptography.getInstance();
         publicKey = nodeCryptography.getPublicKey();
         nodeID = generateNodeId();
-        hashID = signNodeId();
+        hashID = signNodeIdUsingPrivateKey();
     }
 
     public B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
@@ -56,7 +56,7 @@ public class B4_NodeGeneration {
         return node1ID;
     }
 
-    private String signNodeId() {
+    private String signNodeIdUsingPrivateKey() {
         String hash1ID = null;
         StringBuilder signData = new StringBuilder();
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);

@@ -11,17 +11,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
 
 public class CreateXMLWithEntry {
-    public static void main(String[] args) {
+    public static File createXML() {
         String selfNodeId = "7589ABAA1234ABA1234591111ABCDFE123456789";
         PublicKey selfPublicKey = keyPairGeneration();
         String selfHashID = "7589ABAA1234ABA1234591111ABCDFE1234567897589ABAA1234ABA1234591111ABCDFE123456789";
@@ -43,7 +41,7 @@ public class CreateXMLWithEntry {
                 testPublicKey = keyPairGeneration();
                 testHashId = getNodeID()+""+getNodeID();
                 testNodeIP = getIPaddress();
-                testRoutingtable[i][j] = new B4_Node(new B4_NodeTupple(testNodeID,testPublicKey,testHashId), testNodeIP, (testNodePort + i + j) + "", testTransport);
+                testRoutingtable[i][j] = new B4_Node(new B4_NodeTuple(testNodeID,testPublicKey,testHashId), testNodeIP, (testNodePort + i + j) + "", testTransport);
             }
         }
 
@@ -52,7 +50,7 @@ public class CreateXMLWithEntry {
             testNodeIP = getIPaddress();
             testPublicKey = keyPairGeneration();
             testHashId = getNodeID()+""+getNodeID();
-            testNeighbourTable[i] = new B4_Node(new B4_NodeTupple(testNodeID,testPublicKey,testHashId), testNodeIP, (testNodePort + i) + "", (testTransport), (rtt + i));
+            testNeighbourTable[i] = new B4_Node(new B4_NodeTuple(testNodeID,testPublicKey,testHashId), testNodeIP, (testNodePort + i) + "", (testTransport), (rtt + i));
         }
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -154,6 +152,9 @@ public class CreateXMLWithEntry {
             e.printStackTrace();
         }
 
+        File file1 = new File("TestStorageLayerRT.xml");
+        return file1;
+
     }
 
     public static String getNodeID() {
@@ -222,4 +223,13 @@ public class CreateXMLWithEntry {
         return publicKey;
     }
 
+    public static void main(String[] args) {
+        RoutingManagerBuffer buffer = RoutingManagerBuffer.getInstance();
+        buffer.addFileToBuffer(createXML());
+        buffer.addFileToBuffer(createXML());
+        buffer.addFileToBuffer(createXML());
+        System.out.println(buffer.getInputRoutingBuffer().add(createXML()));
+        System.out.println(buffer.getInputRoutingBuffer().size());
+
+    }
 }

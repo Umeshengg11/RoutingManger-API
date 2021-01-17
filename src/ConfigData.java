@@ -87,7 +87,7 @@ public class ConfigData {
             String bootStrapIP = properties.getProperty("BootstrapPvtIP");
             String bootStrapPort = properties.getProperty("BootstrapPort");
             String bootStrapAddress = properties.getProperty("BootstrapAddress");
-            bootStrapNode = new B4_Node(new B4_NodeTupple(bootStrapID,nodeCryptography.strToPub(bootStrapPub),bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
+            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID,nodeCryptography.strToPub(bootStrapPub),bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
         } catch (IOException e) {
             System.out.println("Config file not Found or Issue in config file fetching");
         }

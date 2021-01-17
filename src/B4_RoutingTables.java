@@ -66,7 +66,7 @@ public class B4_RoutingTables {
                     matcher.find();
                     int index2 = Integer.parseInt(matcher.group(1));
                     //System.out.println(index1 + " " + index2);
-                    routingTable[index1][index2] = new B4_Node(new B4_NodeTupple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
+                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
                 }
             }
             doc.getDocumentElement().normalize();
@@ -76,7 +76,7 @@ public class B4_RoutingTables {
             String selfIPAddress = doc.getDocumentElement().getAttribute("SELF_IP_ADDRESS");
             String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
             String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
-            selfMergerNode = new B4_Node(new B4_NodeTupple(selfNodeID,nodeCryptography.strToPub(selfNodePub),selfNodeHash), selfIPAddress, selfPortAddress, selfTransport);
+            selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID,nodeCryptography.strToPub(selfNodePub),selfNodeHash), selfIPAddress, selfPortAddress, selfTransport);
 
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
             for (int i = 0; i < nodeList1.getLength(); i++) {
@@ -106,7 +106,7 @@ public class B4_RoutingTables {
                     matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
                     //System.out.println(index1);
-                    neighbourTable[index1] = new B4_Node(new B4_NodeTupple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {

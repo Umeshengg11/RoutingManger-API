@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by S/L Umesh U Nair
- * <br>Aim is to create an Routing Manager API for Brehaspati-4
+ * <br>Aim is to create an Routing Manager API for Brahaspati-4
  */
 public class RoutingManager {
     private static RoutingManager routingManager;
@@ -113,7 +113,7 @@ public class RoutingManager {
             /* Routing Table */
             for (int i = 0; i < rt_dimension; i++) {
                 for (int j = 0; j < 3; j++) {
-                    routingTable[i][j] = new B4_Node(new B4_NodeTupple("",null,""), "", "", "");
+                    routingTable[i][j] = new B4_Node(new B4_NodeTuple("",null,""), "", "", "");
                 }
             }
             B4_Node bootStrapNode = config.getBootStrapNode();
@@ -121,7 +121,7 @@ public class RoutingManager {
 
             /* Neighbour Table */
             for (int i = 0; i < nt_dimension; i++) {
-                neighbourTable[i] = new B4_Node(new B4_NodeTupple("",null,""), "", "", "", -1);
+                neighbourTable[i] = new B4_Node(new B4_NodeTuple("",null,""), "", "", "", -1);
             }
             localBaseTablesToXML(rtFileName, routingTable, neighbourTable);
 
@@ -161,7 +161,7 @@ public class RoutingManager {
                         int index1 = Integer.parseInt(matcher.group(1));
                         matcher.find();
                         int index2 = Integer.parseInt(matcher.group(1));
-                        routingTable[index1][index2] = new B4_Node(new B4_NodeTupple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
+                        routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
                     }
                 }
                 NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
@@ -187,7 +187,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         int index1 = Integer.parseInt(matcher.group(1));
-                        neighbourTable[index1] = new B4_Node(new B4_NodeTupple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                        neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
             } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
@@ -213,7 +213,7 @@ public class RoutingManager {
      * <br>Presently it is hardcoded (will be ammended later).
      */
     private void setLocalNode() {
-        localNode = new B4_Node(new B4_NodeTupple(b4_nodeGeneration.getNodeID(),b4_nodeGeneration.getPublicKey(),b4_nodeGeneration.getHashID()), "192.168.0.105", "6666", "TCP");
+        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(),b4_nodeGeneration.getPublicKey(),b4_nodeGeneration.getHashID()), "192.168.0.105", "6666", "TCP");
     }
 
     /**
@@ -226,7 +226,7 @@ public class RoutingManager {
     }
 
     /**
-     * @param mergerTableDataFile
+     * @param fileFromBuffer
      * @param layerID             <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
      *                            <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
      *                            <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
@@ -234,7 +234,7 @@ public class RoutingManager {
      *                            Array at which the data is to be updated.
      *                            <br>Based on the algorithm the B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
      */
-    public void mergeRoutingTable(String mergerTableDataFile, int layerID) {
+    public void mergeRoutingTable(File fileFromBuffer, int layerID) {
 
         B4_Node[][] routingTableLayer = null;
         if (layerID == 0) {
@@ -242,8 +242,8 @@ public class RoutingManager {
         } else if (layerID == 1) {
             routingTableLayer = storageRoutingTable;
         }
-        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
-        B4_Node[][] mergerRoutingTable = getMergerRoutingTable(mergerTableDataFile);
+        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
+        B4_Node[][] mergerRoutingTable = getMergerRoutingTable(fileFromBuffer.getAbsolutePath());
 
         mergerRT(selfNodeOfMergerTable, routingTableLayer);
         for (int i = 0; i < rt_dimension; i++) {
@@ -262,10 +262,10 @@ public class RoutingManager {
     }
 
     /**
-     * @param mergerTableDataFile
+     * @param fileFromBuffer
      * @param layerID
      */
-    public void mergeNeighbourTable(String mergerTableDataFile, int layerID) {
+    public void mergeNeighbourTable(File fileFromBuffer, int layerID) {
         B4_Node[] neighbourTable = null;
         if (layerID == 0) {
             neighbourTable = localBaseNeighbourTable;
@@ -276,7 +276,7 @@ public class RoutingManager {
         boolean rttFileExists;
         B4_Node[] mergerNeighbourTable = new B4_Node[nt_dimension];
         B4_Node selfMergerNode = null;
-        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
+        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         String mergerNodeID = selfNodeOfMergerTable.getB4node().getNodeID();
         String fileName = "RcvRTT_"+layerID+"_" + mergerNodeID;
         File rttFile = new File(fileName + ".xml");
@@ -301,7 +301,7 @@ public class RoutingManager {
                 String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
                 String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
                 String selfRTT = doc.getDocumentElement().getAttribute("SELF_RTT");
-                selfMergerNode = new B4_Node(new B4_NodeTupple(selfNodeID,nodeCryptography.strToPub(selfNodePub),selfNodeHash), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
+                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID,nodeCryptography.strToPub(selfNodePub),selfNodeHash), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
 
                 NodeList nodeList = doc.getElementsByTagName("NEIGHBOUR");
                 for (int i = 0; i < nodeList.getLength(); i++) {
@@ -325,7 +325,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         int index1 = Integer.parseInt(matcher.group(1));
-                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTupple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -925,7 +925,7 @@ public class RoutingManager {
         Thread purgeThread = new Thread(() -> {
             System.out.println("Thread is started");
             //count will decide the number of times the while loop will run.
-            //I have choosen count value four here.It can be changed to any other value depending on the requirment
+            //I have chosen count value four here.It can be changed to any other value depending on the requirment
             int count = 0;
             int dataPurged_RT = 0;
             int dataPurged_Neighbour = 0;
