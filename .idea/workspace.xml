@@ -20,30 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="995d29c0-2f21-4f28-b5c1-234591841a40" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/RoutingManagerBuffer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BaseRoutingTable.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BaseRoutingTable.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KeyStore.ks" beforeDir="false" afterPath="$PROJECT_DIR$/KeyStore.ks" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NodeDetails.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/StorageRoutingTable.xml" beforeDir="false" afterPath="$PROJECT_DIR$/StorageRoutingTable.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestRoutingTable.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestStorageLayerRT.xml" beforeDir="false" afterPath="$PROJECT_DIR$/TestStorageLayerRT.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_Node.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_Node.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_NodeGeneration.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_NodeGeneration.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_NodeTupple.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_RoutingTables.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_RoutingTables.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/ConfigData.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/ConfigData.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/CreateXMLWithEntry.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/CreateXMLWithEntry.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/RoutingManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/RoutingManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/Testing.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/Testing.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/B4_Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/B4_Node.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/B4_NodeGeneration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/B4_NodeGeneration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/B4_NodeTupple.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/B4_NodeTuple.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/B4_RoutingTables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/B4_RoutingTables.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ConfigData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ConfigData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CreateXMLWithEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CreateXMLWithEntry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RoutingManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RoutingManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Testing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Testing.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
