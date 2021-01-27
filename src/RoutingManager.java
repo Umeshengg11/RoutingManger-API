@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by S/L Umesh U Nair
- * <br>Aim is to create an Routing Manager API for Brahaspati-4
+ * <br>Aim is to create an Routing Manager API for Brihaspati-4
  */
 public class RoutingManager {
     private static RoutingManager routingManager;
@@ -48,7 +48,6 @@ public class RoutingManager {
      */
     private RoutingManager() {
         nodeCryptography = NodeCryptography.getInstance();
-
         boolean nodeDetailsExists;
         File nodeFile = new File("NodeDetails.txt");
         nodeDetailsExists = nodeFile.exists();
@@ -65,7 +64,6 @@ public class RoutingManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         } else {
             try {
                 BufferedReader bufferedReader = new BufferedReader(new FileReader("NodeDetails.txt"));
@@ -210,7 +208,7 @@ public class RoutingManager {
 
     /**
      * This method is used for setting Local Node information.
-     * <br>Presently it is hardcoded (will be ammended later).
+     * <br>Presently it is hardcoded (will be amended later).
      */
     private void setLocalNode() {
         localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(),b4_nodeGeneration.getPublicKey(),b4_nodeGeneration.getHashID()), "192.168.0.105", "6666", "TCP");
