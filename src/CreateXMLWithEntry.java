@@ -223,13 +223,13 @@ public class CreateXMLWithEntry {
         return publicKey;
     }
 
-    public static void main(String[] args) {
-        RoutingManagerBuffer buffer = RoutingManagerBuffer.getInstance();
-        buffer.addFileToBuffer(createXML());
-        buffer.addFileToBuffer(createXML());
-        buffer.addFileToBuffer(createXML());
-        System.out.println(buffer.getInputRoutingBuffer().add(createXML()));
-        System.out.println(buffer.getInputRoutingBuffer().size());
+//    public static void main(String[] args) {
+//        RoutingManagerBuffer buffer = RoutingManagerBuffer.getInstance();
+//        buffer.addFileToBuffer(createXML());
+//        buffer.addFileToBuffer(createXML());
+//        buffer.addFileToBuffer(createXML());
+//        System.out.println(buffer.getInputRoutingBuffer().add(createXML()));
+//        System.out.println(buffer.getInputRoutingBuffer().size());
 
-    }
+   // }
 }

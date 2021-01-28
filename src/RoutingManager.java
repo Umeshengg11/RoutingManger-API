@@ -18,13 +18,13 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Created by S/L Umesh U Nair
  * <br>Aim is to create an Routing Manager API for Brihaspati-4
  */
 public class RoutingManager {
     private static RoutingManager routingManager;
+    private static RoutingManagerBuffer routingManagerBuffer;
     private static ConfigData config;
     private final B4_Node[][] localBaseRoutingTable;
     private final B4_Node[] localBaseNeighbourTable;
@@ -41,7 +41,6 @@ public class RoutingManager {
     private String selfTransportAddress;
     private String selfPortAddress;
 
-
     /**
      * Constructor
      * <br>Main job of constructor are as follows:-
@@ -53,6 +52,7 @@ public class RoutingManager {
      */
     private RoutingManager() {
         nodeCryptography = NodeCryptography.getInstance();
+        routingManagerBuffer = RoutingManagerBuffer.getInstance();
         boolean nodeDetailsExists;
         File nodeFile = new File("NodeDetails.txt");
         nodeDetailsExists = nodeFile.exists();
@@ -64,9 +64,9 @@ public class RoutingManager {
                 PrintWriter printWriter = new PrintWriter(writer);
                 printWriter.println("#  Self Node Details  #");
                 printWriter.println("..................................");
-                printWriter.println("NodeID="+b4_nodeGeneration.getNodeID());
-                printWriter.println("PublicKey="+nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
-                printWriter.println("HashID="+b4_nodeGeneration.getHashID());
+                printWriter.println("NodeID=" + b4_nodeGeneration.getNodeID());
+                printWriter.println("PublicKey=" + nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
+                printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
                 printWriter.println("IPAddress=191.126.10.12");
                 printWriter.println("PortAddress=1024");
                 printWriter.println("TransportAddress=TCP");
@@ -86,8 +86,8 @@ public class RoutingManager {
                 selfIPAddress = properties.getProperty("IPAddress");
                 selfPortAddress = properties.getProperty("PortAddress");
                 selfTransportAddress = properties.getProperty("TransportAddress");
-                System.out.println(selfIPAddress+"   "+selfPortAddress+"   "+selfTransportAddress+"   "+selfNodeID);
-                b4_nodeGeneration = new B4_NodeGeneration(selfNodeID,nodeCryptography.strToPub(selfPublicKey),selfHashID);
+                //System.out.println(selfIPAddress+"   "+selfPortAddress+"   "+selfTransportAddress+"   "+selfNodeID);
+                b4_nodeGeneration = new B4_NodeGeneration(selfNodeID, nodeCryptography.strToPub(selfPublicKey), selfHashID);
 
 
             } catch (IOException e) {
@@ -126,7 +126,7 @@ public class RoutingManager {
             /* Routing Table */
             for (int i = 0; i < rt_dimension; i++) {
                 for (int j = 0; j < 3; j++) {
-                    routingTable[i][j] = new B4_Node(new B4_NodeTuple("",null,""), "", "", "");
+                    routingTable[i][j] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "");
                 }
             }
             B4_Node bootStrapNode = config.getBootStrapNode();
@@ -134,7 +134,7 @@ public class RoutingManager {
 
             /* Neighbour Table */
             for (int i = 0; i < nt_dimension; i++) {
-                neighbourTable[i] = new B4_Node(new B4_NodeTuple("",null,""), "", "", "", -1);
+                neighbourTable[i] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "", -1);
             }
             localBaseTablesToXML(rtFileName, routingTable, neighbourTable);
 
@@ -174,7 +174,7 @@ public class RoutingManager {
                         int index1 = Integer.parseInt(matcher.group(1));
                         matcher.find();
                         int index2 = Integer.parseInt(matcher.group(1));
-                        routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
+                        routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport);
                     }
                 }
                 NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
@@ -200,7 +200,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         int index1 = Integer.parseInt(matcher.group(1));
-                        neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                        neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
             } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
@@ -222,14 +222,6 @@ public class RoutingManager {
     }
 
     /**
-     * This method is used for setting Local Node information.
-     * <br>Presently it is hardcoded (will be amended later).
-     */
-    private void setLocalNode() {
-        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(),b4_nodeGeneration.getPublicKey(),b4_nodeGeneration.getHashID()), selfIPAddress, selfPortAddress, selfTransportAddress);
-    }
-
-    /**
      * @return B4_Node Object
      * <br>This method is used for getting Local Node Information.
      * <br>This method can be called by any function to get complete information about the current Node.
@@ -240,12 +232,12 @@ public class RoutingManager {
 
     /**
      * @param fileFromBuffer
-     * @param layerID             <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
-     *                            <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
-     *                            <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
-     *                            <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
-     *                            Array at which the data is to be updated.
-     *                            <br>Based on the algorithm the B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
+     * @param layerID        <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
+     *                       <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
+     *                       <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
+     *                       <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
+     *                       Array at which the data is to be updated.
+     *                       <br>Based on the algorithm the B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
      */
     public void mergeRoutingTable(File fileFromBuffer, int layerID) {
 
@@ -291,7 +283,7 @@ public class RoutingManager {
         B4_Node selfMergerNode = null;
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         String mergerNodeID = selfNodeOfMergerTable.getB4node().getNodeID();
-        String fileName = "RcvRTT_"+layerID+"_" + mergerNodeID;
+        String fileName = "RcvRTT_" + layerID + "_" + mergerNodeID;
         File rttFile = new File(fileName + ".xml");
         rttFileExists = rttFile.exists();
         if (!rttFileExists) {
@@ -314,7 +306,7 @@ public class RoutingManager {
                 String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
                 String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
                 String selfRTT = doc.getDocumentElement().getAttribute("SELF_RTT");
-                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID,nodeCryptography.strToPub(selfNodePub),selfNodeHash), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
+                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub), selfNodeHash), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
 
                 NodeList nodeList = doc.getElementsByTagName("NEIGHBOUR");
                 for (int i = 0; i < nodeList.getLength(); i++) {
@@ -338,7 +330,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         int index1 = Integer.parseInt(matcher.group(1));
-                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID,nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -352,9 +344,8 @@ public class RoutingManager {
                     neighbourTable[i] = selfMergerNode;
                     break;
                 } else if (neighbourTable[i].getRtt() <= selfMergerNode.getRtt()) {
-                    continue;
                 } else {
-                    for (int j = nt_dimension-1; j >= i + 1; j--) {
+                    for (int j = nt_dimension - 1; j >= i + 1; j--) {
                         neighbourTable[j] = neighbourTable[j - 1];
                     }
                     neighbourTable[i] = selfMergerNode;
@@ -368,9 +359,8 @@ public class RoutingManager {
                         neighbourTable[j] = mergerNeighbourTable[i];
                         break;
                     } else if (mergerNeighbourTable[i].getRtt() >= neighbourTable[j].getRtt()) {
-                        continue;
                     } else {
-                        for (int k = nt_dimension-1; k >= j + 1; k--) {
+                        for (int k = nt_dimension - 1; k >= j + 1; k--) {
                             neighbourTable[k] = neighbourTable[k - 1];
                         }
                         neighbourTable[j] = mergerNeighbourTable[i];
@@ -397,7 +387,7 @@ public class RoutingManager {
     /**
      * @param mergerTableDataFile
      */
-    public void getRTTMergerTable(String mergerTableDataFile,int layerID) {
+    public void getRTTMergerTable(String mergerTableDataFile, int layerID) {
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
         B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile);
 
@@ -464,7 +454,7 @@ public class RoutingManager {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(doc);
 
-            StreamResult streamResult = new StreamResult(new File("GetRTT_"+layerID+"_" + selfNodeIdMerger+ ".xml"));
+            StreamResult streamResult = new StreamResult(new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml"));
             transformer.transform(domSource, streamResult);
             System.out.println("getRTT File is created");
 
@@ -599,6 +589,148 @@ public class RoutingManager {
     }
 
     /**
+     * @param rtFileName         0     * @param routingTableName
+     * @param neighbourTableName
+     */
+    public void purgeRTEntry(String rtFileName, B4_Node[][] routingTableName, B4_Node[] neighbourTableName) {
+        //Two counter arrays were created to keep track of no of failed ping.
+        int[][] counter_rtable = new int[rt_dimension][3];
+        int[] counter_neighbour = new int[nt_dimension];
+        long currentTime = System.currentTimeMillis();
+        System.out.println("I am in main Thread");
+
+        // New thread is created
+        Thread purgeThread = new Thread(() -> {
+            System.out.println("Thread is started");
+            //count will decide the number of times the while loop will run.
+            //I have chosen count value four here.It can be changed to any other value depending on the requirment
+            int count = 0;
+            int dataPurged_RT = 0;
+            int dataPurged_Neighbour = 0;
+            long sleepingTime = 0;
+            while (true) {
+                while (!(count >= 4)) {
+                    for (int i = 0; i < rt_dimension; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            String ipAddressBase = routingTableName[i][j].getIpAddress();
+                            System.out.println(ipAddressBase);
+                            if (!ipAddressBase.isEmpty()) {
+                                try {
+                                    InetAddress ping = InetAddress.getByName(ipAddressBase);
+                                    if (ping.isReachable(1000)) {
+                                        System.out.println("Host is Reachable");
+                                        counter_rtable[i][j] = 0;
+                                    } else {
+                                        System.out.println("Not reachable");
+                                        counter_rtable[i][j] = counter_rtable[i][j] + 1;
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            if (counter_rtable[i][j] == 4) {
+                                routingTableName[i][j] = new B4_Node(null, "", "", "");
+                                System.out.println("Data is purged");
+                                dataPurged_RT = dataPurged_RT + 1;
+                                counter_rtable[i][j] = 0;
+                            }
+                        }
+                    }
+                    for (int k = 0; k < 16; k++) {
+                        String ipAddressNeighbour = neighbourTableName[k].getIpAddress();
+                        if (!ipAddressNeighbour.isEmpty()) {
+                            try {
+                                InetAddress ping = InetAddress.getByName(ipAddressNeighbour);
+                                if (ping.isReachable(1000)) {
+                                    System.out.println("Host is Reachable");
+                                    counter_neighbour[k] = 0;
+                                } else {
+                                    System.out.println("Not reachable");
+                                    counter_neighbour[k] = counter_neighbour[k] + 1;
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if (counter_neighbour[k] == 4) {
+                            neighbourTableName[k] = new B4_Node(null, "", "", "", -1);
+                            System.out.println("Data is purged");
+                            dataPurged_Neighbour = dataPurged_Neighbour + 1;
+                            counter_neighbour[k] = 0;
+                        }
+                    }
+                    localBaseTablesToXML(rtFileName, routingTableName, neighbourTableName);
+                    count = count + 1;
+                }
+                count = 0;
+                System.out.println(dataPurged_Neighbour);
+                System.out.println(dataPurged_RT);
+                if (dataPurged_RT == 0 && dataPurged_Neighbour == 0) {
+                    try {
+                        sleepingTime = sleepingTime + incrementTime;
+                        System.out.println("going for sleeping for " + sleepingTime);
+                        Thread.sleep(sleepingTime);
+                        dataPurged_Neighbour = 0;
+                        dataPurged_RT = 0;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        sleepingTime = sleepTime;
+                        System.out.println("going for sleeping for " + sleepingTime);
+                        Thread.sleep(sleepingTime);
+                        dataPurged_Neighbour = 0;
+                        dataPurged_RT = 0;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        purgeThread.start();
+    }
+
+    public B4_Node[][] getLocalBaseRoutingTable() {
+        return localBaseRoutingTable;
+    }
+
+    public B4_Node[] getLocalBaseNeighbourTable() {
+        return localBaseNeighbourTable;
+    }
+
+    public B4_Node[][] getStorageRoutingTable() {
+        return storageRoutingTable;
+    }
+
+    public B4_Node[] getStorageNeighbourTable() {
+        return storageNeighbourTable;
+    }
+
+    public RoutingManagerBuffer getRoutingManagerBuffer() {
+        return routingManagerBuffer;
+    }
+
+    public boolean addFileToOutputBuffer(File file) {
+        boolean isAdded = false;
+        isAdded = routingManagerBuffer.addFileToBuffer(file);
+        return isAdded;
+
+    }
+
+    public File fetchFileFromInputBuffer() {
+        return routingManagerBuffer.fetchFileFromBuffer();
+    }
+
+    /**
+     * This method is used for setting Local Node information.
+     * <br>Presently it is hardcoded (will be amended later).
+     */
+    private void setLocalNode() {
+        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(), b4_nodeGeneration.getPublicKey(), b4_nodeGeneration.getHashID()), selfIPAddress, selfPortAddress, selfTransportAddress);
+    }
+
+    /**
      * @param mergerFile
      * @return B4_RoutingTable Object
      */
@@ -617,7 +749,7 @@ public class RoutingManager {
     }
 
     /**
-     * @param mergerFile
+     * @param mergerFile-Merger File need to be added
      * @return B4_Node Object
      */
     private B4_Node getSelfNodeOfMergerTable(String mergerFile) {
@@ -634,7 +766,6 @@ public class RoutingManager {
         int sucNodeIdInHex;
         String mergerNodeID = mergerNode.getB4node().getNodeID();
         String localNodeID = localNode.getB4node().getNodeID();
-        //System.out.println();
         //System.out.println("mergerNodeID  " + mergerNodeID + "\nLocalNodeID  " + localNodeID);
         char[] mergerNodeidInCharArray = mergerNodeID.toCharArray();
         char[] localNodeidInCharArray = localNodeID.toCharArray();
@@ -921,125 +1052,6 @@ public class RoutingManager {
         } catch (ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * @param rtFileName         0     * @param routingTableName
-     * @param neighbourTableName
-     */
-    public void purgeRTEntry(String rtFileName, B4_Node[][] routingTableName, B4_Node[] neighbourTableName) {
-        //Two counter arrays were created to keep track of no of failed ping.
-        int[][] counter_rtable = new int[rt_dimension][3];
-        int[] counter_neighbour = new int[nt_dimension];
-        long currentTime = System.currentTimeMillis();
-        System.out.println("I am in main Thread");
-
-        // New thread is created
-        Thread purgeThread = new Thread(() -> {
-            System.out.println("Thread is started");
-            //count will decide the number of times the while loop will run.
-            //I have chosen count value four here.It can be changed to any other value depending on the requirment
-            int count = 0;
-            int dataPurged_RT = 0;
-            int dataPurged_Neighbour = 0;
-            long sleepingTime =0;
-            while (true) {
-                while (!(count >= 4)) {
-                    for (int i = 0; i < rt_dimension; i++) {
-                        for (int j = 0; j < 3; j++) {
-                            String ipAddressBase = routingTableName[i][j].getIpAddress();
-                            System.out.println(ipAddressBase);
-                            if (!ipAddressBase.isEmpty()) {
-                                try {
-                                    InetAddress ping = InetAddress.getByName(ipAddressBase);
-                                    if (ping.isReachable(1000)) {
-                                        System.out.println("Host is Reachable");
-                                        counter_rtable[i][j] = 0;
-                                    } else {
-                                        System.out.println("Not reachable");
-                                        counter_rtable[i][j] = counter_rtable[i][j] + 1;
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (counter_rtable[i][j] == 4) {
-                                routingTableName[i][j] = new B4_Node(null, "", "", "");
-                                System.out.println("Data is purged");
-                                dataPurged_RT = dataPurged_RT + 1;
-                                counter_rtable[i][j] = 0;
-                            }
-                        }
-                    }
-                    for (int k = 0; k < 16; k++) {
-                        String ipAddressNeighbour = neighbourTableName[k].getIpAddress();
-                        if (!ipAddressNeighbour.isEmpty()) {
-                            try {
-                                InetAddress ping = InetAddress.getByName(ipAddressNeighbour);
-                                if (ping.isReachable(1000)) {
-                                    System.out.println("Host is Reachable");
-                                    counter_neighbour[k] = 0;
-                                } else {
-                                    System.out.println("Not reachable");
-                                    counter_neighbour[k] = counter_neighbour[k] + 1;
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        if (counter_neighbour[k] == 4) {
-                            neighbourTableName[k] = new B4_Node(null, "", "", "", -1);
-                            System.out.println("Data is purged");
-                            dataPurged_Neighbour = dataPurged_Neighbour + 1;
-                            counter_neighbour[k] = 0;
-                        }
-                    }
-                    localBaseTablesToXML(rtFileName, routingTableName, neighbourTableName);
-                    count = count + 1;
-                }
-                count = 0;
-                System.out.println(dataPurged_Neighbour);
-                System.out.println(dataPurged_RT);
-                if (dataPurged_RT == 0 && dataPurged_Neighbour == 0) {
-                    try {
-                        sleepingTime = sleepingTime + incrementTime;
-                        System.out.println("going for sleeping for " + sleepingTime);
-                        Thread.sleep(sleepingTime);
-                        dataPurged_Neighbour=0;
-                        dataPurged_RT=0;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        sleepingTime = sleepTime;
-                        System.out.println("going for sleeping for " + sleepingTime);
-                        Thread.sleep(sleepingTime);
-                        dataPurged_Neighbour=0;
-                        dataPurged_RT=0;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        purgeThread.start();
-    }
-
-    public B4_Node[][] getLocalBaseRoutingTable() {
-        return localBaseRoutingTable;
-    }
-
-    public B4_Node[] getLocalBaseNeighbourTable() {
-        return localBaseNeighbourTable;
-    }
-
-    public B4_Node[][] getStorageRoutingTable() {
-        return storageRoutingTable;
-    }
-
-    public B4_Node[] getStorageNeighbourTable() {
-        return storageNeighbourTable;
     }
 
 }

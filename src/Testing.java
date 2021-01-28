@@ -3,16 +3,12 @@ import java.io.IOException;
 
 public class Testing {
     public static void main(String[] args) throws IOException, InterruptedException {
-        RoutingManagerBuffer buffer = RoutingManagerBuffer.getInstance();
-        CreateXMLWithEntry makeXML = new CreateXMLWithEntry();
-        buffer.addFileToBuffer(makeXML.createXML());
-
-
         RoutingManager rt = RoutingManager.getInstance();
-        File file = buffer.fetchFileFromBuffer();
-
-      rt.mergeRoutingTable(file, 0);
-       rt.mergeNeighbourTable(file, 0);
+        CreateXMLWithEntry makeXML = new CreateXMLWithEntry();
+        rt.addFileToOutputBuffer(makeXML.createXML());
+        File file = rt.fetchFileFromInputBuffer();
+        rt.mergeRoutingTable(file, 0);
+        rt.mergeNeighbourTable(file, 0);
 //       rt.mergeRoutingTable("TestStorageLayerRT.xml", 1);
 //       rt.mergeNeighbourTable("TestStorageLayerRT.xml", 1);
 //        B4_Node node = rt.findNextHop("6588DBAA1286821A9B66AEDA0CA7BBA29DEA9C9C", 0);
@@ -27,7 +23,7 @@ public class Testing {
 //        System.out.println(b4_nodeGeneration.getHashID());
 //        System.out.println(b4_nodeGeneration.getPublicKey());
 //        System.out.println(b4_nodeGeneration.getNodeID());
-       // rt.getRTTMergerTable("TestStorageLayerRT.xml",1);
+        // rt.getRTTMergerTable("TestStorageLayerRT.xml",1);
 
     }
 }
