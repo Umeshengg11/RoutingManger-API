@@ -14,6 +14,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.InetAddress;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +37,10 @@ public class RoutingManager {
     private final int nt_dimension;
     private final long incrementTime;
     private final long sleepTime;
+    private String selfIPAddress;
+    private String selfTransportAddress;
+    private String selfPortAddress;
+
 
     /**
      * Constructor
@@ -57,26 +62,36 @@ public class RoutingManager {
             try {
                 FileWriter writer = new FileWriter("NodeDetails.txt");
                 PrintWriter printWriter = new PrintWriter(writer);
-                printWriter.println(b4_nodeGeneration.getNodeID());
-                printWriter.println(nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
-                printWriter.println(b4_nodeGeneration.getHashID());
+                printWriter.println("#  Self Node Details  #");
+                printWriter.println("..................................");
+                printWriter.println("NodeID="+b4_nodeGeneration.getNodeID());
+                printWriter.println("PublicKey="+nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
+                printWriter.println("HashID="+b4_nodeGeneration.getHashID());
+                printWriter.println("IPAddress=191.126.10.12");
+                printWriter.println("PortAddress=1024");
+                printWriter.println("TransportAddress=TCP");
                 printWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
+
             try {
-                BufferedReader bufferedReader = new BufferedReader(new FileReader("NodeDetails.txt"));
-                String[] details = new String[3];
-                String line;
-                int i = 0;
-                while ((line = bufferedReader.readLine())!=null){
-                    details[i] = line;
-                    i=i+1;
-                }
-                b4_nodeGeneration = new B4_NodeGeneration(details[0],nodeCryptography.strToPub(details[1]),details[2]);
+                FileReader reader = new FileReader("NodeDetails.txt");
+                Properties properties = new Properties();
+                properties.load(reader);
+                String selfNodeID = properties.getProperty("NodeID");
+                String selfPublicKey = properties.getProperty("PublicKey");
+                String selfHashID = properties.getProperty("HashID");
+                selfIPAddress = properties.getProperty("IPAddress");
+                selfPortAddress = properties.getProperty("PortAddress");
+                selfTransportAddress = properties.getProperty("TransportAddress");
+                System.out.println(selfIPAddress+"   "+selfPortAddress+"   "+selfTransportAddress+"   "+selfNodeID);
+                b4_nodeGeneration = new B4_NodeGeneration(selfNodeID,nodeCryptography.strToPub(selfPublicKey),selfHashID);
+
+
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("NodeDetails File not Found or Issue in file fetching");
             }
         }
         config = ConfigData.getInstance();
@@ -211,7 +226,7 @@ public class RoutingManager {
      * <br>Presently it is hardcoded (will be amended later).
      */
     private void setLocalNode() {
-        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(),b4_nodeGeneration.getPublicKey(),b4_nodeGeneration.getHashID()), "192.168.0.105", "6666", "TCP");
+        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(),b4_nodeGeneration.getPublicKey(),b4_nodeGeneration.getHashID()), selfIPAddress, selfPortAddress, selfTransportAddress);
     }
 
     /**
