@@ -40,10 +40,10 @@ public class RoutingManagerBuffer {
         try{
             file = inputRoutingBuffer.get(0);
             inputRoutingBuffer.remove(0);
-            inputBufferLock.unlock();  
         } catch(Exception e) {
             System.out.println("There is no File in Input Buffer");
         }
+        inputBufferLock.unlock();
         return file;
     }
 }

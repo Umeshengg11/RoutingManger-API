@@ -105,8 +105,11 @@ public class RoutingManager {
         storageRoutingTable = new B4_Node[rt_dimension][3];
         storageNeighbourTable = new B4_Node[nt_dimension];
         init("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
+        fetchFileFromInputBuffer();
         boolean access = config.isLayerAccess("StorageAccess");
-        if (access) init("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
+        if (access) {
+            init("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
+        }
     }
 
     /**
@@ -711,15 +714,44 @@ public class RoutingManager {
         return routingManagerBuffer;
     }
 
-    public boolean addFileToOutputBuffer(File file) {
+    public boolean addFileToInputBuffer(File file) {
         boolean isAdded = false;
         isAdded = routingManagerBuffer.addFileToBuffer(file);
         return isAdded;
-
     }
 
-    public File fetchFileFromInputBuffer() {
-        return routingManagerBuffer.fetchFileFromBuffer();
+    public void fetchFileFromInputBuffer()  {
+        Thread fetchThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true){
+                    File file = routingManagerBuffer.fetchFileFromBuffer();
+                    if(!(file==null)){
+                        System.out.println(file.getName());
+                        System.out.println("New file fetched");
+                        if(file.getName().startsWith("0")){
+                            mergeRoutingTable(file, 0);
+                            mergeNeighbourTable(file, 0);
+                            System.out.println("In Base routing Table");
+                        } else if(file.getName().startsWith("1")){
+                            mergeRoutingTable(file, 1);
+                            mergeNeighbourTable(file, 1);
+                            System.out.println("In storage routing Table");
+                        }
+                        System.out.println("Merging is completed after fetching");
+                    }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+        fetchThread.start();
+
+
     }
 
     /**

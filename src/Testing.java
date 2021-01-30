@@ -5,10 +5,14 @@ public class Testing {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();
         CreateXMLWithEntry makeXML = new CreateXMLWithEntry();
-        rt.addFileToOutputBuffer(makeXML.createXML());
-        File file = rt.fetchFileFromInputBuffer();
-        rt.mergeRoutingTable(file, 0);
-        rt.mergeNeighbourTable(file, 0);
+        rt.addFileToInputBuffer(makeXML.createXML());
+        rt.addFileToInputBuffer(makeXML.createXML());
+        rt.addFileToInputBuffer(makeXML.createXML());
+
+
+//        File file = rt.fetchFileFromInputBuffer();
+//        rt.mergeRoutingTable(file, 0);
+//        rt.mergeNeighbourTable(file, 0);
 //       rt.mergeRoutingTable("TestStorageLayerRT.xml", 1);
 //       rt.mergeNeighbourTable("TestStorageLayerRT.xml", 1);
 //        B4_Node node = rt.findNextHop("6588DBAA1286821A9B66AEDA0CA7BBA29DEA9C9C", 0);

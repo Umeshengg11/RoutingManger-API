@@ -142,7 +142,7 @@ public class CreateXMLWithEntry {
              * StreamResult streamResult = new StreamResult(System.out);
              **/
 
-            StreamResult streamResult = new StreamResult(new File("TestStorageLayerRT.xml"));
+            StreamResult streamResult = new StreamResult(new File("1StorageLayerRT.xml"));
             transformer.transform(domSource, streamResult);
             System.out.println("XML document is created");
 
@@ -152,7 +152,7 @@ public class CreateXMLWithEntry {
             e.printStackTrace();
         }
 
-        File file1 = new File("TestStorageLayerRT.xml");
+        File file1 = new File("1StorageLayerRT.xml");
         return file1;
 
     }
