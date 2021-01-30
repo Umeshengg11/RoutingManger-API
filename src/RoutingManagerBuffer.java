@@ -25,16 +25,15 @@ public class RoutingManagerBuffer {
         return routingManagerBuffer;
     }
 
-    public boolean addFileToBuffer(File file) {
+    public boolean addToInputBuffer(File file) {
         inputBufferLock.lock();
         inputRoutingBuffer.add(file);
-        System.out.println("file added to the buffer");
-        System.out.println(inputRoutingBuffer.size());
+        System.out.println("File added to Input buffer");
         inputBufferLock.unlock();
         return true;
     }
 
-    public File fetchFileFromBuffer() {
+    public File fetchFromInputBuffer() {
         inputBufferLock.lock();
         File file = null;
         try{
@@ -44,6 +43,27 @@ public class RoutingManagerBuffer {
             System.out.println("There is no File in Input Buffer");
         }
         inputBufferLock.unlock();
+        return file;
+    }
+
+    public boolean addToOutputBuffer(File file) {
+        outputBufferLock.lock();
+        outputRoutingBuffer.add(file);
+        System.out.println("file added to Output buffer");
+        outputBufferLock.unlock();
+        return true;
+    }
+
+    public File fetchFromOutputBuffer() {
+        outputBufferLock.lock();
+        File file = null;
+        try{
+            file = outputRoutingBuffer.get(0);
+            outputRoutingBuffer.remove(0);
+        } catch(Exception e) {
+            System.out.println("There is no File in Output Buffer");
+        }
+        outputBufferLock.unlock();
         return file;
     }
 }

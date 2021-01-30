@@ -21,6 +21,9 @@ import java.util.regex.Pattern;
 /**
  * Created by S/L Umesh U Nair
  * <br>Aim is to create an Routing Manager API for Brihaspati-4
+ * <br> Various layers presently implemented
+ * <br> 1. BaseRoutingTable - LayerID = 0
+ * <br> 2. StorageRoutingTable - LayerID = 1
  */
 public class RoutingManager {
     private static RoutingManager routingManager;
@@ -75,7 +78,6 @@ public class RoutingManager {
                 e.printStackTrace();
             }
         } else {
-
             try {
                 FileReader reader = new FileReader("NodeDetails.txt");
                 Properties properties = new Properties();
@@ -88,8 +90,6 @@ public class RoutingManager {
                 selfTransportAddress = properties.getProperty("TransportAddress");
                 //System.out.println(selfIPAddress+"   "+selfPortAddress+"   "+selfTransportAddress+"   "+selfNodeID);
                 b4_nodeGeneration = new B4_NodeGeneration(selfNodeID, nodeCryptography.strToPub(selfPublicKey), selfHashID);
-
-
             } catch (IOException e) {
                 System.out.println("NodeDetails File not Found or Issue in file fetching");
             }
@@ -105,19 +105,18 @@ public class RoutingManager {
         storageRoutingTable = new B4_Node[rt_dimension][3];
         storageNeighbourTable = new B4_Node[nt_dimension];
         init("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
-        fetchFileFromInputBuffer();
         boolean access = config.isLayerAccess("StorageAccess");
-        if (access) {
-            init("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
-        }
+        if (access) init("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
+        fetchFileFromInputBuffer();
     }
 
     /**
-     * @param rtFileName <br>@param routingTable
-     *                   <br>@param neighbourTable
-     *                   <br>All the initialisation w.r.t routing Manager will be performed here.
-     *                   <br>This function is called by the constuctor for initialisation of routing manager.
-     *                   <br>Initialisation includes creating routingTable and neighbour table,creating a routing table file for future references etc.
+     * @param rtFileName     - Desired name of the Routing Table
+     * @param routingTable   - Object of Routing Table
+     * @param neighbourTable - Object of Neighbour Table
+     *                       <br>All the initialisation w.r.t routing Manager will be performed here.
+     *                       <br>This function is called by the constructor for initialisation of routing manager.
+     *                       <br>Initialisation includes creating routingTable and neighbour table,creating a routing table file for future references etc.
      */
     private void init(String rtFileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         boolean rtExists;
@@ -143,20 +142,16 @@ public class RoutingManager {
 
         } else {
             try {
-                //Get Document builder
                 DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
 
-                //Load the input XML document,parse it and return an instance of Document class
                 Document doc = documentBuilder.parse(new File(rtFileName + ".xml"));
                 doc.getDocumentElement().normalize();
                 //String rootElement = doc.getDocumentElement().getNodeName();
-                //System.out.println(rootElement);
 
                 NodeList nodeList = doc.getElementsByTagName("B4_Node");
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Node node = nodeList.item(i);
-
                     if (node.getNodeType() == node.ELEMENT_NODE) {
                         Element element = (Element) node;
 
@@ -186,8 +181,6 @@ public class RoutingManager {
 
                     if (node.getNodeType() == node.ELEMENT_NODE) {
                         Element element = (Element) node;
-
-                        //Get the value of ID attribute
                         String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
 
                         //Get value of all sub-Elements
@@ -234,8 +227,9 @@ public class RoutingManager {
     }
 
     /**
-     * @param fileFromBuffer
-     * @param layerID        <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
+     * @param fileFromBuffer - The file that is fetched from the input buffer of the routing Table.
+     * @param layerID        - Specify the layer Id of the routing table which needs to be merged
+     *                       <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
      *                       <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
      *                       <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
      *                       <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
@@ -261,17 +255,17 @@ public class RoutingManager {
         }
         if (routingTableLayer == localBaseRoutingTable) {
             localBaseTablesToXML("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
-            System.out.println("Base Routing Table Merged successfully");
+            System.out.println("BaseRoutingTable Merging completed Successfully");
         }
         if (routingTableLayer == storageRoutingTable) {
             localBaseTablesToXML("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
-            System.out.println("Storage Routing Table Merged successfully");
+            System.out.println("StorageRoutingTable Merging completed Successfully");
         }
     }
 
     /**
-     * @param fileFromBuffer
-     * @param layerID
+     * @param fileFromBuffer - File fetched from the inputbuffer of routing Table
+     * @param layerID - The layer in which the operation is to be performed
      */
     public void mergeNeighbourTable(File fileFromBuffer, int layerID) {
         B4_Node[] neighbourTable = null;
@@ -287,7 +281,7 @@ public class RoutingManager {
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         String mergerNodeID = selfNodeOfMergerTable.getB4node().getNodeID();
         String fileName = "RcvRTT_" + layerID + "_" + mergerNodeID;
-        File rttFile = new File(fileName + ".xml");
+        File rttFile = new File(fileFromBuffer.getName() + ".xml");
         rttFileExists = rttFile.exists();
         if (!rttFileExists) {
             System.out.println("RTT updated file does not exist");
@@ -377,22 +371,23 @@ public class RoutingManager {
             }
             if (neighbourTable == localBaseNeighbourTable) {
                 localBaseTablesToXML("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
-                //System.out.println("Base NeighbourTable Merged successfully");
+                System.out.println("Base NeighbourTable Merged successfully");
             }
-
             if (neighbourTable == storageNeighbourTable) {
                 localBaseTablesToXML("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
-                //System.out.println("Storage NeighbourTable Merged successfully");
+                System.out.println("Storage NeighbourTable Merged successfully");
             }
         }
     }
 
     /**
-     * @param mergerTableDataFile
+     * @param mergerTableDataFile - get RTT data file from the input buffer of routing table<br>
+     * @param layerID - layer id on which the operation needs to be performed
+     *
      */
-    public void getRTTMergerTable(String mergerTableDataFile, int layerID) {
-        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile);
-        B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile);
+    public File getRTTMergerTable(File mergerTableDataFile, int layerID) {
+        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile.getName());
+        B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile.getName());
 
         String selfNodeIdMerger = selfNodeOfMergerTable.getB4node().getNodeID();
         String selfNodePubMerger = nodeCryptography.pubToStr(selfNodeOfMergerTable.getB4node().getPublicKey());
@@ -464,12 +459,15 @@ public class RoutingManager {
         } catch (ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
         }
-
+        File file1 = new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml");
+        addFileToOutputBuffer(file1);
+        return file1;
     }
 
+
     /**
-     * @param hashID
-     * @param layerID
+     * @param hashID - hash id received as a query to find the next hop
+     * @param layerID - layer id on which the operation is to be performed
      * @return null if next hop is selfNode else return B4_Node object
      * 1. This method is used to find the nextHop for a hashID/NodeID which is received as a query.
      * 2. Initially check whether the hashId/nodeId is equal to localNodeID.
@@ -671,7 +669,7 @@ public class RoutingManager {
                 if (dataPurged_RT == 0 && dataPurged_Neighbour == 0) {
                     try {
                         sleepingTime = sleepingTime + incrementTime;
-                        System.out.println("going for sleeping for " + sleepingTime);
+                        System.out.println("Going to sleeping for " + sleepingTime);
                         Thread.sleep(sleepingTime);
                         dataPurged_Neighbour = 0;
                         dataPurged_RT = 0;
@@ -716,29 +714,41 @@ public class RoutingManager {
 
     public boolean addFileToInputBuffer(File file) {
         boolean isAdded = false;
-        isAdded = routingManagerBuffer.addFileToBuffer(file);
+        isAdded = routingManagerBuffer.addToInputBuffer(file);
         return isAdded;
     }
 
-    public void fetchFileFromInputBuffer()  {
+    public boolean addFileToOutputBuffer(File file) {
+        boolean isAdded = false;
+        isAdded = routingManagerBuffer.addToOutputBuffer(file);
+        return isAdded;
+    }
+
+    public void fetchFileFromInputBuffer() {
         Thread fetchThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true){
-                    File file = routingManagerBuffer.fetchFileFromBuffer();
-                    if(!(file==null)){
+                while (true) {
+                    File file = routingManagerBuffer.fetchFromInputBuffer();
+                    if (!(file == null)) {
                         System.out.println(file.getName());
                         System.out.println("New file fetched");
-                        if(file.getName().startsWith("0")){
+                        if (file.getName().startsWith("0")) {
                             mergeRoutingTable(file, 0);
-                            mergeNeighbourTable(file, 0);
-                            System.out.println("In Base routing Table");
-                        } else if(file.getName().startsWith("1")){
+                            getRTTMergerTable(file,0);
+                            System.out.println("Confirm it is 0");
+                        } else if (file.getName().startsWith("1")) {
                             mergeRoutingTable(file, 1);
-                            mergeNeighbourTable(file, 1);
-                            System.out.println("In storage routing Table");
+                            getRTTMergerTable(file, 1);
+                            System.out.println("Confirm it is 1");
+                        } else if (file.getName().startsWith("RcvRTT_0")){
+                            mergeNeighbourTable(file,0);
+                            System.out.println("hdhdhdhdhdd");
+                        } else if (file.getName().startsWith("RcvRTT_1")){
+                            mergeNeighbourTable(file,1);
+                            System.out.println("hdhdhdhdhdd");
                         }
-                        System.out.println("Merging is completed after fetching");
+                        System.out.println("Routing Table updated !!!");
                     }
                     try {
                         Thread.sleep(5000);
@@ -749,9 +759,13 @@ public class RoutingManager {
 
             }
         });
+
         fetchThread.start();
+    }
 
-
+    public File fetchFileFromOutputBuffer() {
+        File file = routingManagerBuffer.fetchFromOutputBuffer();
+        return file;
     }
 
     /**
@@ -1080,7 +1094,7 @@ public class RoutingManager {
              **/
             StreamResult streamResult = new StreamResult(new File(fileHeading + ".xml"));
             transformer.transform(domSource, streamResult);
-            System.out.println("Added to file " + fileHeading);
+            System.out.println(fileHeading + " file updated");
         } catch (ParserConfigurationException | TransformerException e) {
             e.printStackTrace();
         }

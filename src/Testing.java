@@ -8,18 +8,16 @@ public class Testing {
         rt.addFileToInputBuffer(makeXML.createXML());
         rt.addFileToInputBuffer(makeXML.createXML());
         rt.addFileToInputBuffer(makeXML.createXML());
+        File file = rt.fetchFileFromOutputBuffer();
+        InActCommunicationManager in = new InActCommunicationManager();
+        in.returnRTTData(file);
 
 
-//        File file = rt.fetchFileFromInputBuffer();
-//        rt.mergeRoutingTable(file, 0);
-//        rt.mergeNeighbourTable(file, 0);
-//       rt.mergeRoutingTable("TestStorageLayerRT.xml", 1);
-//       rt.mergeNeighbourTable("TestStorageLayerRT.xml", 1);
 //        B4_Node node = rt.findNextHop("6588DBAA1286821A9B66AEDA0CA7BBA29DEA9C9C", 0);
 //        if (node != null) System.out.println("Next hop is " + node.getB4node().getNodeID());
 //        else System.out.println("Current Node is the Root Node " + rt.getLocalNode().getB4node().getNodeID());
 //
-//        rt.getRTTMergerTable("TestRoutingTable.xml");
+       // rt.getRTTMergerTable("TestRoutingTable.xml");
 //       // rt.rt_length();
 //
 //        rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());

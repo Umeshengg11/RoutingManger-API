@@ -144,7 +144,7 @@ public class CreateXMLWithEntry {
 
             StreamResult streamResult = new StreamResult(new File("1StorageLayerRT.xml"));
             transformer.transform(domSource, streamResult);
-            System.out.println("XML document is created");
+            //System.out.println("XML document is created");
 
         } catch (ParserConfigurationException | TransformerConfigurationException e) {
             e.printStackTrace();
