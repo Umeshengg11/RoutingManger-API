@@ -14,6 +14,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,12 +41,14 @@ public class InActCommunicationManager {
     public File test(int layerID, String fileName){
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = null;
+        String selfNodeID = null;
         try {
             documentBuilder = builderFactory.newDocumentBuilder();
             Document doc = documentBuilder.parse(new File(fileName ));
             doc.getDocumentElement().normalize();
             String rootElement = doc.getDocumentElement().getNodeName();
-            System.out.println(rootElement);
+            selfNodeID = doc.getDocumentElement().getAttribute("SELF_NODE_ID");
+            System.out.println(selfNodeID);
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
             for (int i = 0; i < nodeList1.getLength(); i++) {
                 Node node = nodeList1.item(i);
@@ -61,8 +64,10 @@ public class InActCommunicationManager {
                     String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
                     String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                     String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
-
-                    element.getElementsByTagName("NODERTT").item(0).setTextContent("10");
+                    Random rand = new Random();
+                    int randInt12 = rand.nextInt(200);
+                    String randIntS = Integer.toString(randInt12);
+                    element.getElementsByTagName("NODERTT").item(0).setTextContent(randIntS);
                     String nodeRTT = element.getElementsByTagName("NODERTT").item(0).getTextContent();
                     System.out.println("Node RTT is " + nodeRTT);
                 }
@@ -71,15 +76,15 @@ public class InActCommunicationManager {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(doc);
-            StreamResult streamResult = new StreamResult(new File("RcvRTT_" + layerID + "_" + ".xml"));
+            StreamResult streamResult = new StreamResult(new File("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml"));
             transformer.transform(domSource, streamResult);
-            System.out.println("RcvRTT_" + layerID + "_" + ".xml" + " file updated");
+            System.out.println("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml" + " file updated");
 
 
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
             e.printStackTrace();
         }
-        File file1 = new File("RcvRTT_" + layerID + "_" + ".xml");
+        File file1 = new File("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml");
         return file1;
 
     }

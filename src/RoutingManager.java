@@ -74,6 +74,9 @@ public class RoutingManager {
                 printWriter.println("PortAddress=1024");
                 printWriter.println("TransportAddress=TCP");
                 printWriter.close();
+                selfIPAddress = "191.126.10.12";
+                selfPortAddress = "1024";
+                selfTransportAddress = "TCP";
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -274,14 +277,13 @@ public class RoutingManager {
         } else if (layerID == 1) {
             neighbourTable = storageNeighbourTable;
         }
-
         boolean rttFileExists;
         B4_Node[] mergerNeighbourTable = new B4_Node[nt_dimension];
         B4_Node selfMergerNode = null;
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         String mergerNodeID = selfNodeOfMergerTable.getB4node().getNodeID();
-        String fileName = "RcvRTT_" + layerID + "_" + mergerNodeID;
-        File rttFile = new File(fileFromBuffer.getName() + ".xml");
+//        String fileName = "RcvRTT_" + layerID + "_" + mergerNodeID;
+        File rttFile = new File(fileFromBuffer.getName());
         rttFileExists = rttFile.exists();
         if (!rttFileExists) {
             System.out.println("RTT updated file does not exist");
@@ -292,7 +294,7 @@ public class RoutingManager {
             try {
                 documentBuilder = builderFactory.newDocumentBuilder();
                 //Load the input XML document,parse it and return an instance of Document class
-                Document doc = documentBuilder.parse(new File(fileName + ".xml"));
+                Document doc = documentBuilder.parse(new File(fileFromBuffer.getName()));
                 doc.getDocumentElement().normalize();
                 //String rootElement = doc.getDocumentElement().getNodeName();
                 //System.out.println(rootElement);
@@ -395,7 +397,7 @@ public class RoutingManager {
         String selfIPAddressMerger = selfNodeOfMergerTable.getIpAddress();
         String selfPortAddressMerger = selfNodeOfMergerTable.getPortAddress();
         String selfTransportMerger = selfNodeOfMergerTable.getTransport();
-        String selfRTTMerger = "";
+        String selfRTTMerger = "-1";
 
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -743,10 +745,8 @@ public class RoutingManager {
                             System.out.println("Confirm it is 1");
                         } else if (file.getName().startsWith("RcvRTT_0")){
                             mergeNeighbourTable(file,0);
-                            System.out.println("hdhdhdhdhdd");
                         } else if (file.getName().startsWith("RcvRTT_1")){
                             mergeNeighbourTable(file,1);
-                            System.out.println("hdhdhdhdhdd");
                         }
                         System.out.println("Routing Table updated !!!");
                     }

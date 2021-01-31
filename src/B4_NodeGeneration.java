@@ -22,13 +22,6 @@ public class B4_NodeGeneration {
         this.hashID = hashID;
     }
 
-//    public static synchronized B4_NodeGeneration getInstance() {
-//        if (b4_nodeGeneration == null) {
-//            b4_nodeGeneration = new B4_NodeGeneration();
-//        }
-//        return b4_nodeGeneration;
-//    }
-
     private String generateNodeId() {
         String node1ID=null;
         StringBuilder publicKeyToString = new StringBuilder();
