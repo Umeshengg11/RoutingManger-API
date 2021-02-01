@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * Created by S/L Umesh U Nair
  * <br>Aim is to create an Routing Manager API for Brihaspati-4
- * <br> Various layers presently implemented
+ * <br> Various layers presently implemented are:-
  * <br> 1. BaseRoutingTable - LayerID = 0
  * <br> 2. StorageRoutingTable - LayerID = 1
  */
@@ -47,6 +47,7 @@ public class RoutingManager {
     /**
      * Constructor
      * <br>Main job of constructor are as follows:-
+     * <br>Check NodeDetails.txt file exits from the previous login, if true take data from the file else generate nodeDetails and write it into a file.
      * <br>Check routing table and neighbour table exist from the previous login(ie to check RoutingTable.xml is available in the path).
      * <br>If RT exists then data is taken from the xml file and added to the localBaseRoutingTable(which is the routingTable for current node)
      * and to the localBaseNeighbourTable(which is the neighbourTable for current node).
@@ -147,7 +148,6 @@ public class RoutingManager {
             try {
                 DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
-
                 Document doc = documentBuilder.parse(new File(rtFileName + ".xml"));
                 doc.getDocumentElement().normalize();
                 //String rootElement = doc.getDocumentElement().getNodeName();
@@ -470,7 +470,8 @@ public class RoutingManager {
     /**
      * @param hashID - hash id received as a query to find the next hop
      * @param layerID - layer id on which the operation is to be performed
-     * @return null if next hop is selfNode else return B4_Node object
+     * @return null if next hop is selfNode else return B4_Node object else return B4_Node Object
+     *
      * 1. This method is used to find the nextHop for a hashID/NodeID which is received as a query.
      * 2. Initially check whether the hashId/nodeId is equal to localNodeID.
      * 3. Thereafter check whether the localNode is the root node for the given hashId/NodeId.
@@ -592,7 +593,8 @@ public class RoutingManager {
     }
 
     /**
-     * @param rtFileName         0     * @param routingTableName
+     * @param rtFileName
+     * @param routingTableName
      * @param neighbourTableName
      */
     public void purgeRTEntry(String rtFileName, B4_Node[][] routingTableName, B4_Node[] neighbourTableName) {
@@ -993,10 +995,11 @@ public class RoutingManager {
     }
 
     /**
-     * @param fileHeading
-     * @param routingTable
-     * @param neighbourTable <br>This function is used to convert the Routing Table in the form of an array to xml format
-     *                       <br>Here XML parsing is used.
+     * @param fileHeading - Desired name
+     * @param routingTable - Object of Routing table which need to be converted to XML
+     * @param neighbourTable - Object of Neighbour table which need to be converted to XML
+     * <br>This function is used to convert the Routing Table in the form of an array to xml format
+     * <br>Here XML parsing is used.
      */
     private void localBaseTablesToXML(String fileHeading, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         String selfNodeId = localNode.getB4node().getNodeID();
@@ -1088,10 +1091,6 @@ public class RoutingManager {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(doc);
-            /**
-             * For debugging//
-             * StreamResult streamResult = new StreamResult(System.out);
-             **/
             StreamResult streamResult = new StreamResult(new File(fileHeading + ".xml"));
             transformer.transform(domSource, streamResult);
             System.out.println(fileHeading + " file updated");
@@ -1100,4 +1099,9 @@ public class RoutingManager {
         }
     }
 
+    public boolean verifySignature(String hashID){
+        boolean verify = false;
+        verify = b4_nodeGeneration.verifySignature();
+        return verify;
+    }
 }

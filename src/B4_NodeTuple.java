@@ -1,5 +1,9 @@
 import java.security.PublicKey;
 
+/**
+ * This class will is used to create an Object which contains a tuple- NodeID,PublicKey and HashID
+ * This class is used along with B4_Node to create a bigger Object used in the RoutingTable and NeighbourTable.
+ */
 public class B4_NodeTuple {
     private final String nodeID;
     private final PublicKey publicKey;

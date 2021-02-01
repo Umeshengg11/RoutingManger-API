@@ -1,7 +1,8 @@
 /**
  * Created by S/L Umesh Nair
- * This class hold all the information about a node like its Node ID, Node IP, Node Port,Node Transport
- * The routingTable created will be array of this class (ie Nodes)
+ * This class hold all the information about the node - Node ID, Node IP, Node Port,Node Transport and rtt.
+ * The routingTable and neighbourTable will be created using the object of this class and NodeTuple class.
+ * Two constructor of this class is created - one without rtt value and other with rtt value.
  */
 public class B4_Node {
     private final B4_NodeTuple b4node;
