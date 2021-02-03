@@ -14,16 +14,22 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Created by S/L Umesh U Nair
- * <br>Aim is to create an Routing Manager API for Brihaspati-4
+ * <br> Aim is to create an Routing Manager API for Brihaspati-4
  * <br> Various layers presently implemented are:-
  * <br> 1. BaseRoutingTable - LayerID = 0
  * <br> 2. StorageRoutingTable - LayerID = 1
+ * ...........................................
+ * <br> 3. VoipRoutingTable - LayerID = 2
+ * <br> 4. MailRoutingTable - LayerID = 3
  */
 public class RoutingManager {
     private static RoutingManager routingManager;
@@ -46,13 +52,13 @@ public class RoutingManager {
 
     /**
      * Constructor
-     * <br>Main job of constructor are as follows:-
-     * <br>Check NodeDetails.txt file exits from the previous login, if true take data from the file else generate nodeDetails and write it into a file.
-     * <br>Check routing table and neighbour table exist from the previous login(ie to check RoutingTable.xml is available in the path).
-     * <br>If RT exists then data is taken from the xml file and added to the localBaseRoutingTable(which is the routingTable for current node)
+     * <br> Main job of constructor are as follows:-
+     * <br> Check NodeDetails.txt file exits from the previous login, if true take data from the file else generate nodeDetails and write it into a file.
+     * <br> Check routing table and neighbour table exist from the previous login(ie to check RoutingTable.xml is available in the path).
+     * <br> If RT exists then data is taken from the xml file and added to the localBaseRoutingTable(which is the routingTable for current node)
      * and to the localBaseNeighbourTable(which is the neighbourTable for current node).
-     * <br>If not available then create a routing table(localBaseRoutingTable) and neighbour table (localBaseNeighbourTable).
-     * <br>Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of B4_Node with only bootstrap node entry.
+     * <br> If not available then create a routing table(localBaseRoutingTable) and neighbour table (localBaseNeighbourTable).
+     * <br> Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of B4_Node with only bootstrap node entry.
      */
     private RoutingManager() {
         nodeCryptography = NodeCryptography.getInstance();
@@ -75,7 +81,7 @@ public class RoutingManager {
                 printWriter.println("PortAddress=1024");
                 printWriter.println("TransportAddress=TCP");
                 printWriter.close();
-                selfIPAddress = "191.126.10.12";
+                selfIPAddress = getSystemIP();
                 selfPortAddress = "1024";
                 selfTransportAddress = "TCP";
             } catch (IOException e) {
@@ -268,7 +274,7 @@ public class RoutingManager {
 
     /**
      * @param fileFromBuffer - File fetched from the inputbuffer of routing Table
-     * @param layerID - The layer in which the operation is to be performed
+     * @param layerID        - The layer in which the operation is to be performed
      */
     public void mergeNeighbourTable(File fileFromBuffer, int layerID) {
         B4_Node[] neighbourTable = null;
@@ -384,8 +390,7 @@ public class RoutingManager {
 
     /**
      * @param mergerTableDataFile - get RTT data file from the input buffer of routing table<br>
-     * @param layerID - layer id on which the operation needs to be performed
-     *
+     * @param layerID             - layer id on which the operation needs to be performed
      */
     public File getRTTMergerTable(File mergerTableDataFile, int layerID) {
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile.getName());
@@ -468,10 +473,10 @@ public class RoutingManager {
 
 
     /**
-     * @param hashID - hash id received as a query to find the next hop
+     * @param hashID  - hash id received as a query to find the next hop
      * @param layerID - layer id on which the operation is to be performed
      * @return null if next hop is selfNode else return B4_Node object else return B4_Node Object
-     *
+     * <p>
      * 1. This method is used to find the nextHop for a hashID/NodeID which is received as a query.
      * 2. Initially check whether the hashId/nodeId is equal to localNodeID.
      * 3. Thereafter check whether the localNode is the root node for the given hashId/NodeId.
@@ -739,16 +744,16 @@ public class RoutingManager {
                         System.out.println("New file fetched");
                         if (file.getName().startsWith("0")) {
                             mergeRoutingTable(file, 0);
-                            getRTTMergerTable(file,0);
+                            getRTTMergerTable(file, 0);
                             System.out.println("Confirm it is 0");
                         } else if (file.getName().startsWith("1")) {
                             mergeRoutingTable(file, 1);
                             getRTTMergerTable(file, 1);
                             System.out.println("Confirm it is 1");
-                        } else if (file.getName().startsWith("RcvRTT_0")){
-                            mergeNeighbourTable(file,0);
-                        } else if (file.getName().startsWith("RcvRTT_1")){
-                            mergeNeighbourTable(file,1);
+                        } else if (file.getName().startsWith("RcvRTT_0")) {
+                            mergeNeighbourTable(file, 0);
+                        } else if (file.getName().startsWith("RcvRTT_1")) {
+                            mergeNeighbourTable(file, 1);
                         }
                         System.out.println("Routing Table updated !!!");
                     }
@@ -995,11 +1000,11 @@ public class RoutingManager {
     }
 
     /**
-     * @param fileHeading - Desired name
-     * @param routingTable - Object of Routing table which need to be converted to XML
+     * @param fileHeading    - Desired name
+     * @param routingTable   - Object of Routing table which need to be converted to XML
      * @param neighbourTable - Object of Neighbour table which need to be converted to XML
-     * <br>This function is used to convert the Routing Table in the form of an array to xml format
-     * <br>Here XML parsing is used.
+     *                       <br>This function is used to convert the Routing Table in the form of an array to xml format
+     *                       <br>Here XML parsing is used.
      */
     private void localBaseTablesToXML(String fileHeading, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         String selfNodeId = localNode.getB4node().getNodeID();
@@ -1099,9 +1104,74 @@ public class RoutingManager {
         }
     }
 
-    public boolean verifySignature(String hashID){
-        boolean verify = false;
+    public boolean verifySignature(String hashID) {
+        boolean verify;
         verify = b4_nodeGeneration.verifySignature();
         return verify;
     }
+
+    public String getSystemIP() {
+        NetworkInterface networkInterface;
+        String ethernet;
+        String selfIPAddress = "";
+        String regex = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+        try {
+            String OSName = System.getProperty("os.name");
+            if (OSName.contains("Windows")) {
+                selfIPAddress = InetAddress.getLocalHost().getHostAddress();
+            } else {
+                try {
+                    for (Enumeration interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements(); ) {
+                        networkInterface = (NetworkInterface) interfaces.nextElement();
+                        ethernet = networkInterface.getDisplayName();
+                        if (!(ethernet.equals("lo"))) {
+                            if (!(ethernet.contains("br"))) {
+                                InetAddress inetAddress = null;
+                                for (Enumeration ips = networkInterface.getInetAddresses(); ips.hasMoreElements(); ) {
+                                    inetAddress = (InetAddress) ips.nextElement();
+                                    if (Pattern.matches(regex, inetAddress.getCanonicalHostName())) {
+                                        selfIPAddress = inetAddress.getCanonicalHostName();
+                                        return selfIPAddress;
+                                    }
+                                }
+                                assert inetAddress != null;
+                                String pip = inetAddress.toString();
+                                int abc = pip.indexOf("/");
+                                int cutat = abc + 1;
+                                selfIPAddress = pip.substring(cutat);
+                                return selfIPAddress;
+                            }
+                        }
+                    }
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                }
+            }
+            return selfIPAddress;
+        } catch (Exception E) {
+            System.out.println("Exception");
+            return null;
+        }
+    }
+
+    public String getMACAddress() {
+        String macaddr = "";
+        try {
+
+            String ipAddress = getSystemIP();
+            NetworkInterface network = NetworkInterface.getByInetAddress(InetAddress.getByName(ipAddress));
+            byte[] mac = network.getHardwareAddress();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < mac.length; i++) {
+                sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+            }
+            System.out.println("Current MAC address : " + sb.toString());
+            macaddr = sb.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return macaddr;
+    }
+
 }

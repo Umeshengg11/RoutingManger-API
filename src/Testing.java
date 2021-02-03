@@ -4,13 +4,16 @@ import java.io.IOException;
 public class Testing {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();
-        CreateXMLWithEntry makeXML = new CreateXMLWithEntry();
-        rt.addFileToInputBuffer(makeXML.createXML());
-        rt.addFileToInputBuffer(makeXML.createXML());
-        rt.addFileToInputBuffer(makeXML.createXML());
-        File file = rt.fetchFileFromOutputBuffer();
-        InActCommunicationManager in = new InActCommunicationManager();
-        in.returnRTTData(file);
+        String ip = rt.getSystemIP();
+        System.out.println(ip);
+        System.out.println(rt.getMACAddress());
+//        CreateXMLWithEntry makeXML = new CreateXMLWithEntry();
+//        rt.addFileToInputBuffer(makeXML.createXML());
+//        rt.addFileToInputBuffer(makeXML.createXML());
+//        rt.addFileToInputBuffer(makeXML.createXML());
+//        File file = rt.fetchFileFromOutputBuffer();
+//        InActCommunicationManager in = new InActCommunicationManager();
+//        in.returnRTTData(file);
 
 
 //        B4_Node node = rt.findNextHop("6588DBAA1286821A9B66AEDA0CA7BBA29DEA9C9C", 0);
