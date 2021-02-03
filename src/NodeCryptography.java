@@ -15,7 +15,12 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 
-public class NodeCryptography {
+/**
+ * This class deals with all the cryptographic work associated with the Node like
+ * generating public and private key , generation of keystore, generation of certificate for the node
+ * putting private key and certificate in the keystore, retrieval of private key from the keystore
+ */
+class NodeCryptography {
     private PublicKey publicKey;
     private PrivateKey privateKey;
     private KeyStore keyStore;
@@ -37,7 +42,7 @@ public class NodeCryptography {
         return nodeCryptography;
     }
 
-    public  PublicKey getPublicKey() {
+    PublicKey getPublicKey() {
         return publicKey;
     }
 
@@ -111,17 +116,16 @@ public class NodeCryptography {
         return cert;
     }
 
-    public  KeyStore getKeyStore() {
+    KeyStore getKeyStore() {
         return keyStore;
     }
 
-    public PublicKey strToPub(String str){
+    PublicKey strToPub(String str){
         PublicKey publicKey = null;
         //converting string to byte initially and then back to public key
         byte[] bytePub1 = Base64.getDecoder().decode(str);
         if (str.equals("")){
-            publicKey=null;
-            return publicKey;
+            return null;
         }
         KeyFactory factory;
         try {
@@ -133,9 +137,8 @@ public class NodeCryptography {
         return publicKey;
     }
 
-    public String pubToStr(PublicKey key){
-        String strPub=null;
-        PublicKey publicKey1 = null;
+    String pubToStr(PublicKey key){
+        String strPub;
         //converting public key to byte[] and then convert it in to string
         if(key==null){
             strPub = "";

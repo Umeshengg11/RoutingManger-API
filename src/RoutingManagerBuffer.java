@@ -1,13 +1,9 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class RoutingManagerBuffer {
-    private List<File> getInputRoutingBuffer() {
-        return inputRoutingBuffer;
-    }
+class RoutingManagerBuffer {
 
     private static final List<File> inputRoutingBuffer = new LinkedList<>();
     private static final List<File> outputRoutingBuffer = new LinkedList<>();
@@ -24,8 +20,11 @@ public class RoutingManagerBuffer {
         }
         return routingManagerBuffer;
     }
+    private List<File> getInputRoutingBuffer() {
+        return inputRoutingBuffer;
+    }
 
-    public boolean addToInputBuffer(File file) {
+    boolean addToInputBuffer(File file) {
         inputBufferLock.lock();
         inputRoutingBuffer.add(file);
         System.out.println("File added to Input buffer");
@@ -33,7 +32,7 @@ public class RoutingManagerBuffer {
         return true;
     }
 
-    public File fetchFromInputBuffer() {
+    File fetchFromInputBuffer() {
         inputBufferLock.lock();
         File file = null;
         try{
@@ -46,7 +45,7 @@ public class RoutingManagerBuffer {
         return file;
     }
 
-    public boolean addToOutputBuffer(File file) {
+    boolean addToOutputBuffer(File file) {
         outputBufferLock.lock();
         outputRoutingBuffer.add(file);
         System.out.println("file added to Output buffer");
@@ -54,7 +53,7 @@ public class RoutingManagerBuffer {
         return true;
     }
 
-    public File fetchFromOutputBuffer() {
+    File fetchFromOutputBuffer() {
         outputBufferLock.lock();
         File file = null;
         try{

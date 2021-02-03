@@ -273,7 +273,7 @@ public class RoutingManager {
     }
 
     /**
-     * @param fileFromBuffer - File fetched from the inputbuffer of routing Table
+     * @param fileFromBuffer - File fetched from the inputBuffer of routing Table
      * @param layerID        - The layer in which the operation is to be performed
      */
     public void mergeNeighbourTable(File fileFromBuffer, int layerID) {
@@ -775,6 +775,76 @@ public class RoutingManager {
         return file;
     }
 
+    public boolean verifySignature(String hashID) {
+        boolean verify;
+        verify = b4_nodeGeneration.verifySignature();
+        return verify;
+    }
+
+    public String getSystemIP() {
+        NetworkInterface networkInterface;
+        String ethernet;
+        String selfIPAddress = "";
+        String regex = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+        try {
+            String OSName = System.getProperty("os.name");
+            if (OSName.contains("Windows")) {
+                selfIPAddress = InetAddress.getLocalHost().getHostAddress();
+            } else {
+                try {
+                    for (Enumeration interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements(); ) {
+                        networkInterface = (NetworkInterface) interfaces.nextElement();
+                        ethernet = networkInterface.getDisplayName();
+                        if (!(ethernet.equals("lo"))) {
+                            if (!(ethernet.contains("br"))) {
+                                InetAddress inetAddress = null;
+                                for (Enumeration ips = networkInterface.getInetAddresses(); ips.hasMoreElements(); ) {
+                                    inetAddress = (InetAddress) ips.nextElement();
+                                    if (Pattern.matches(regex, inetAddress.getCanonicalHostName())) {
+                                        selfIPAddress = inetAddress.getCanonicalHostName();
+                                        return selfIPAddress;
+                                    }
+                                }
+                                assert inetAddress != null;
+                                String pip = inetAddress.toString();
+                                int abc = pip.indexOf("/");
+                                int cutat = abc + 1;
+                                selfIPAddress = pip.substring(cutat);
+                                return selfIPAddress;
+                            }
+                        }
+                    }
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                }
+            }
+            return selfIPAddress;
+        } catch (Exception E) {
+            System.out.println("Exception");
+            return null;
+        }
+    }
+
+    public String getMACAddress() {
+        String macaddr = "";
+        try {
+
+            String ipAddress = getSystemIP();
+            NetworkInterface network = NetworkInterface.getByInetAddress(InetAddress.getByName(ipAddress));
+            byte[] mac = network.getHardwareAddress();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < mac.length; i++) {
+                sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+            }
+            System.out.println("Current MAC address : " + sb.toString());
+            macaddr = sb.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return macaddr;
+    }
+
     /**
      * This method is used for setting Local Node information.
      * <br>Presently it is hardcoded (will be amended later).
@@ -1104,74 +1174,6 @@ public class RoutingManager {
         }
     }
 
-    public boolean verifySignature(String hashID) {
-        boolean verify;
-        verify = b4_nodeGeneration.verifySignature();
-        return verify;
-    }
 
-    public String getSystemIP() {
-        NetworkInterface networkInterface;
-        String ethernet;
-        String selfIPAddress = "";
-        String regex = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
-        try {
-            String OSName = System.getProperty("os.name");
-            if (OSName.contains("Windows")) {
-                selfIPAddress = InetAddress.getLocalHost().getHostAddress();
-            } else {
-                try {
-                    for (Enumeration interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements(); ) {
-                        networkInterface = (NetworkInterface) interfaces.nextElement();
-                        ethernet = networkInterface.getDisplayName();
-                        if (!(ethernet.equals("lo"))) {
-                            if (!(ethernet.contains("br"))) {
-                                InetAddress inetAddress = null;
-                                for (Enumeration ips = networkInterface.getInetAddresses(); ips.hasMoreElements(); ) {
-                                    inetAddress = (InetAddress) ips.nextElement();
-                                    if (Pattern.matches(regex, inetAddress.getCanonicalHostName())) {
-                                        selfIPAddress = inetAddress.getCanonicalHostName();
-                                        return selfIPAddress;
-                                    }
-                                }
-                                assert inetAddress != null;
-                                String pip = inetAddress.toString();
-                                int abc = pip.indexOf("/");
-                                int cutat = abc + 1;
-                                selfIPAddress = pip.substring(cutat);
-                                return selfIPAddress;
-                            }
-                        }
-                    }
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                }
-            }
-            return selfIPAddress;
-        } catch (Exception E) {
-            System.out.println("Exception");
-            return null;
-        }
-    }
-
-    public String getMACAddress() {
-        String macaddr = "";
-        try {
-
-            String ipAddress = getSystemIP();
-            NetworkInterface network = NetworkInterface.getByInetAddress(InetAddress.getByName(ipAddress));
-            byte[] mac = network.getHardwareAddress();
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < mac.length; i++) {
-                sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-            }
-            System.out.println("Current MAC address : " + sb.toString());
-            macaddr = sb.toString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return macaddr;
-    }
 
 }

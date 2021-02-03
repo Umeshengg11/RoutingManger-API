@@ -4,21 +4,34 @@
  * The routingTable and neighbourTable will be created using the object of this class and NodeTuple class.
  * Two constructor of this class is created - one without rtt value and other with rtt value.
  */
-public class B4_Node {
+class B4_Node {
     private final B4_NodeTuple b4node;
     private final String ipAddress;
     private final String portAddress;
     private final String transport;
     private float rtt;
 
-    public B4_Node(B4_NodeTuple b4node, String ipAddress, String portAddress, String transport) {
+    /**
+     * @param b4node -Its a B4_NodeTuple Object
+     * @param ipAddress - IpAddress of the node
+     * @param portAddress - PortAddress of the node
+     * @param transport - TransportAddress of the node
+     */
+    B4_Node(B4_NodeTuple b4node, String ipAddress, String portAddress, String transport) {
         this.b4node = b4node;
         this.ipAddress = ipAddress;
         this.portAddress = portAddress;
         this.transport = transport;
     }
 
-    public B4_Node(B4_NodeTuple b4node, String ipAddress, String portAddress, String transport, float rtt) {
+    /**
+     * @param b4node -Its a B4_NodeTuple Object
+     * @param ipAddress- IpAddress of the node
+     * @param portAddress - PortAddress of the node
+     * @param transport - TransportAddress of the node
+     * @param rtt - rtt value of the particular node form the selfNode
+     */
+    B4_Node(B4_NodeTuple b4node, String ipAddress, String portAddress, String transport, float rtt) {
         this.b4node = b4node;
         this.ipAddress = ipAddress;
         this.portAddress = portAddress;
@@ -26,23 +39,23 @@ public class B4_Node {
         this.rtt = rtt;
     }
 
-    public float getRtt() {
+    float getRtt() {
         return rtt;
     }
 
-    public B4_NodeTuple getB4node() {
+    B4_NodeTuple getB4node() {
         return b4node;
     }
 
-    public String getIpAddress() {
+    String getIpAddress() {
         return ipAddress;
     }
 
-    public String getPortAddress() {
+    String getPortAddress() {
         return portAddress;
     }
 
-    public String getTransport() {
+    String getTransport() {
         return transport;
     }
 }

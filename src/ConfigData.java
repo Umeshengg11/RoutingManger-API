@@ -2,7 +2,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ConfigData {
+/**
+ * This class is used to get all the data from the configuration file ie config.properties
+ */
+class ConfigData {
     private static ConfigData config;
     private long sleepTime;
     private B4_Node bootStrapNode;
@@ -19,29 +22,29 @@ public class ConfigData {
         return config;
     }
 
-    public int getNeighbourTableLength() {
+    int getNeighbourTableLength() {
         return servicesInt("NT_length");
     }
 
-    public int getRoutingTableLength() {
+    int getRoutingTableLength() {
         return servicesInt("RT_length");
     }
 
-    public long getSleepTime() {
+    long getSleepTime() {
         sleepTime = servicesLong("Sleep_time");
         return sleepTime;
     }
 
-    public long getIncrementTime() {
+    long getIncrementTime() {
         return servicesLong("Increment_time");
     }
 
-    public B4_Node getBootStrapNode() {
+    B4_Node getBootStrapNode() {
         serviceBootStrap();
         return bootStrapNode;
     }
 
-    public boolean isLayerAccess(String layerName) {
+    boolean isLayerAccess(String layerName) {
         return serviceAccess(layerName);
     }
 
