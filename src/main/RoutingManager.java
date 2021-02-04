@@ -1,3 +1,5 @@
+package main;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -58,7 +60,7 @@ public class RoutingManager {
      * <br> If RT exists then data is taken from the xml file and added to the localBaseRoutingTable(which is the routingTable for current node)
      * and to the localBaseNeighbourTable(which is the neighbourTable for current node).
      * <br> If not available then create a routing table(localBaseRoutingTable) and neighbour table (localBaseNeighbourTable).
-     * <br> Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of B4_Node with only bootstrap node entry.
+     * <br> Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of main.resources.B4_Node with only bootstrap node entry.
      */
     private RoutingManager() {
         nodeCryptography = NodeCryptography.getInstance();
@@ -158,7 +160,7 @@ public class RoutingManager {
                 doc.getDocumentElement().normalize();
                 //String rootElement = doc.getDocumentElement().getNodeName();
 
-                NodeList nodeList = doc.getElementsByTagName("B4_Node");
+                NodeList nodeList = doc.getElementsByTagName("main.resources.B4_Node");
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Node node = nodeList.item(i);
                     if (node.getNodeType() == node.ELEMENT_NODE) {
@@ -216,8 +218,8 @@ public class RoutingManager {
 
     /**
      * @return RoutingManger Object
-     * <br>This method is required to create an instance of RoutingManager.
-     * <br>Instance of RoutingManager will be obtained by calling this function.
+     * <br>This method is required to create an instance of main.resources.RoutingManager.
+     * <br>Instance of main.resources.RoutingManager will be obtained by calling this function.
      */
     public static synchronized RoutingManager getInstance() {
         if (routingManager == null) {
@@ -227,7 +229,7 @@ public class RoutingManager {
     }
 
     /**
-     * @return B4_Node Object
+     * @return main.resources.B4_Node Object
      * <br>This method is used for getting Local Node Information.
      * <br>This method can be called by any function to get complete information about the current Node.
      */
@@ -238,12 +240,12 @@ public class RoutingManager {
     /**
      * @param fileFromBuffer - The file that is fetched from the input buffer of the routing Table.
      * @param layerID        - Specify the layer Id of the routing table which needs to be merged
-     *                       <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
+     *                       <br>This method is used for merging routing table obtained from other main.resources.B4_Node in to localBaseRoutingTable.
      *                       <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
      *                       <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
      *                       <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
      *                       Array at which the data is to be updated.
-     *                       <br>Based on the algorithm the B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
+     *                       <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
      */
     public void mergeRoutingTable(File fileFromBuffer, int layerID) {
 
@@ -475,7 +477,7 @@ public class RoutingManager {
     /**
      * @param hashID  - hash id received as a query to find the next hop
      * @param layerID - layer id on which the operation is to be performed
-     * @return null if next hop is selfNode else return B4_Node object else return B4_Node Object
+     * @return null if next hop is selfNode else return main.resources.B4_Node object else return main.resources.B4_Node Object
      * <p>
      * 1. This method is used to find the nextHop for a hashID/NodeID which is received as a query.
      * 2. Initially check whether the hashId/nodeId is equal to localNodeID.
@@ -873,7 +875,7 @@ public class RoutingManager {
 
     /**
      * @param mergerFile-Merger File need to be added
-     * @return B4_Node Object
+     * @return main.resources.B4_Node Object
      */
     private B4_Node getSelfNodeOfMergerTable(String mergerFile) {
         B4_RoutingTables mergerTable = new B4_RoutingTables(mergerFile);
@@ -1101,7 +1103,7 @@ public class RoutingManager {
 
             for (int i = 0; i < rt_dimension; i++) {
                 for (int j = 0; j < 3; j++) {
-                    Element row = doc.createElement("B4_Node");
+                    Element row = doc.createElement("main.resources.B4_Node");
                     root.appendChild(row);
                     row.setAttribute("INDEX", "[" + i + "]" + "[" + j + "]");
 

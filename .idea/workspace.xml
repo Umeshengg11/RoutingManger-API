@@ -20,14 +20,37 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="995d29c0-2f21-4f28-b5c1-234591841a40" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/log4j_1_2_17.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LogFiles/file.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/log4j.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/bcprov_jdk15on_168.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/bcprov_jdk15on_168.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/B4_Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/B4_Node.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/B4_NodeGeneration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/B4_NodeGeneration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/B4_RoutingTables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/B4_RoutingTables.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ConfigData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ConfigData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NodeCryptography.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/NodeCryptography.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RoutingManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RoutingManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RoutingManagerBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RoutingManagerBuffer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KeyStore.ks" beforeDir="false" afterPath="$PROJECT_DIR$/KeyStore.ks" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NodeDetails.txt" beforeDir="false" afterPath="$PROJECT_DIR$/NodeDetails.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RoutingManger-API.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RoutingManger-API.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_Node.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_NodeGeneration.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_NodeTuple.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/B4_RoutingTables.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/ConfigData.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/CreateXMLWithEntry.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/InActCommunicationManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/NodeCryptography.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/RoutingManager$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/RoutingManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/RoutingManagerBuffer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/Testing.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/B4_Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/B4_Node.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/B4_NodeGeneration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/B4_NodeGeneration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/B4_NodeTuple.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/B4_NodeTuple.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/B4_RoutingTables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/B4_RoutingTables.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ConfigData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/ConfigData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CreateXMLWithEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/CreateXMLWithEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/InActCommunicationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/InActCommunicationManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NodeCryptography.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/NodeCryptography.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/RoutingManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/RoutingManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/RoutingManagerBuffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/RoutingManagerBuffer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Testing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Testing.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +68,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/RoutingManager.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/RoutingManager.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1kbWwHh1TbZ30eA43N6iMC6ezXq" />
   <component name="ProjectLevelVcsManager">
@@ -61,10 +84,10 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="full.screen.before.presentation.mode" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../b4client" />
-    <property name="project.structure.last.edited" value="Libraries" />
-    <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/Jar file/bcprov-jdk15on-168.jar" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
@@ -72,38 +95,57 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/LogFiles" />
+      <recent name="$PROJECT_DIR$/src/resources" />
+      <recent name="$PROJECT_DIR$/main/resources" />
+    </key>
   </component>
-  <component name="RunManager" selected="Application.Testing">
-    <configuration name="B4_NodeGeneration" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="B4_NodeGeneration" />
+  <component name="RunManager" selected="Application.Testing (1)">
+    <configuration name="B4_NodeGeneration (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="main.B4_NodeGeneration" />
       <module name="RoutingManger-API" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="CreateXMLWithEntry" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="CreateXMLWithEntry" />
+      <option name="MAIN_CLASS_NAME" value="main.resources.CreateXMLWithEntry" />
       <module name="RoutingManger-API" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="InActCommunicationManager" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="InActCommunicationManager" />
+      <option name="MAIN_CLASS_NAME" value="main.resources.InActCommunicationManager" />
       <module name="RoutingManger-API" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NodeCryptography" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="NodeCryptography" />
+    <configuration name="Testing (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="main.Testing" />
       <module name="RoutingManger-API" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="Testing" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Testing" />
+      <option name="MAIN_CLASS_NAME" value="main.resources.Testing" />
       <module name="RoutingManger-API" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -111,11 +153,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Testing (1)" />
+        <item itemvalue="Application.B4_NodeGeneration (1)" />
         <item itemvalue="Application.Testing" />
         <item itemvalue="Application.InActCommunicationManager" />
         <item itemvalue="Application.CreateXMLWithEntry" />
-        <item itemvalue="Application.B4_NodeGeneration" />
-        <item itemvalue="Application.NodeCryptography" />
       </list>
     </recent_temporary>
   </component>

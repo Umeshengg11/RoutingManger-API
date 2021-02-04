@@ -1,3 +1,5 @@
+package main;
+
 /**
  * Created by S/L Umesh Nair
  * This class hold all the information about the node - Node ID, Node IP, Node Port,Node Transport and rtt.
@@ -12,7 +14,7 @@ class B4_Node {
     private float rtt;
 
     /**
-     * @param b4node -Its a B4_NodeTuple Object
+     * @param b4node -Its a main.resources.B4_NodeTuple Object
      * @param ipAddress - IpAddress of the node
      * @param portAddress - PortAddress of the node
      * @param transport - TransportAddress of the node
@@ -25,7 +27,7 @@ class B4_Node {
     }
 
     /**
-     * @param b4node -Its a B4_NodeTuple Object
+     * @param b4node -Its a main.resources.B4_NodeTuple Object
      * @param ipAddress- IpAddress of the node
      * @param portAddress - PortAddress of the node
      * @param transport - TransportAddress of the node

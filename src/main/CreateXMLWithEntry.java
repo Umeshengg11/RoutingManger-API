@@ -1,3 +1,5 @@
+package main;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -224,7 +226,7 @@ public class CreateXMLWithEntry {
     }
 
 //    public static void main(String[] args) {
-//        RoutingManagerBuffer buffer = RoutingManagerBuffer.getInstance();
+//        main.resources.RoutingManagerBuffer buffer = main.resources.RoutingManagerBuffer.getInstance();
 //        buffer.addFileToBuffer(createXML());
 //        buffer.addFileToBuffer(createXML());
 //        buffer.addFileToBuffer(createXML());
