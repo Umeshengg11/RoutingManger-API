@@ -1,5 +1,6 @@
 package main;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -21,6 +22,7 @@ public class B4_RoutingTables {
     private final B4_Node[][] routingTable;
     private final B4_Node[] neighbourTable;
     private B4_Node selfMergerNode ;
+    private static final Logger log = Logger.getLogger(B4_RoutingTables.class);
 
     public B4_RoutingTables(String mergerRTFile) {
         NodeCryptography nodeCryptography = NodeCryptography.getInstance();
@@ -101,7 +103,7 @@ public class B4_RoutingTables {
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred",e);
         }
 
     }

@@ -1,8 +1,6 @@
 package main;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.w3c.dom.ls.LSOutput;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -13,7 +11,7 @@ import java.security.*;
  * hashID generated can be verified using the verifySignature method.This method can access from the main.resources.RoutingManager class .
  */
 class B4_NodeGeneration {
-    private static Logger log = Logger.getLogger(B4_NodeGeneration.class);
+    private static final Logger log = Logger.getLogger(B4_NodeGeneration.class);
     private final String nodeID;
     private final PublicKey publicKey;
     private final String hashID;

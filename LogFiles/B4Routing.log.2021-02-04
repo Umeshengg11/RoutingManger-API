@@ -1,0 +1,6 @@
+04-Feb-2021 ; 08.30.58 INFO  : main.B4_NodeGeneration [generateNodeId] - Node ID is generated Successfully 
+04-Feb-2021 ; 08.30.58 INFO  : main.B4_NodeGeneration [generateNodeId] - Node ID -59462400AE7EAC5C9FE98B110AF81B7973697AC9 
+04-Feb-2021 ; 08.30.58 INFO  : main.B4_NodeGeneration [signNodeIdUsingPrivateKey] - NodeID signed using PrivateKey 
+04-Feb-2021 ; 08.32.36 INFO  : main.B4_NodeGeneration [generateNodeId] - Node ID is generated Successfully 
+04-Feb-2021 ; 08.32.36 INFO  : main.B4_NodeGeneration [generateNodeId] - Node ID -D0ACA1EEC064872C738A79426C3444BD17EE89DF 
+04-Feb-2021 ; 08.32.36 INFO  : main.B4_NodeGeneration [signNodeIdUsingPrivateKey] - NodeID signed using PrivateKey 

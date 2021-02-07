@@ -1,5 +1,7 @@
 package main;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +14,7 @@ class RoutingManagerBuffer {
     private static final ReentrantLock inputBufferLock = new ReentrantLock();
     private static final ReentrantLock outputBufferLock = new ReentrantLock();
     private static RoutingManagerBuffer routingManagerBuffer;
+    private static final Logger log = Logger.getLogger(RoutingManagerBuffer.class);
 
     private RoutingManagerBuffer() {
     }
@@ -29,7 +32,7 @@ class RoutingManagerBuffer {
     boolean addToInputBuffer(File file) {
         inputBufferLock.lock();
         inputRoutingBuffer.add(file);
-        System.out.println("File added to Input buffer");
+        log.debug("File added to Input buffer");
         inputBufferLock.unlock();
         return true;
     }
@@ -41,7 +44,7 @@ class RoutingManagerBuffer {
             file = inputRoutingBuffer.get(0);
             inputRoutingBuffer.remove(0);
         } catch(Exception e) {
-            System.out.println("There is no File in Input Buffer");
+            log.debug("There is no File in Input Buffer");
         }
         inputBufferLock.unlock();
         return file;
@@ -50,7 +53,7 @@ class RoutingManagerBuffer {
     boolean addToOutputBuffer(File file) {
         outputBufferLock.lock();
         outputRoutingBuffer.add(file);
-        System.out.println("file added to Output buffer");
+        log.debug("File added to Output buffer");
         outputBufferLock.unlock();
         return true;
     }
@@ -62,7 +65,7 @@ class RoutingManagerBuffer {
             file = outputRoutingBuffer.get(0);
             outputRoutingBuffer.remove(0);
         } catch(Exception e) {
-            System.out.println("There is no File in Output Buffer");
+            log.debug("There is no File in Output Buffer");
         }
         outputBufferLock.unlock();
         return file;

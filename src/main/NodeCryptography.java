@@ -1,5 +1,6 @@
 package main;
 
+import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
@@ -27,6 +28,7 @@ class NodeCryptography {
     private PrivateKey privateKey;
     private KeyStore keyStore;
     private static NodeCryptography nodeCryptography;
+    private static final Logger log = Logger.getLogger(NodeCryptography.class);
 
     private NodeCryptography() {
         Provider provider = new BouncyCastleProvider();
@@ -56,9 +58,9 @@ class NodeCryptography {
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
-            //System.out.println("Key Pair Generated");
+            log.debug("Key Pair Generated");
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred",e);
         }
     }
 
@@ -70,8 +72,9 @@ class NodeCryptography {
             FileOutputStream fos = new FileOutputStream("KeyStore.ks");
             keyStore.store(fos, keyStorePassword);
             fos.close();
+            log.debug("Key Store Created");
         } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred",e);
         }
     }
 
@@ -84,8 +87,9 @@ class NodeCryptography {
         KeyStore.PrivateKeyEntry privateKeyEntry = new KeyStore.PrivateKeyEntry(privateKey, certChain);
         try {
             keyStore.setEntry("Private Key", privateKeyEntry, protectionParameter);
+            log.debug("Private key stored to KeyStore");
         } catch (KeyStoreException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred",e);
         }
     }
 
@@ -112,8 +116,9 @@ class NodeCryptography {
         X509Certificate cert = null;
         try {
             cert = certGen.generate(privateKey, "BC");
+            log.debug("Certificate Generated");
         } catch (CertificateEncodingException | InvalidKeyException | NoSuchAlgorithmException | SignatureException | NoSuchProviderException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred",e);
         }
         return cert;
     }
@@ -134,7 +139,7 @@ class NodeCryptography {
             factory = KeyFactory.getInstance("RSA");
             publicKey = factory.generatePublic(new X509EncodedKeySpec(bytePub1));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred",e);
         }
         return publicKey;
     }
@@ -148,7 +153,6 @@ class NodeCryptography {
         }
         byte[] bytePub = key.getEncoded();
         strPub = Base64.getEncoder().encodeToString(bytePub);
-        //System.out.println("String format is   "+strPub);
         return strPub;
     }
 }

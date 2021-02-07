@@ -1,5 +1,6 @@
 package main;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,7 +20,7 @@ import java.io.IOException;
 import java.util.Random;
 
 public class InActCommunicationManager {
-
+    private static final Logger log = Logger.getLogger(InActCommunicationManager.class);
     public void returnRTTData(File file) {
         RoutingManager rt = RoutingManager.getInstance();
         if (!(file == null)) {
@@ -48,7 +49,6 @@ public class InActCommunicationManager {
             doc.getDocumentElement().normalize();
             String rootElement = doc.getDocumentElement().getNodeName();
             selfNodeID = doc.getDocumentElement().getAttribute("SELF_NODE_ID");
-            System.out.println(selfNodeID);
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
             for (int i = 0; i < nodeList1.getLength(); i++) {
                 Node node = nodeList1.item(i);
@@ -69,7 +69,7 @@ public class InActCommunicationManager {
                     String randIntS = Integer.toString(randInt12);
                     element.getElementsByTagName("NODERTT").item(0).setTextContent(randIntS);
                     String nodeRTT = element.getElementsByTagName("NODERTT").item(0).getTextContent();
-                    System.out.println("Node RTT is " + nodeRTT);
+
                 }
             }
 
@@ -78,11 +78,12 @@ public class InActCommunicationManager {
             DOMSource domSource = new DOMSource(doc);
             StreamResult streamResult = new StreamResult(new File("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml"));
             transformer.transform(domSource, streamResult);
-            System.out.println("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml" + " file updated");
+            log.debug("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml" + "file updated");
+
 
 
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred",e);
         }
         File file1 = new File("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml");
         return file1;

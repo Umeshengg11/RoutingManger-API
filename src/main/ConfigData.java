@@ -1,5 +1,8 @@
 package main;
 
+import org.apache.log4j.Logger;
+
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -12,9 +15,18 @@ class ConfigData {
     private long sleepTime;
     private B4_Node bootStrapNode;
     private final NodeCryptography nodeCryptography;
+    private static final Logger log = Logger.getLogger(ConfigData.class);
+    private FileReader reader;
+    private Properties properties;
 
     private ConfigData() {
         nodeCryptography = NodeCryptography.getInstance();
+        try {
+            reader = new FileReader("src/configuration/config.properties");
+            properties = new Properties();
+        } catch (FileNotFoundException e) {
+           log.error("Exception Occurred",e);
+        }
     }
 
     public static synchronized ConfigData getInstance() {
@@ -52,16 +64,13 @@ class ConfigData {
 
     private int servicesInt(String key) {
         int length = 0;
-        FileReader reader;
         try {
-            reader = new FileReader("config.properties");
-            Properties properties = new Properties();
             properties.load(reader);
             String value = properties.getProperty(key);
             length = Integer.parseInt(value);
 
         } catch (IOException e) {
-            System.out.println("RT_length parameter not found in config file\n" + e);
+            log.error("RT_length parameter not found in config file\n",e);
         }
         return length;
     }
@@ -69,22 +78,18 @@ class ConfigData {
     private long servicesLong(String key) {
         long time = 0;
         try {
-            FileReader reader = new FileReader("config.properties");
-            Properties properties = new Properties();
             properties.load(reader);
             String slp_time = properties.getProperty(key);
             sleepTime = Long.parseLong(slp_time);
 
         } catch (IOException e) {
-            System.out.println("Config file not Found or Issue in config file fetching");
+            log.error("Config file not Found or Issue in config file fetching\n",e);
         }
         return time;
     }
 
     private void serviceBootStrap() {
         try {
-            FileReader reader = new FileReader("config.properties");
-            Properties properties = new Properties();
             properties.load(reader);
             String bootStrapID = properties.getProperty("BootstrapND");
             String bootStrapPub = properties.getProperty("BootstrapPubKey");
@@ -94,22 +99,19 @@ class ConfigData {
             String bootStrapAddress = properties.getProperty("BootstrapAddress");
             bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID,nodeCryptography.strToPub(bootStrapPub),bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
         } catch (IOException e) {
-            System.out.println("Config file not Found or Issue in config file fetching");
+            log.error("Config file not Found or Issue in config file fetching\n",e);
         }
     }
 
     private boolean serviceAccess(String serviceName) {
         boolean access = false;
-        FileReader reader;
         try {
-            reader = new FileReader("config.properties");
-            Properties properties = new Properties();
             properties.load(reader);
             String value = properties.getProperty(serviceName);
             if (value.contentEquals("yes")) access = true;
 
         } catch (IOException e) {
-            System.out.println("Service Not found in Config file\n" + e);
+            log.error("Service Not found in Config file\n",e);
         }
         return access;
     }
