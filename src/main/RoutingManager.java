@@ -84,6 +84,7 @@ public class RoutingManager {
                 printWriter.println("IPAddress="+getSystemIP());
                 printWriter.println("PortAddress=1024");
                 printWriter.println("TransportAddress=TCP");
+                printWriter.flush();
                 printWriter.close();
                 log.debug("NodeDetail File created successfully");
             } catch (IOException e) {

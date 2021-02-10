@@ -1,0 +1,92 @@
+09-Feb-2021 ; 11.46.48 DEBUG  : main.NodeCryptography [keyPairGeneration] - Key Pair Generated 
+09-Feb-2021 ; 11.46.49 DEBUG  : main.NodeCryptography [keyStoreCreation] - Key Store Created 
+09-Feb-2021 ; 11.46.49 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+09-Feb-2021 ; 11.46.49 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+09-Feb-2021 ; 11.46.49 DEBUG  : main.NodeCryptography [savePrivateKeyToKeyStore] - Private key stored to KeyStore 
+09-Feb-2021 ; 11.46.49 INFO  : main.B4_NodeGeneration [generateNodeId] - Node ID is generated Successfully 
+09-Feb-2021 ; 11.46.49 INFO  : main.B4_NodeGeneration [generateNodeId] - Node ID -5CAD3DF6E89B0AFF3B6A9C56B10832CA28A29EAC 
+09-Feb-2021 ; 11.46.49 INFO  : main.B4_NodeGeneration [signNodeIdUsingPrivateKey] - NodeID signed using PrivateKey 
+09-Feb-2021 ; 11.46.50 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+09-Feb-2021 ; 11.46.50 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+09-Feb-2021 ; 11.46.50 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+09-Feb-2021 ; 11.46.54 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.46.55 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
+09-Feb-2021 ; 11.46.55 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
+09-Feb-2021 ; 11.46.55 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+09-Feb-2021 ; 11.46.55 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
+09-Feb-2021 ; 11.46.55 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
+09-Feb-2021 ; 11.46.55 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
+09-Feb-2021 ; 11.46.55 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
+09-Feb-2021 ; 11.46.58 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.47.00 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
+09-Feb-2021 ; 11.47.00 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
+09-Feb-2021 ; 11.47.00 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+09-Feb-2021 ; 11.47.00 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
+09-Feb-2021 ; 11.47.00 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
+09-Feb-2021 ; 11.47.00 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
+09-Feb-2021 ; 11.47.00 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
+09-Feb-2021 ; 11.47.02 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.47.02 DEBUG  : main.InActCommunicationManager [test] - RcvRTT_1_7589ABAA1234ABA1234591111ABCDFE123456789.xmlfile updated 
+09-Feb-2021 ; 11.47.02 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.47.02 DEBUG  : main.InActCommunicationManager [test] - RcvRTT_1_7589ABAA1234ABA1234591111ABCDFE123456789.xmlfile updated 
+09-Feb-2021 ; 11.47.02 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.47.02 DEBUG  : main.RoutingManagerBuffer [fetchFromOutputBuffer] - There is no File in Output Buffer 
+09-Feb-2021 ; 11.47.02 DEBUG  : main.RoutingManager [getMACAddress] - Current MAC address : 48-E2-44-2D-3B-BD 
+09-Feb-2021 ; 11.47.05 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
+09-Feb-2021 ; 11.47.05 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
+09-Feb-2021 ; 11.47.05 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+09-Feb-2021 ; 11.47.05 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
+09-Feb-2021 ; 11.47.05 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
+09-Feb-2021 ; 11.47.05 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
+09-Feb-2021 ; 11.47.05 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
+09-Feb-2021 ; 11.47.10 DEBUG  : main.RoutingManager$1 [run] - RcvRTT_1_7589ABAA1234ABA1234591111ABCDFE123456789.xml 
+09-Feb-2021 ; 11.47.10 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
+09-Feb-2021 ; 11.47.10 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+09-Feb-2021 ; 11.47.10 INFO  : main.RoutingManager [mergeNeighbourTable] - Storage NeighbourTable Merged successfully 
+09-Feb-2021 ; 11.47.10 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
+09-Feb-2021 ; 11.47.15 DEBUG  : main.RoutingManager$1 [run] - RcvRTT_1_7589ABAA1234ABA1234591111ABCDFE123456789.xml 
+09-Feb-2021 ; 11.47.15 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
+09-Feb-2021 ; 11.47.15 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+09-Feb-2021 ; 11.47.15 INFO  : main.RoutingManager [mergeNeighbourTable] - Storage NeighbourTable Merged successfully 
+09-Feb-2021 ; 11.47.15 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
+09-Feb-2021 ; 11.47.20 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+09-Feb-2021 ; 11.47.25 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+09-Feb-2021 ; 11.47.30 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+09-Feb-2021 ; 11.48.55 DEBUG  : main.NodeCryptography [keyPairGeneration] - Key Pair Generated 
+09-Feb-2021 ; 11.48.56 DEBUG  : main.NodeCryptography [keyStoreCreation] - Key Store Created 
+09-Feb-2021 ; 11.48.56 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+09-Feb-2021 ; 11.48.56 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+09-Feb-2021 ; 11.48.56 DEBUG  : main.NodeCryptography [savePrivateKeyToKeyStore] - Private key stored to KeyStore 
+09-Feb-2021 ; 11.48.57 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+09-Feb-2021 ; 11.48.57 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+09-Feb-2021 ; 11.48.57 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+09-Feb-2021 ; 11.49.02 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+09-Feb-2021 ; 11.49.02 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.49.06 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.49.07 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
+09-Feb-2021 ; 11.49.07 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
+09-Feb-2021 ; 11.49.07 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+09-Feb-2021 ; 11.49.07 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
+09-Feb-2021 ; 11.49.07 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
+09-Feb-2021 ; 11.49.07 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
+09-Feb-2021 ; 11.49.07 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
+09-Feb-2021 ; 11.49.09 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.49.09 DEBUG  : main.InActCommunicationManager [test] - RcvRTT_1_7589ABAA1234ABA1234591111ABCDFE123456789.xmlfile updated 
+09-Feb-2021 ; 11.49.09 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
+09-Feb-2021 ; 11.49.09 DEBUG  : main.RoutingManagerBuffer [fetchFromOutputBuffer] - There is no File in Output Buffer 
+09-Feb-2021 ; 11.49.09 DEBUG  : main.RoutingManagerBuffer [fetchFromOutputBuffer] - There is no File in Output Buffer 
+09-Feb-2021 ; 11.49.09 DEBUG  : main.RoutingManager [getMACAddress] - Current MAC address : 48-E2-44-2D-3B-BD 
+09-Feb-2021 ; 11.49.12 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
+09-Feb-2021 ; 11.49.12 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
+09-Feb-2021 ; 11.49.12 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+09-Feb-2021 ; 11.49.12 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
+09-Feb-2021 ; 11.49.12 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
+09-Feb-2021 ; 11.49.12 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
+09-Feb-2021 ; 11.49.12 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
+09-Feb-2021 ; 11.49.17 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
+09-Feb-2021 ; 11.49.17 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
+09-Feb-2021 ; 11.49.17 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+09-Feb-2021 ; 11.49.17 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
+09-Feb-2021 ; 11.49.17 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
+09-Feb-2021 ; 11.49.17 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
+09-Feb-2021 ; 11.49.17 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 

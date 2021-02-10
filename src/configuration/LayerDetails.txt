@@ -1,0 +1,8 @@
+#  Layering Details  #
+..................................
+Heightens=3
+BaseRoutingTable=0
+StorageRoutingTable=1
+MessageRoutingTable=2
+VoipRoutingTable=3
+UmeshLayer=4
