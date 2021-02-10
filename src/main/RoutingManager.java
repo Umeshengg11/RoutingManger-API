@@ -68,32 +68,30 @@ public class RoutingManager {
         nodeCryptography = NodeCryptography.getInstance();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
         boolean nodeDetailsExists;
-        File nodeFile = new File("NodeDetails.txt");
+        File nodeFile = new File("src/configuration/NodeDetails.txt");
         nodeDetailsExists = nodeFile.exists();
 
         if (!nodeDetailsExists) {
             b4_nodeGeneration = new B4_NodeGeneration();
             try {
-                FileWriter writer = new FileWriter("NodeDetails.txt");
+                FileWriter writer = new FileWriter("src/configuration/NodeDetails.txt");
                 PrintWriter printWriter = new PrintWriter(writer);
                 printWriter.println("#  Self Node Details  #");
                 printWriter.println("..................................");
                 printWriter.println("NodeID=" + b4_nodeGeneration.getNodeID());
                 printWriter.println("PublicKey=" + nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
                 printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
-                printWriter.println("IPAddress=191.126.10.12");
+                printWriter.println("IPAddress="+getSystemIP());
                 printWriter.println("PortAddress=1024");
                 printWriter.println("TransportAddress=TCP");
                 printWriter.close();
-                selfIPAddress = getSystemIP();
-                selfPortAddress = "1024";
-                selfTransportAddress = "TCP";
+                log.debug("NodeDetail File created successfully");
             } catch (IOException e) {
                 log.error("Exception Occurred",e);
             }
         } else {
             try {
-                FileReader reader = new FileReader("NodeDetails.txt");
+                FileReader reader = new FileReader("src/configuration/NodeDetails.txt");
                 Properties properties = new Properties();
                 properties.load(reader);
                 String selfNodeID = properties.getProperty("NodeID");

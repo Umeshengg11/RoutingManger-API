@@ -16,7 +16,6 @@ public class Testing {
         String ip = rt.getSystemIP();
         System.out.println(ip);
         System.out.println(rt.getMACAddress());
-
-
     }
 }
+
