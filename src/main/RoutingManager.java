@@ -19,6 +19,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -38,10 +39,11 @@ public class RoutingManager {
     private static RoutingManager routingManager;
     private static RoutingManagerBuffer routingManagerBuffer;
     private static ConfigData config;
-    private final B4_Node[][] localBaseRoutingTable;
-    private final B4_Node[] localBaseNeighbourTable;
-    private final B4_Node[][] storageRoutingTable;
-    private final B4_Node[] storageNeighbourTable;
+    private ArrayList<B4_RoutingTable> routingTables;
+    //    private final B4_Node[][] localBaseRoutingTable;
+//    private final B4_Node[] localBaseNeighbourTable;
+//    private final B4_Node[][] storageRoutingTable;
+//    private final B4_Node[] storageNeighbourTable;
     private B4_Node localNode;
     private final NodeCryptography nodeCryptography;
     private B4_NodeGeneration b4_nodeGeneration;
@@ -65,6 +67,7 @@ public class RoutingManager {
      * <br> Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of main.resources.B4_Node with only bootstrap node entry.
      */
     private RoutingManager() {
+        routingTables = new ArrayList<>();
         nodeCryptography = NodeCryptography.getInstance();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
         boolean nodeDetailsExists;
@@ -81,14 +84,14 @@ public class RoutingManager {
                 printWriter.println("NodeID=" + b4_nodeGeneration.getNodeID());
                 printWriter.println("PublicKey=" + nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
                 printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
-                printWriter.println("IPAddress="+getSystemIP());
+                printWriter.println("IPAddress=" + getSystemIP());
                 printWriter.println("PortAddress=1024");
                 printWriter.println("TransportAddress=TCP");
                 printWriter.flush();
                 printWriter.close();
                 log.debug("NodeDetail File created successfully");
             } catch (IOException e) {
-                log.error("Exception Occurred",e);
+                log.error("Exception Occurred", e);
             }
         } else {
             try {
@@ -103,7 +106,7 @@ public class RoutingManager {
                 selfTransportAddress = properties.getProperty("TransportAddress");
                 b4_nodeGeneration = new B4_NodeGeneration(selfNodeID, nodeCryptography.strToPub(selfPublicKey), selfHashID);
             } catch (IOException e) {
-                log.error("NodeDetails File not Found or Issue in file fetching\n",e);
+                log.error("NodeDetails File not Found or Issue in file fetching\n", e);
             }
         }
         config = ConfigData.getInstance();
@@ -112,13 +115,14 @@ public class RoutingManager {
         incrementTime = config.getIncrementTime();
         sleepTime = config.getSleepTime();
         setLocalNode();
-        localBaseRoutingTable = new B4_Node[rt_dimension][3];
-        localBaseNeighbourTable = new B4_Node[nt_dimension];
-        storageRoutingTable = new B4_Node[rt_dimension][3];
-        storageNeighbourTable = new B4_Node[nt_dimension];
-        init("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
-        boolean access = config.isLayerAccess("StorageAccess");
-        if (access) init("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
+        addToArrayList();
+//        routingTables.add(0,new B4_RoutingTable(rt_dimension,nt_dimension));
+//        routingTables.add(1,new B4_RoutingTable(rt_dimension,nt_dimension));
+//        localBaseRoutingTable = new B4_Node[rt_dimension][3];
+//        localBaseNeighbourTable = new B4_Node[nt_dimension];
+//        storageRoutingTable = new B4_Node[rt_dimension][3];
+//        storageNeighbourTable = new B4_Node[nt_dimension];
+        initialLayerLoading();
         fetchFileFromInputBuffer();
     }
 
@@ -160,7 +164,7 @@ public class RoutingManager {
                 doc.getDocumentElement().normalize();
                 //String rootElement = doc.getDocumentElement().getNodeName();
 
-                NodeList nodeList = doc.getElementsByTagName("main.resources.B4_Node");
+                NodeList nodeList = doc.getElementsByTagName("B4_Node");
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Node node = nodeList.item(i);
                     if (node.getNodeType() == node.ELEMENT_NODE) {
@@ -211,7 +215,7 @@ public class RoutingManager {
                     }
                 }
             } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
-                log.error("Exception Occurred",e);
+                log.error("Exception Occurred", e);
             }
             log.debug("New RoutingTable file created for future use");
         }
@@ -252,9 +256,9 @@ public class RoutingManager {
 
         B4_Node[][] routingTableLayer = null;
         if (layerID == 0) {
-            routingTableLayer = localBaseRoutingTable;
+            routingTableLayer = routingTables.get(0).getRoutingTable();
         } else if (layerID == 1) {
-            routingTableLayer = storageRoutingTable;
+            routingTableLayer = routingTables.get(1).getRoutingTable();
         }
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         B4_Node[][] mergerRoutingTable = getMergerRoutingTable(fileFromBuffer.getAbsolutePath());
@@ -265,12 +269,12 @@ public class RoutingManager {
                 mergerRT(mergerRoutingTable[i][j], routingTableLayer);
             }
         }
-        if (routingTableLayer == localBaseRoutingTable) {
-            localBaseTablesToXML("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
+        if (routingTableLayer == routingTables.get(0).getRoutingTable()) {
+            localBaseTablesToXML("BaseRoutingTable", routingTables.get(0).getRoutingTable(), routingTables.get(0).getNeighbourTable());
             log.info("BaseRoutingTable Merging completed Successfully");
         }
-        if (routingTableLayer == storageRoutingTable) {
-            localBaseTablesToXML("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
+        if (routingTableLayer == routingTables.get(1).getRoutingTable()) {
+            localBaseTablesToXML("StorageRoutingTable", routingTables.get(1).getRoutingTable(), routingTables.get(1).getNeighbourTable());
             log.info("StorageRoutingTable Merging completed Successfully");
         }
     }
@@ -282,9 +286,9 @@ public class RoutingManager {
     public void mergeNeighbourTable(File fileFromBuffer, int layerID) {
         B4_Node[] neighbourTable = null;
         if (layerID == 0) {
-            neighbourTable = localBaseNeighbourTable;
+            neighbourTable = routingTables.get(0).getNeighbourTable();
         } else if (layerID == 1) {
-            neighbourTable = storageNeighbourTable;
+            neighbourTable = routingTables.get(1).getNeighbourTable();
         }
         boolean rttFileExists;
         B4_Node[] mergerNeighbourTable = new B4_Node[nt_dimension];
@@ -340,7 +344,7 @@ public class RoutingManager {
                     }
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
-                log.error("Exception Occurred",e);
+                log.error("Exception Occurred", e);
             }
             for (int i = 0; i < nt_dimension; i++) {
                 assert selfMergerNode != null;
@@ -377,12 +381,12 @@ public class RoutingManager {
             for (int i = 0; i < nt_dimension; i++) {
                 assert neighbourTable != null;
             }
-            if (neighbourTable == localBaseNeighbourTable) {
-                localBaseTablesToXML("BaseRoutingTable", localBaseRoutingTable, localBaseNeighbourTable);
+            if (neighbourTable == routingTables.get(0).getNeighbourTable()) {
+                localBaseTablesToXML("BaseRoutingTable", routingTables.get(0).getRoutingTable(), routingTables.get(0).getNeighbourTable());
                 log.info("Base NeighbourTable Merged successfully");
             }
-            if (neighbourTable == storageNeighbourTable) {
-                localBaseTablesToXML("StorageRoutingTable", storageRoutingTable, storageNeighbourTable);
+            if (neighbourTable == routingTables.get(1).getNeighbourTable()) {
+                localBaseTablesToXML("StorageRoutingTable", routingTables.get(1).getRoutingTable(), routingTables.get(1).getNeighbourTable());
                 log.info("Storage NeighbourTable Merged successfully");
             }
         }
@@ -464,7 +468,7 @@ public class RoutingManager {
             log.debug("getRTT File is created");
 
         } catch (ParserConfigurationException | TransformerException e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
         File file1 = new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml");
         addFileToOutputBuffer(file1);
@@ -484,9 +488,9 @@ public class RoutingManager {
     public B4_Node findNextHop(String hashID, int layerID) {
         B4_Node[][] routingTable = null;
         if (layerID == 0) {
-            routingTable = localBaseRoutingTable;
+            routingTable = routingTables.get(0).getRoutingTable();
         } else if (layerID == 1) {
-            routingTable = storageRoutingTable;
+            routingTable = routingTables.get(1).getRoutingTable();
         }
         String localNodeID = localNode.getB4node().getNodeID();
         //System.out.println("HashID  : " + hashID + " " + "  LocalID  : " + localNodeID);
@@ -507,7 +511,7 @@ public class RoutingManager {
                     String localNodeIdChar = Character.toString(localNodeID.charAt(k));
                     int hashIdHex = Integer.parseInt(hashIdChar, 16);
                     int localNodeIdInHex = Integer.parseInt(localNodeIdChar, 16);
-                    if (!localBaseRoutingTable[k][0].getB4node().getNodeID().isEmpty()) {
+                    if (!routingTables.get(0).getRoutingTable()[k][0].getB4node().getNodeID().isEmpty()) {
                         assert routingTable != null;
                         String preNodeIdChar = Character.toString(routingTable[k][0].getB4node().getNodeID().charAt(k));
                         String sucNodeIdChar = Character.toString(routingTable[k][1].getB4node().getNodeID().charAt(k));
@@ -609,7 +613,7 @@ public class RoutingManager {
 
         // New thread is created
         Thread purgeThread = new Thread(() -> {
-           // System.out.println("Thread is started");
+            // System.out.println("Thread is started");
             //count will decide the number of times the while loop will run.
             //I have chosen count value four here.It can be changed to any other value depending on the requirment
             int count = 0;
@@ -681,7 +685,7 @@ public class RoutingManager {
                         dataPurged_Neighbour = 0;
                         dataPurged_RT = 0;
                     } catch (InterruptedException e) {
-                        log.error("Exception Occurred",e);
+                        log.error("Exception Occurred", e);
                     }
                 } else {
                     try {
@@ -691,7 +695,7 @@ public class RoutingManager {
                         dataPurged_Neighbour = 0;
                         dataPurged_RT = 0;
                     } catch (InterruptedException e) {
-                        log.error("Exception Occurred",e);
+                        log.error("Exception Occurred", e);
                     }
                 }
             }
@@ -700,19 +704,19 @@ public class RoutingManager {
     }
 
     public B4_Node[][] getLocalBaseRoutingTable() {
-        return localBaseRoutingTable;
+        return routingTables.get(0).getRoutingTable();
     }
 
     public B4_Node[] getLocalBaseNeighbourTable() {
-        return localBaseNeighbourTable;
+        return routingTables.get(0).getNeighbourTable();
     }
 
     public B4_Node[][] getStorageRoutingTable() {
-        return storageRoutingTable;
+        return routingTables.get(1).getRoutingTable();
     }
 
     public B4_Node[] getStorageNeighbourTable() {
-        return storageNeighbourTable;
+        return routingTables.get(1).getNeighbourTable();
     }
 
     public RoutingManagerBuffer getRoutingManagerBuffer() {
@@ -732,43 +736,39 @@ public class RoutingManager {
     }
 
     public void fetchFileFromInputBuffer() {
-        Thread fetchThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    File file = routingManagerBuffer.fetchFromInputBuffer();
-                    if (!(file == null)) {
-                        log.debug(file.getName());
-                        log.debug("New file fetched from InputBuffer");
-                        if (file.getName().startsWith("0")) {
-                            mergeRoutingTable(file, 0);
-                            getRTTMergerTable(file, 0);
-                        } else if (file.getName().startsWith("1")) {
-                            mergeRoutingTable(file, 1);
-                            getRTTMergerTable(file, 1);
-                        } else if (file.getName().startsWith("RcvRTT_0")) {
-                            mergeNeighbourTable(file, 0);
-                        } else if (file.getName().startsWith("RcvRTT_1")) {
-                            mergeNeighbourTable(file, 1);
-                        }
-                        log.info("Routing Table updated !!!");
+        Thread fetchThread = new Thread(() -> {
+            while (true) {
+                File file = routingManagerBuffer.fetchFromInputBuffer();
+                if (!(file == null)) {
+                    log.debug(file.getName());
+                    log.debug("New file fetched from InputBuffer");
+                    if (file.getName().startsWith("0")) {
+                        mergeRoutingTable(file, 0);
+                        getRTTMergerTable(file, 0);
+                    } else if (file.getName().startsWith("1")) {
+                        mergeRoutingTable(file, 1);
+                        getRTTMergerTable(file, 1);
+                    } else if (file.getName().startsWith("RcvRTT_0")) {
+                        mergeNeighbourTable(file, 0);
+                    } else if (file.getName().startsWith("RcvRTT_1")) {
+                        mergeNeighbourTable(file, 1);
                     }
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        log.error("Exception Occurred",e);
-                    }
+                    log.info("Routing Table updated !!!");
                 }
-
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    log.error("Exception Occurred", e);
+                }
             }
+
         });
 
         fetchThread.start();
     }
 
     public File fetchFileFromOutputBuffer() {
-        File file = routingManagerBuffer.fetchFromOutputBuffer();
-        return file;
+        return routingManagerBuffer.fetchFromOutputBuffer();
     }
 
     public boolean verifySignature(String hashID) {
@@ -811,12 +811,12 @@ public class RoutingManager {
                         }
                     }
                 } catch (SocketException e) {
-                    log.error("Exception Occurred",e);
+                    log.error("Exception Occurred", e);
                 }
             }
             return selfIPAddress;
         } catch (Exception e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
             return null;
         }
     }
@@ -836,7 +836,7 @@ public class RoutingManager {
             macaddr = sb.toString();
 
         } catch (Exception e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
         return macaddr;
     }
@@ -854,7 +854,7 @@ public class RoutingManager {
      * @return B4_RoutingTable Object
      */
     private B4_Node[][] getMergerRoutingTable(String mergerFile) {
-        B4_RoutingTables mergerTable = new B4_RoutingTables(mergerFile);
+        B4_MergeRoutingTable mergerTable = new B4_MergeRoutingTable(mergerFile);
         return mergerTable.getRoutingTable();
     }
 
@@ -863,7 +863,7 @@ public class RoutingManager {
      * @return B4_RoutingTable Object
      */
     private B4_Node[] getMergerNeighbourTable(String mergerFile) {
-        B4_RoutingTables mergerTable = new B4_RoutingTables(mergerFile);
+        B4_MergeRoutingTable mergerTable = new B4_MergeRoutingTable(mergerFile);
         return mergerTable.getNeighbourTable();
     }
 
@@ -872,7 +872,7 @@ public class RoutingManager {
      * @return main.resources.B4_Node Object
      */
     private B4_Node getSelfNodeOfMergerTable(String mergerFile) {
-        B4_RoutingTables mergerTable = new B4_RoutingTables(mergerFile);
+        B4_MergeRoutingTable mergerTable = new B4_MergeRoutingTable(mergerFile);
         return mergerTable.getSelfNode();
     }
 
@@ -1086,7 +1086,7 @@ public class RoutingManager {
 
             for (int i = 0; i < rt_dimension; i++) {
                 for (int j = 0; j < 3; j++) {
-                    Element row = doc.createElement("main.resources.B4_Node");
+                    Element row = doc.createElement("B4_Node");
                     root.appendChild(row);
                     row.setAttribute("INDEX", "[" + i + "]" + "[" + j + "]");
 
@@ -1155,10 +1155,71 @@ public class RoutingManager {
             transformer.transform(domSource, streamResult);
             log.debug(fileHeading + " file updated");
         } catch (ParserConfigurationException | TransformerException e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
     }
 
+    private boolean addToConfigFile(String layerName) {
+        boolean isAdded = false;
+        try {
+            FileWriter writer = new FileWriter("src/configuration/config.properties", true);
+            PrintWriter printWriter = new PrintWriter(writer);
+            printWriter.println(layerName + "=yes");
+            printWriter.flush();
+            printWriter.close();
+            log.debug("Config.properties File updated successfully");
+            isAdded = true;
+        } catch (IOException e) {
+            log.error("Exception Occurred", e);
+        }
+        return isAdded;
+    }
+
+    public boolean createNewLayer(String layerName) {
+        boolean isCreated;
+        B4_Layer newLayer = new B4_Layer();
+        newLayer.addToLayeringDetailsFile(layerName);
+        isCreated = newLayer.amendLayerFile();
+        addToConfigFile(layerName);
+        int layerID = addNewLayerToArrayList();
+        init(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        return isCreated;
+    }
+
+    private void addToArrayList() {
+        B4_Layer b4_layer = new B4_Layer();
+        int totalLayer = b4_layer.fetchMaxLayerID();
+        for (int i = 0; i <= totalLayer; i++) {
+            routingTables.add(i, new B4_RoutingTable(rt_dimension, nt_dimension));
+        }
+    }
+
+    private int addNewLayerToArrayList() {
+        B4_Layer b4_layer = new B4_Layer();
+        int totalLayer = b4_layer.fetchMaxLayerID();
+        routingTables.add(totalLayer, new B4_RoutingTable(rt_dimension, nt_dimension));
+        return totalLayer;
+    }
+
+    private void initialLayerLoading() {
+        B4_Layer b4_layer = new B4_Layer();
+        int totalLayer = b4_layer.fetchMaxLayerID();
+        FileReader reader;
+        for (int i = 0; i <= totalLayer; i++) {
+            try {
+                reader = new FileReader("src/configuration/LayerDetails.txt");
+                Properties properties = new Properties();
+                properties.load(reader);
+                String layerName = properties.getProperty("" + i + "");
+                boolean access = config.isLayerAccess(layerName);
+                if (access)
+                    init(layerName, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
+
+            } catch (IOException e) {
+                log.error("Exception Occurred", e);
+            }
+        }
 
 
+    }
 }

@@ -1,59 +1,68 @@
-10-Feb-2021 ; 11.43.04 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 11.43.56 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 11.45.41 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 11.47.02 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 11.49.08 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 11.50.41 DEBUG  : main.NodeCryptography [keyPairGeneration] - Key Pair Generated 
-10-Feb-2021 ; 11.50.41 DEBUG  : main.NodeCryptography [keyStoreCreation] - Key Store Created 
-10-Feb-2021 ; 11.50.42 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
-10-Feb-2021 ; 11.50.42 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
-10-Feb-2021 ; 11.50.42 DEBUG  : main.NodeCryptography [savePrivateKeyToKeyStore] - Private key stored to KeyStore 
-10-Feb-2021 ; 11.50.42 INFO  : main.B4_NodeGeneration [generateNodeId] - Node ID is generated Successfully 
-10-Feb-2021 ; 11.50.42 INFO  : main.B4_NodeGeneration [generateNodeId] - Node ID -3692B5BCC6A551219E2CDD2AD120C0FB8993C307 
-10-Feb-2021 ; 11.50.42 INFO  : main.B4_NodeGeneration [signNodeIdUsingPrivateKey] - NodeID signed using PrivateKey 
-10-Feb-2021 ; 11.50.42 DEBUG  : main.RoutingManager [<init>] - NodeDetail File created successfully 
-10-Feb-2021 ; 11.50.42 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
-10-Feb-2021 ; 11.50.42 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
-10-Feb-2021 ; 11.50.42 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
-10-Feb-2021 ; 11.50.46 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
-10-Feb-2021 ; 11.50.47 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
-10-Feb-2021 ; 11.50.47 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
-10-Feb-2021 ; 11.50.47 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
-10-Feb-2021 ; 11.50.47 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
-10-Feb-2021 ; 11.50.47 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
-10-Feb-2021 ; 11.50.47 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
-10-Feb-2021 ; 11.50.47 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
-10-Feb-2021 ; 11.50.50 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
-10-Feb-2021 ; 11.50.52 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
-10-Feb-2021 ; 11.50.52 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
-10-Feb-2021 ; 11.50.53 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
-10-Feb-2021 ; 11.50.53 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.InActCommunicationManager [test] - RcvRTT_1_7589ABAA1234ABA1234591111ABCDFE123456789.xmlfile updated 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.InActCommunicationManager [test] - RcvRTT_1_7589ABAA1234ABA1234591111ABCDFE123456789.xmlfile updated 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.RoutingManagerBuffer [addToInputBuffer] - File added to Input buffer 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.RoutingManagerBuffer [fetchFromOutputBuffer] - There is no File in Output Buffer 
-10-Feb-2021 ; 11.50.53 DEBUG  : main.RoutingManager [getMACAddress] - Current MAC address : 48-E2-44-2D-3B-BD 
-10-Feb-2021 ; 11.50.58 DEBUG  : main.RoutingManager$1 [run] - 1StorageLayerRT.xml 
-10-Feb-2021 ; 11.50.58 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
-10-Feb-2021 ; 11.50.58 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
-10-Feb-2021 ; 11.50.58 INFO  : main.RoutingManager [mergeRoutingTable] - StorageRoutingTable Merging completed Successfully 
-10-Feb-2021 ; 11.50.58 DEBUG  : main.RoutingManager [getRTTMergerTable] - getRTT File is created 
-10-Feb-2021 ; 11.50.58 DEBUG  : main.RoutingManagerBuffer [addToOutputBuffer] - File added to Output buffer 
-10-Feb-2021 ; 11.50.58 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
-10-Feb-2021 ; 11.51.03 DEBUG  : main.RoutingManager$1 [run] - RcvRTT_1_7589ABAA1234ABA1234591111ABCDFE123456789.xml 
-10-Feb-2021 ; 11.51.03 DEBUG  : main.RoutingManager$1 [run] - New file fetched from InputBuffer 
-10-Feb-2021 ; 11.51.03 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
-10-Feb-2021 ; 11.51.03 INFO  : main.RoutingManager [mergeNeighbourTable] - Storage NeighbourTable Merged successfully 
-10-Feb-2021 ; 11.51.03 INFO  : main.RoutingManager$1 [run] - Routing Table updated !!! 
-10-Feb-2021 ; 11.53.00 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 11.57.10 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 12.02.40 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 12.04.12 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 01.02.26 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 01.04.23 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
-10-Feb-2021 ; 01.09.20 DEBUG  : main.B4_Layer [<init>] - LayerDetail File created successfully 
+13-Feb-2021 ; 10.47.21 DEBUG  : main.NodeCryptography [keyPairGeneration] - Key Pair Generated 
+13-Feb-2021 ; 10.47.21 DEBUG  : main.NodeCryptography [keyStoreCreation] - Key Store Created 
+13-Feb-2021 ; 10.47.21 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 10.47.21 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 10.47.21 DEBUG  : main.NodeCryptography [savePrivateKeyToKeyStore] - Private key stored to KeyStore 
+13-Feb-2021 ; 10.47.21 DEBUG  : main.B4_Layer [<init>] - LayerDetails File created successfully 
+13-Feb-2021 ; 10.47.21 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 10.47.22 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 10.47.22 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 10.47.22 DEBUG  : main.RoutingManager [addToConfigFile] - Config.properties File updated successfully 
+13-Feb-2021 ; 10.47.27 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 10.47.32 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 10.51.30 DEBUG  : main.NodeCryptography [keyPairGeneration] - Key Pair Generated 
+13-Feb-2021 ; 10.51.30 DEBUG  : main.NodeCryptography [keyStoreCreation] - Key Store Created 
+13-Feb-2021 ; 10.51.30 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 10.51.30 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 10.51.30 DEBUG  : main.NodeCryptography [savePrivateKeyToKeyStore] - Private key stored to KeyStore 
+13-Feb-2021 ; 10.51.30 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 10.51.30 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 10.51.30 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 10.51.35 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 10.51.40 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 10.51.45 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.47.36 DEBUG  : main.NodeCryptography [keyPairGeneration] - Key Pair Generated 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.NodeCryptography [keyStoreCreation] - Key Store Created 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.NodeCryptography [savePrivateKeyToKeyStore] - Private key stored to KeyStore 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.B4_Layer [<init>] - LayerDetails File created successfully 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.RoutingManager [localBaseTablesToXML] - BaseRoutingTable file updated 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.RoutingManager [localBaseTablesToXML] - StorageRoutingTable file updated 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.RoutingManager [localBaseTablesToXML] - MessageRoutingTable file updated 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.RoutingManager [addToConfigFile] - Config.properties File updated successfully 
+13-Feb-2021 ; 11.47.37 DEBUG  : main.RoutingManager [localBaseTablesToXML] - MulticastingLayer file updated 
+13-Feb-2021 ; 11.47.42 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.47.47 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.47.52 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.47.57 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.48.02 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.48.07 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.51.08 DEBUG  : main.NodeCryptography [keyPairGeneration] - Key Pair Generated 
+13-Feb-2021 ; 11.51.08 DEBUG  : main.NodeCryptography [keyStoreCreation] - Key Store Created 
+13-Feb-2021 ; 11.51.08 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 11.51.08 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 11.51.09 DEBUG  : main.NodeCryptography [savePrivateKeyToKeyStore] - Private key stored to KeyStore 
+13-Feb-2021 ; 11.51.09 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.51.09 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.51.09 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.51.09 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.51.09 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.51.09 DEBUG  : main.RoutingManager [addToConfigFile] - Config.properties File updated successfully 
+13-Feb-2021 ; 11.51.09 DEBUG  : main.RoutingManager [localBaseTablesToXML] - BroadcastingLayer file updated 
+13-Feb-2021 ; 11.51.14 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.51.19 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.52.31 DEBUG  : main.NodeCryptography [keyPairGeneration] - Key Pair Generated 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.NodeCryptography [keyStoreCreation] - Key Store Created 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.NodeCryptography [generateCertificate] - Certificate Generated 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.NodeCryptography [savePrivateKeyToKeyStore] - Private key stored to KeyStore 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.RoutingManager [addToConfigFile] - Config.properties File updated successfully 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.RoutingManagerBuffer [fetchFromInputBuffer] - There is no File in Input Buffer 
+13-Feb-2021 ; 11.52.32 DEBUG  : main.RoutingManager [init] - New RoutingTable file created for future use 

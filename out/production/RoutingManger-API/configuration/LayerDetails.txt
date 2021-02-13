@@ -1,6 +1,6 @@
 #  Layering Details  #
 ..................................
-Heightens=6
+Heightens=5
 0=BaseRoutingTable
 1=StorageRoutingTable
 2=MessageRoutingTable

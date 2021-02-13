@@ -18,13 +18,13 @@ import java.util.regex.Pattern;
  * This class is used to create an object of RoutingTable.
  * It can create routing and neighbour table for all layers associated with brihaspati-4
  */
-public class B4_RoutingTables {
+public class B4_MergeRoutingTable {
     private final B4_Node[][] routingTable;
     private final B4_Node[] neighbourTable;
     private B4_Node selfMergerNode ;
-    private static final Logger log = Logger.getLogger(B4_RoutingTables.class);
+    private static final Logger log = Logger.getLogger(B4_MergeRoutingTable.class);
 
-    public B4_RoutingTables(String mergerRTFile) {
+    public B4_MergeRoutingTable(String mergerRTFile) {
         NodeCryptography nodeCryptography = NodeCryptography.getInstance();
         ConfigData config = ConfigData.getInstance();
         int rt_dimension = config.getRoutingTableLength();
