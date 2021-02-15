@@ -2,9 +2,7 @@ package main;
 
 import org.apache.log4j.Logger;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -114,5 +112,21 @@ class ConfigData {
             log.error("Service Not found in Config file\n",e);
         }
         return access;
+    }
+
+    boolean addToConfigFile(String layerName) {
+        boolean isAdded = false;
+        try {
+            FileWriter writer = new FileWriter("src/configuration/config.properties", true);
+            PrintWriter printWriter = new PrintWriter(writer);
+            printWriter.println(layerName + "=yes");
+            printWriter.flush();
+            printWriter.close();
+            log.debug("Config.properties File updated successfully");
+            isAdded = true;
+        } catch (IOException e) {
+            log.error("Exception Occurred", e);
+        }
+        return isAdded;
     }
 }

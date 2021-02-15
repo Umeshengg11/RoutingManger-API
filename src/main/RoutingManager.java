@@ -39,11 +39,7 @@ public class RoutingManager {
     private static RoutingManager routingManager;
     private static RoutingManagerBuffer routingManagerBuffer;
     private static ConfigData config;
-    private ArrayList<B4_RoutingTable> routingTables;
-    //    private final B4_Node[][] localBaseRoutingTable;
-//    private final B4_Node[] localBaseNeighbourTable;
-//    private final B4_Node[][] storageRoutingTable;
-//    private final B4_Node[] storageNeighbourTable;
+    private final ArrayList<B4_RoutingTable> routingTables;
     private B4_Node localNode;
     private final NodeCryptography nodeCryptography;
     private B4_NodeGeneration b4_nodeGeneration;
@@ -116,12 +112,6 @@ public class RoutingManager {
         sleepTime = config.getSleepTime();
         setLocalNode();
         addToArrayList();
-//        routingTables.add(0,new B4_RoutingTable(rt_dimension,nt_dimension));
-//        routingTables.add(1,new B4_RoutingTable(rt_dimension,nt_dimension));
-//        localBaseRoutingTable = new B4_Node[rt_dimension][3];
-//        localBaseNeighbourTable = new B4_Node[nt_dimension];
-//        storageRoutingTable = new B4_Node[rt_dimension][3];
-//        storageNeighbourTable = new B4_Node[nt_dimension];
         initialLayerLoading();
         fetchFileFromInputBuffer();
     }
@@ -1159,28 +1149,12 @@ public class RoutingManager {
         }
     }
 
-    private boolean addToConfigFile(String layerName) {
-        boolean isAdded = false;
-        try {
-            FileWriter writer = new FileWriter("src/configuration/config.properties", true);
-            PrintWriter printWriter = new PrintWriter(writer);
-            printWriter.println(layerName + "=yes");
-            printWriter.flush();
-            printWriter.close();
-            log.debug("Config.properties File updated successfully");
-            isAdded = true;
-        } catch (IOException e) {
-            log.error("Exception Occurred", e);
-        }
-        return isAdded;
-    }
-
     public boolean createNewLayer(String layerName) {
         boolean isCreated;
         B4_Layer newLayer = new B4_Layer();
         newLayer.addToLayeringDetailsFile(layerName);
         isCreated = newLayer.amendLayerFile();
-        addToConfigFile(layerName);
+        config.addToConfigFile(layerName);
         int layerID = addNewLayerToArrayList();
         init(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         return isCreated;
