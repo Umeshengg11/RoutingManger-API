@@ -102,6 +102,7 @@ class ConfigData {
     }
 
     private boolean serviceAccess(String serviceName) {
+        System.out.println(serviceName);
         boolean access = false;
         try {
             properties.load(reader);

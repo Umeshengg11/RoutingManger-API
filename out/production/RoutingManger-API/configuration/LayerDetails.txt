@@ -1,9 +1,0 @@
-#  Layering Details  #
-..................................
-Heightens=5
-0=BaseRoutingTable
-1=StorageRoutingTable
-2=MessageRoutingTable
-3=VoipRoutingTable
-4=MulticastingLayer
-5=BroadcastingLayer

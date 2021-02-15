@@ -1,10 +1,13 @@
  # exclude everything except directory foo/bar
 
-.gradle
-.idea
-/LogFiles
-/out
+.gradle/
+.idea/
+LogFiles/
+out/
 *.iml
 *.xml
 *.txt
 *.class
+.idea/workspace.xml
+KeyStore.ks
+src/main/ConfigData.java

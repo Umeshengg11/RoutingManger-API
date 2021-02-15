@@ -19,8 +19,17 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="995d29c0-2f21-4f28-b5c1-234591841a40" name="Default Changelist" comment="">
+    <list default="true" id="995d29c0-2f21-4f28-b5c1-234591841a40" name="Default Changelist" comment="gitignore">
+      <change afterPath="$PROJECT_DIR$/KeyStore.ks" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LogFiles/B4Routing.log" beforeDir="false" afterPath="$PROJECT_DIR$/LogFiles/B4Routing.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/configuration/LayerDetails.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/main/ConfigData.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/main/ConfigData.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/RoutingManger-API/main/RoutingManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/RoutingManger-API/main/RoutingManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/configuration/LayerDetails.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/configuration/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/configuration/config.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/ConfigData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/ConfigData.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,8 +166,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle./home/umesh/IdeaProjects/RoutingManger-API" />
         <item itemvalue="Application.Testing (1)" />
+        <item itemvalue="Gradle./home/umesh/IdeaProjects/RoutingManger-API" />
         <item itemvalue="Application.B4_Layer" />
         <item itemvalue="Application.Testing" />
         <item itemvalue="Application.InActCommunicationManager" />
@@ -174,6 +183,14 @@
       <option name="presentableId" value="Default" />
       <updated>1605970010906</updated>
     </task>
+    <task id="LOCAL-00001" summary="gitignore">
+      <created>1613373886878</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1613373886878</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -190,5 +207,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="gitignore" />
   </component>
 </project>
