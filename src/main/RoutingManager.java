@@ -36,21 +36,22 @@ import java.util.regex.Pattern;
  * <br> 4. MailRoutingTable - LayerID = 3
  */
 public class RoutingManager {
+    private static final Logger log = Logger.getLogger(RoutingManager.class);
     private static RoutingManager routingManager;
     private static RoutingManagerBuffer routingManagerBuffer;
     private static ConfigData config;
     private final ArrayList<B4_RoutingTable> routingTables;
-    private B4_Node localNode;
     private final NodeCryptography nodeCryptography;
-    private B4_NodeGeneration b4_nodeGeneration;
     private final int rt_dimension;
     private final int nt_dimension;
     private final long incrementTime;
     private final long sleepTime;
+    private final String nodeFile = "src/configuration/NodeDetails.txt";
+    private B4_Node localNode;
+    private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
     private String selfTransportAddress;
     private String selfPortAddress;
-    private static final Logger log = Logger.getLogger(RoutingManager.class);
 
     /**
      * Constructor
@@ -73,7 +74,7 @@ public class RoutingManager {
         if (!nodeDetailsExists) {
             b4_nodeGeneration = new B4_NodeGeneration();
             try {
-                FileWriter writer = new FileWriter("src/configuration/NodeDetails.txt");
+                FileWriter writer = new FileWriter(nodeFile);
                 PrintWriter printWriter = new PrintWriter(writer);
                 printWriter.println("#  Self Node Details  #");
                 printWriter.println("..................................");
@@ -91,7 +92,7 @@ public class RoutingManager {
             }
         } else {
             try {
-                FileReader reader = new FileReader("src/configuration/NodeDetails.txt");
+                FileReader reader = new FileReader(nodeFile);
                 Properties properties = new Properties();
                 properties.load(reader);
                 String selfNodeID = properties.getProperty("NodeID");
@@ -114,6 +115,18 @@ public class RoutingManager {
         addToArrayList();
         initialLayerLoading();
         fetchFileFromInputBuffer();
+    }
+
+    /**
+     * @return RoutingManger Object
+     * <br>This method is required to create an instance of main.resources.RoutingManager.
+     * <br>Instance of main.resources.RoutingManager will be obtained by calling this function.
+     */
+    public static synchronized RoutingManager getInstance() {
+        if (routingManager == null) {
+            routingManager = new RoutingManager();
+        }
+        return routingManager;
     }
 
     /**
@@ -209,18 +222,6 @@ public class RoutingManager {
             }
             log.debug("New RoutingTable file created for future use");
         }
-    }
-
-    /**
-     * @return RoutingManger Object
-     * <br>This method is required to create an instance of main.resources.RoutingManager.
-     * <br>Instance of main.resources.RoutingManager will be obtained by calling this function.
-     */
-    public static synchronized RoutingManager getInstance() {
-        if (routingManager == null) {
-            routingManager = new RoutingManager();
-        }
-        return routingManager;
     }
 
     /**
@@ -831,6 +832,17 @@ public class RoutingManager {
         return macaddr;
     }
 
+    public boolean createNewLayer(String layerName) {
+        boolean isCreated;
+        B4_Layer newLayer = new B4_Layer();
+        newLayer.addToLayeringDetailsFile(layerName);
+        isCreated = newLayer.amendLayerFile();
+        config.addToConfigFile(layerName);
+        int layerID = addNewLayerToArrayList();
+        init(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        return isCreated;
+    }
+
     /**
      * This method is used for setting Local Node information.
      * <br>Presently it is hardcoded (will be amended later).
@@ -1147,17 +1159,6 @@ public class RoutingManager {
         } catch (ParserConfigurationException | TransformerException e) {
             log.error("Exception Occurred", e);
         }
-    }
-
-    public boolean createNewLayer(String layerName) {
-        boolean isCreated;
-        B4_Layer newLayer = new B4_Layer();
-        newLayer.addToLayeringDetailsFile(layerName);
-        isCreated = newLayer.amendLayerFile();
-        config.addToConfigFile(layerName);
-        int layerID = addNewLayerToArrayList();
-        init(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
-        return isCreated;
     }
 
     private void addToArrayList() {
