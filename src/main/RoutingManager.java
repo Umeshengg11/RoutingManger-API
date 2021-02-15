@@ -28,12 +28,14 @@ import java.util.regex.Pattern;
 /**
  * Created by S/L Umesh U Nair
  * <br> Aim is to create an Routing Manager API for Brihaspati-4
- * <br> Various layers presently implemented are:-
+ * <br> Various layers presently implemented by default are:-
  * <br> 1. BaseRoutingTable - LayerID = 0
  * <br> 2. StorageRoutingTable - LayerID = 1
  * ...........................................
  * <br> 3. VoipRoutingTable - LayerID = 2
  * <br> 4. MailRoutingTable - LayerID = 3
+ * <br> Excess to this layers except base layer can be changed in the config.properties file.
+ * <br> New Layer can also be added by calling createNewLayer() function in the routing table manger API
  */
 public class RoutingManager {
     private static final Logger log = Logger.getLogger(RoutingManager.class);
