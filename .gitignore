@@ -1,9 +1,10 @@
  # exclude everything except directory foo/bar
 
-/.gradle
-/.idea
+.gradle
+.idea
 /LogFiles
 /out
-/*.iml
-/*.xml
-/*.txt
+*.iml
+*.xml
+*.txt
+*.class
