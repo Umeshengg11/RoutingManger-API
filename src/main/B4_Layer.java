@@ -36,16 +36,34 @@ public class B4_Layer {
         }
     }
 
-    public void addToLayeringDetailsFile(String name) {
+    public boolean addToLayeringDetailsFile(String name) {
+        boolean isCreated = false;
         try {
+            FileReader reader;
+            String layerName;
+            int layerId = fetchMaxLayerID();
             writer = new FileWriter(filePath, true);
             printWriter = new PrintWriter(writer);
-            printWriter.println((fetchMaxLayerID() + 1) + "=" + name);
-            printWriter.flush();
-            printWriter.close();
+            for (int i = 0; i <= layerId; i++) {
+                    reader = new FileReader(filePath);
+                    Properties properties = new Properties();
+                    properties.load(reader);
+                    layerName = properties.getProperty(""+i+"");
+                    System.out.println(layerName);
+                    if(layerName.equalsIgnoreCase(name)){
+                        break;
+                    }
+                    if(i==layerId){
+                        printWriter.println((layerId + 1) + "=" + name);
+                        printWriter.flush();
+                        printWriter.close();
+                        isCreated=true;
+                    }
+            }
         } catch (IOException e) {
             log.error("Exception Occurred", e);
         }
+        return isCreated;
     }
 
     public int fetchMaxLayerID() {

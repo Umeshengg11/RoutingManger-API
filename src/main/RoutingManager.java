@@ -85,8 +85,8 @@ public class RoutingManager {
                 printWriter.println("PublicKey=" + nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
                 printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
                 printWriter.println("IPAddress=" + getSystemIP());
-                printWriter.println("PortAddress="+config.getPortAddress());
-                printWriter.println("TransportAddress="+config.getTransportAddress());
+                printWriter.println("PortAddress=" + config.getPortAddress());
+                printWriter.println("TransportAddress=" + config.getTransportAddress());
                 printWriter.flush();
                 printWriter.close();
                 log.debug("NodeDetail File created successfully");
@@ -836,13 +836,15 @@ public class RoutingManager {
     }
 
     public boolean createNewLayer(String layerName) {
-        boolean isCreated;
+        boolean isCreated = false;
         B4_Layer newLayer = new B4_Layer();
-        newLayer.addToLayeringDetailsFile(layerName);
-        isCreated = newLayer.amendLayerFile();
-        config.addToConfigFile(layerName);
-        int layerID = addNewLayerToArrayList();
-        init(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        boolean isAdded = newLayer.addToLayeringDetailsFile(layerName);
+        if (isAdded) {
+            isCreated = newLayer.amendLayerFile();
+            config.addToConfigFile(layerName);
+            int layerID = addNewLayerToArrayList();
+            init(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        }
         return isCreated;
     }
 
@@ -1189,6 +1191,7 @@ public class RoutingManager {
                 Properties properties = new Properties();
                 properties.load(reader);
                 String layerName = properties.getProperty("" + i + "");
+                System.out.println(layerName);
                 boolean access = config.isLayerAccess(layerName);
                 if (access)
                     init(layerName, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());

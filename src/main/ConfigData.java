@@ -93,6 +93,7 @@ class ConfigData {
     private boolean serviceAccess(String serviceName) {
         boolean access = false;
         try {
+            System.out.println(serviceName);
             properties.load(reader);
             String value = properties.getProperty(serviceName);
             if (value.contentEquals("yes")) access = true;
