@@ -15,15 +15,18 @@ class ConfigData {
     private final NodeCryptography nodeCryptography;
     private static final Logger log = Logger.getLogger(ConfigData.class);
     private FileReader reader;
+    private final String path = "src/configuration/config.properties";
     private Properties properties;
+    private int portAddress;
+    private String transportAddress;
 
     private ConfigData() {
         nodeCryptography = NodeCryptography.getInstance();
         try {
-            reader = new FileReader("src/configuration/config.properties");
+            reader = new FileReader(path);
             properties = new Properties();
         } catch (FileNotFoundException e) {
-           log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
     }
 
@@ -34,32 +37,6 @@ class ConfigData {
         return config;
     }
 
-    int getNeighbourTableLength() {
-        return servicesInt("NT_length");
-    }
-
-    int getRoutingTableLength() {
-        return servicesInt("RT_length");
-    }
-
-    long getSleepTime() {
-        sleepTime = servicesLong("Sleep_time");
-        return sleepTime;
-    }
-
-    long getIncrementTime() {
-        return servicesLong("Increment_time");
-    }
-
-    B4_Node getBootStrapNode() {
-        serviceBootStrap();
-        return bootStrapNode;
-    }
-
-    boolean isLayerAccess(String layerName) {
-        return serviceAccess(layerName);
-    }
-
     private int servicesInt(String key) {
         int length = 0;
         try {
@@ -68,9 +45,21 @@ class ConfigData {
             length = Integer.parseInt(value);
 
         } catch (IOException e) {
-            log.error("RT_length parameter not found in config file\n",e);
+            log.error("RT_length parameter not found in config file\n", e);
         }
         return length;
+    }
+
+    private String servicesString(String key) {
+        String name = null;
+        try {
+            properties.load(reader);
+            name = properties.getProperty(key);
+
+        } catch (IOException e) {
+            log.error("RT_length parameter not found in config file\n", e);
+        }
+        return name;
     }
 
     private long servicesLong(String key) {
@@ -81,7 +70,7 @@ class ConfigData {
             sleepTime = Long.parseLong(slp_time);
 
         } catch (IOException e) {
-            log.error("Config file not Found or Issue in config file fetching\n",e);
+            log.error("Config file not Found or Issue in config file fetching\n", e);
         }
         return time;
     }
@@ -95,14 +84,13 @@ class ConfigData {
             String bootStrapIP = properties.getProperty("BootstrapPvtIP");
             String bootStrapPort = properties.getProperty("BootstrapPort");
             String bootStrapAddress = properties.getProperty("BootstrapAddress");
-            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID,nodeCryptography.strToPub(bootStrapPub),bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
+            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID, nodeCryptography.strToPub(bootStrapPub), bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
         } catch (IOException e) {
-            log.error("Config file not Found or Issue in config file fetching\n",e);
+            log.error("Config file not Found or Issue in config file fetching\n", e);
         }
     }
 
     private boolean serviceAccess(String serviceName) {
-        System.out.println(serviceName);
         boolean access = false;
         try {
             properties.load(reader);
@@ -110,24 +98,58 @@ class ConfigData {
             if (value.contentEquals("yes")) access = true;
 
         } catch (IOException e) {
-            log.error("Service Not found in Config file\n",e);
+            log.error("Service Not found in Config file\n", e);
         }
         return access;
     }
 
-    boolean addToConfigFile(String layerName) {
-        boolean isAdded = false;
+    long getSleepTime() {
+        sleepTime = servicesLong("Sleep_time");
+        return sleepTime;
+    }
+
+    int getPortAddress() {
+        portAddress = servicesInt("PortAddress");
+        return portAddress;
+    }
+
+    String getTransportAddress() {
+        transportAddress = servicesString("TransportAddress");
+        return transportAddress;
+    }
+
+    long getIncrementTime() {
+        return servicesLong("Increment_time");
+    }
+
+    int getNeighbourTableLength() {
+        return servicesInt("NT_length");
+    }
+
+    int getRoutingTableLength() {
+        return servicesInt("RT_length");
+    }
+
+    boolean isLayerAccess(String layerName) {
+        return serviceAccess(layerName);
+    }
+
+    B4_Node getBootStrapNode() {
+        serviceBootStrap();
+        return bootStrapNode;
+    }
+
+    void addToConfigFile(String layerName) {
         try {
-            FileWriter writer = new FileWriter("src/configuration/config.properties", true);
+            FileWriter writer = new FileWriter(path, true);
             PrintWriter printWriter = new PrintWriter(writer);
             printWriter.println(layerName + "=yes");
             printWriter.flush();
             printWriter.close();
             log.debug("Config.properties File updated successfully");
-            isAdded = true;
         } catch (IOException e) {
             log.error("Exception Occurred", e);
         }
-        return isAdded;
     }
+
 }

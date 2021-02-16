@@ -49,6 +49,7 @@ public class RoutingManager {
     private final long incrementTime;
     private final long sleepTime;
     private final String nodeFile = "src/configuration/NodeDetails.txt";
+    private final String layerFile = "src/configuration/LayerDetails.txt";
     private B4_Node localNode;
     private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
@@ -84,8 +85,8 @@ public class RoutingManager {
                 printWriter.println("PublicKey=" + nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
                 printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
                 printWriter.println("IPAddress=" + getSystemIP());
-                printWriter.println("PortAddress=1024");
-                printWriter.println("TransportAddress=TCP");
+                printWriter.println("PortAddress="+config.getPortAddress());
+                printWriter.println("TransportAddress="+config.getTransportAddress());
                 printWriter.flush();
                 printWriter.close();
                 log.debug("NodeDetail File created successfully");
@@ -121,7 +122,7 @@ public class RoutingManager {
 
     /**
      * @return RoutingManger Object
-     * <br>This method is required to create an instance of main.resources.RoutingManager.
+     * <br>This method is required to create an instance of RoutingManager.
      * <br>Instance of main.resources.RoutingManager will be obtained by calling this function.
      */
     public static synchronized RoutingManager getInstance() {
@@ -1184,7 +1185,7 @@ public class RoutingManager {
         FileReader reader;
         for (int i = 0; i <= totalLayer; i++) {
             try {
-                reader = new FileReader("src/configuration/LayerDetails.txt");
+                reader = new FileReader(layerFile);
                 Properties properties = new Properties();
                 properties.load(reader);
                 String layerName = properties.getProperty("" + i + "");
