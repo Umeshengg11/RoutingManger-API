@@ -48,8 +48,6 @@ public class RoutingManager {
     private final int nt_dimension;
     private final long incrementTime;
     private final long sleepTime;
-    private final String nodeFile = "src/configuration/NodeDetails.txt";
-    private final String layerFile = "src/configuration/LayerDetails.txt";
     private B4_Node localNode;
     private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
@@ -59,7 +57,7 @@ public class RoutingManager {
     /**
      * Constructor
      * <br> Main job of constructor are as follows:-
-     * <br> Check NodeDetails.txt file exits from the previous login, if true take data from the file else generate nodeDetails and write it into a file.
+     * <br> Check NodeDetails file exits from the previous login, if true take data from the file else generate nodeDetails and write it into a file.
      * <br> Check routing table and neighbour table exist from the previous login(ie to check RoutingTable.xml is available in the path).
      * <br> If RT exists then data is taken from the xml file and added to the localBaseRoutingTable(which is the routingTable for current node)
      * and to the localBaseNeighbourTable(which is the neighbourTable for current node).
@@ -70,6 +68,7 @@ public class RoutingManager {
         routingTables = new ArrayList<>();
         nodeCryptography = NodeCryptography.getInstance();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
+        config = ConfigData.getInstance();
         boolean nodeDetailsExists;
         File nodeFile = new File("src/configuration/NodeDetails.txt");
         nodeDetailsExists = nodeFile.exists();
@@ -109,7 +108,6 @@ public class RoutingManager {
                 log.error("NodeDetails File not Found or Issue in file fetching\n", e);
             }
         }
-        config = ConfigData.getInstance();
         rt_dimension = config.getRoutingTableLength();
         nt_dimension = config.getNeighbourTableLength();
         incrementTime = config.getIncrementTime();
@@ -248,15 +246,9 @@ public class RoutingManager {
      */
     public void mergeRoutingTable(File fileFromBuffer, int layerID) {
 
-        B4_Node[][] routingTableLayer = null;
-        if (layerID == 0) {
-            routingTableLayer = routingTables.get(0).getRoutingTable();
-        } else if (layerID == 1) {
-            routingTableLayer = routingTables.get(1).getRoutingTable();
-        }
+        B4_Node[][] routingTableLayer = routingTables.get(layerID).getRoutingTable();
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         B4_Node[][] mergerRoutingTable = getMergerRoutingTable(fileFromBuffer.getAbsolutePath());
-
         mergerRT(selfNodeOfMergerTable, routingTableLayer);
         for (int i = 0; i < rt_dimension; i++) {
             for (int j = 0; j < 3; j++) {
@@ -278,12 +270,7 @@ public class RoutingManager {
      * @param layerID        - The layer in which the operation is to be performed
      */
     public void mergeNeighbourTable(File fileFromBuffer, int layerID) {
-        B4_Node[] neighbourTable = null;
-        if (layerID == 0) {
-            neighbourTable = routingTables.get(0).getNeighbourTable();
-        } else if (layerID == 1) {
-            neighbourTable = routingTables.get(1).getNeighbourTable();
-        }
+        B4_Node[] neighbourTable = routingTables.get(0).getNeighbourTable();
         boolean rttFileExists;
         B4_Node[] mergerNeighbourTable = new B4_Node[nt_dimension];
         B4_Node selfMergerNode = null;
@@ -480,12 +467,7 @@ public class RoutingManager {
      * 3. Thereafter check whether the localNode is the root node for the given hashId/NodeId.
      */
     public B4_Node findNextHop(String hashID, int layerID) {
-        B4_Node[][] routingTable = null;
-        if (layerID == 0) {
-            routingTable = routingTables.get(0).getRoutingTable();
-        } else if (layerID == 1) {
-            routingTable = routingTables.get(1).getRoutingTable();
-        }
+        B4_Node[][] routingTable = routingTables.get(layerID).getRoutingTable();
         String localNodeID = localNode.getB4node().getNodeID();
         //System.out.println("HashID  : " + hashID + " " + "  LocalID  : " + localNodeID);
         char[] hashIdC = hashID.toCharArray();
@@ -736,16 +718,16 @@ public class RoutingManager {
                 if (!(file == null)) {
                     log.debug(file.getName());
                     log.debug("New file fetched from InputBuffer");
-                    if (file.getName().startsWith("0")) {
-                        mergeRoutingTable(file, 0);
-                        getRTTMergerTable(file, 0);
-                    } else if (file.getName().startsWith("1")) {
-                        mergeRoutingTable(file, 1);
-                        getRTTMergerTable(file, 1);
-                    } else if (file.getName().startsWith("RcvRTT_0")) {
-                        mergeNeighbourTable(file, 0);
-                    } else if (file.getName().startsWith("RcvRTT_1")) {
-                        mergeNeighbourTable(file, 1);
+                    B4_Layer b4_layer = new B4_Layer();
+                    int layerID = b4_layer.fetchMaxLayerID();
+                    for (int i = 0; i <= layerID; i++) {
+                        if (file.getName().startsWith("" + i + "")) {
+                            mergeRoutingTable(file, i);
+                            getRTTMergerTable(file, i);
+                        }
+                        if (file.getName().startsWith("RcvRTT_" + i)) {
+                            mergeNeighbourTable(file, i);
+                        }
                     }
                     log.info("Routing Table updated !!!");
                 }
@@ -818,7 +800,6 @@ public class RoutingManager {
     public String getMACAddress() {
         String macaddr = "";
         try {
-
             String ipAddress = getSystemIP();
             NetworkInterface network = NetworkInterface.getByInetAddress(InetAddress.getByName(ipAddress));
             byte[] mac = network.getHardwareAddress();
@@ -828,7 +809,6 @@ public class RoutingManager {
             }
             log.debug("Current MAC address : " + sb.toString());
             macaddr = sb.toString();
-
         } catch (Exception e) {
             log.error("Exception Occurred", e);
         }
@@ -1187,6 +1167,7 @@ public class RoutingManager {
         FileReader reader;
         for (int i = 0; i <= totalLayer; i++) {
             try {
+                String layerFile = "src/configuration/LayerDetails.txt";
                 reader = new FileReader(layerFile);
                 Properties properties = new Properties();
                 properties.load(reader);
@@ -1200,7 +1181,6 @@ public class RoutingManager {
                 log.error("Exception Occurred", e);
             }
         }
-
 
     }
 }
