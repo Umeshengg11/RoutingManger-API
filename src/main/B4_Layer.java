@@ -11,6 +11,7 @@ public class B4_Layer {
     private static final Logger log = Logger.getLogger(B4_Layer.class);
     private FileWriter writer;
     private PrintWriter printWriter;
+    private FileReader reader;
     private final String filePath = "src/configuration/LayerDetails.txt";
 
     public B4_Layer() {
@@ -39,7 +40,6 @@ public class B4_Layer {
     public boolean addToLayeringDetailsFile(String name) {
         boolean isCreated = false;
         try {
-            FileReader reader;
             String layerName;
             int layerId = fetchMaxLayerID();
             writer = new FileWriter(filePath, true);
@@ -109,6 +109,19 @@ public class B4_Layer {
             log.error("Exception Occurred", e);
         }
         return isAmended;
+    }
+
+    public String getLayerName(int layerID){
+        String layerName = null;
+        try {
+            reader = new FileReader(filePath);
+            Properties properties = new Properties();
+            properties.load(reader);
+            layerName = properties.getProperty(""+layerID+"");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    return layerName;
     }
 
 }

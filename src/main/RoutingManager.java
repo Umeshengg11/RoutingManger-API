@@ -53,6 +53,7 @@ public class RoutingManager {
     private String selfIPAddress;
     private String selfTransportAddress;
     private String selfPortAddress;
+    private String nodeDetailFilePath = "src/configuration/NodeDetails.txt";
 
     /**
      * Constructor
@@ -70,13 +71,13 @@ public class RoutingManager {
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
         config = ConfigData.getInstance();
         boolean nodeDetailsExists;
-        File nodeFile = new File("src/configuration/NodeDetails.txt");
+        File nodeFile = new File(nodeDetailFilePath);
         nodeDetailsExists = nodeFile.exists();
 
         if (!nodeDetailsExists) {
             b4_nodeGeneration = new B4_NodeGeneration();
             try {
-                FileWriter writer = new FileWriter(nodeFile);
+                FileWriter writer = new FileWriter(nodeDetailFilePath);
                 PrintWriter printWriter = new PrintWriter(writer);
                 printWriter.println("#  Self Node Details  #");
                 printWriter.println("..................................");
@@ -94,7 +95,7 @@ public class RoutingManager {
             }
         } else {
             try {
-                FileReader reader = new FileReader(nodeFile);
+                FileReader reader = new FileReader(nodeDetailFilePath);
                 Properties properties = new Properties();
                 properties.load(reader);
                 String selfNodeID = properties.getProperty("NodeID");
@@ -245,7 +246,8 @@ public class RoutingManager {
      *                       <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
      */
     public void mergeRoutingTable(File fileFromBuffer, int layerID) {
-
+        System.out.println(fileFromBuffer.getName());
+        System.out.println(layerID);
         B4_Node[][] routingTableLayer = routingTables.get(layerID).getRoutingTable();
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         B4_Node[][] mergerRoutingTable = getMergerRoutingTable(fileFromBuffer.getAbsolutePath());
@@ -255,14 +257,10 @@ public class RoutingManager {
                 mergerRT(mergerRoutingTable[i][j], routingTableLayer);
             }
         }
-        if (routingTableLayer == routingTables.get(0).getRoutingTable()) {
-            localBaseTablesToXML("BaseRoutingTable", routingTables.get(0).getRoutingTable(), routingTables.get(0).getNeighbourTable());
-            log.info("BaseRoutingTable Merging completed Successfully");
-        }
-        if (routingTableLayer == routingTables.get(1).getRoutingTable()) {
-            localBaseTablesToXML("StorageRoutingTable", routingTables.get(1).getRoutingTable(), routingTables.get(1).getNeighbourTable());
-            log.info("StorageRoutingTable Merging completed Successfully");
-        }
+        B4_Layer b4_layer = new B4_Layer();
+        String layerName = b4_layer.getLayerName(layerID);
+        localBaseTablesToXML(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        log.info(layerName + " Merging completed Successfully");
     }
 
     /**
@@ -270,7 +268,7 @@ public class RoutingManager {
      * @param layerID        - The layer in which the operation is to be performed
      */
     public void mergeNeighbourTable(File fileFromBuffer, int layerID) {
-        B4_Node[] neighbourTable = routingTables.get(0).getNeighbourTable();
+        B4_Node[] neighbourTable = routingTables.get(layerID).getNeighbourTable();
         boolean rttFileExists;
         B4_Node[] mergerNeighbourTable = new B4_Node[nt_dimension];
         B4_Node selfMergerNode = null;
@@ -362,14 +360,10 @@ public class RoutingManager {
             for (int i = 0; i < nt_dimension; i++) {
                 assert neighbourTable != null;
             }
-            if (neighbourTable == routingTables.get(0).getNeighbourTable()) {
-                localBaseTablesToXML("BaseRoutingTable", routingTables.get(0).getRoutingTable(), routingTables.get(0).getNeighbourTable());
-                log.info("Base NeighbourTable Merged successfully");
-            }
-            if (neighbourTable == routingTables.get(1).getNeighbourTable()) {
-                localBaseTablesToXML("StorageRoutingTable", routingTables.get(1).getRoutingTable(), routingTables.get(1).getNeighbourTable());
-                log.info("Storage NeighbourTable Merged successfully");
-            }
+            B4_Layer b4_layer = new B4_Layer();
+            String layerName = b4_layer.getLayerName(layerID);
+            localBaseTablesToXML(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+            log.info(layerName + " Merged successfully");
         }
     }
 
