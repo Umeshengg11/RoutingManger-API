@@ -93,7 +93,6 @@ class ConfigData {
     private boolean serviceAccess(String serviceName) {
         boolean access = false;
         try {
-            System.out.println(serviceName);
             properties.load(reader);
             String value = properties.getProperty(serviceName);
             if (value.contentEquals("yes")) access = true;
@@ -155,4 +154,16 @@ class ConfigData {
         }
     }
 
+    boolean checkLayerName(String layerName){
+        boolean access = false;
+        try {
+            properties.load(reader);
+            String value = properties.getProperty(layerName);
+            if (value.equalsIgnoreCase("yes")||(value.equalsIgnoreCase("no"))) access = true;
+
+        } catch (IOException e) {
+            return false;
+        }
+        return access;
+    }
 }

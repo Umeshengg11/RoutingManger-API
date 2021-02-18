@@ -48,12 +48,13 @@ public class RoutingManager {
     private final int nt_dimension;
     private final long incrementTime;
     private final long sleepTime;
+    private final String nodeDetailFilePath = "src/configuration/NodeDetails.txt";
+    private final String layerFile = "src/configuration/LayerDetails.txt";
     private B4_Node localNode;
     private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
     private String selfTransportAddress;
     private String selfPortAddress;
-    private String nodeDetailFilePath = "src/configuration/NodeDetails.txt";
 
     /**
      * Constructor
@@ -811,11 +812,15 @@ public class RoutingManager {
 
     public boolean createNewLayer(String layerName) {
         boolean isCreated = false;
+        boolean hasAccess;
         B4_Layer newLayer = new B4_Layer();
         boolean isAdded = newLayer.addToLayeringDetailsFile(layerName);
         if (isAdded) {
             isCreated = newLayer.amendLayerFile();
-            config.addToConfigFile(layerName);
+            hasAccess = config.checkLayerName(layerName);
+            if (!hasAccess) {
+                config.addToConfigFile(layerName);
+            }
             int layerID = addNewLayerToArrayList();
             init(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         }

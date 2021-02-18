@@ -10,7 +10,3 @@ out/
 *.class
 .idea/workspace.xml
 KeyStore.ks
-src/main/ConfigData.java
-src/main/InActCommunicationManager.java
-src/main/Testing.java
-src/main/CreateXMLWithEntry.java
