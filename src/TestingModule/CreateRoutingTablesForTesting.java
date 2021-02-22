@@ -21,7 +21,7 @@ import java.util.Base64;
 import java.util.Random;
 
 public class CreateRoutingTablesForTesting {
-    public static File createXML() {
+    public static File createXML(String fileName) {
         String selfNodeId = "7589ABAA1234ABA1234591111ABCDFE123456789";
         PublicKey selfPublicKey = keyPairGeneration();
         String selfHashID = "7589ABAA1234ABA1234591111ABCDFE1234567897589ABAA1234ABA1234591111ABCDFE123456789";
@@ -144,7 +144,7 @@ public class CreateRoutingTablesForTesting {
              * StreamResult streamResult = new StreamResult(System.out);
              **/
 
-            StreamResult streamResult = new StreamResult(new File("3StorageLayerRT.xml"));
+            StreamResult streamResult = new StreamResult(new File(fileName+".xml"));
             transformer.transform(domSource, streamResult);
         } catch (ParserConfigurationException | TransformerConfigurationException e) {
             e.printStackTrace();
@@ -152,7 +152,7 @@ public class CreateRoutingTablesForTesting {
             e.printStackTrace();
         }
 
-        File file1 = new File("3StorageLayerRT.xml");
+        File file1 = new File(fileName+".xml");
         return file1;
 
     }

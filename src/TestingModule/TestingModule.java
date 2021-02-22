@@ -10,9 +10,9 @@ public class TestingModule {
         rt.createNewLayer("VoipRoutingTable");
         rt.createNewLayer("OverCastingLayer");
         CreateRoutingTablesForTesting xm = new CreateRoutingTablesForTesting();
-        rt.addFileToInputBuffer(xm.createXML());
-        rt.addFileToInputBuffer(xm.createXML());
-        rt.addFileToInputBuffer(xm.createXML());
+        rt.addFileToInputBuffer(xm.createXML("0BaseRoutingTable"));
+        rt.addFileToInputBuffer(xm.createXML("1StorageRoutingTable"));
+        rt.addFileToInputBuffer(xm.createXML("3VoipRoutingLayer"));
         CommunicationManagerSimulator in = new CommunicationManagerSimulator();
         in.returnRTTData(rt.fetchFileFromOutputBuffer());
         in.returnRTTData(rt.fetchFileFromOutputBuffer());

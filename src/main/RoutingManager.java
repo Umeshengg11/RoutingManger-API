@@ -717,8 +717,11 @@ public class RoutingManager {
                     int layerID = b4_layer.fetchMaxLayerID();
                     for (int i = 0; i <= layerID; i++) {
                         if (file.getName().startsWith("" + i + "")) {
-                            mergeRoutingTable(file, i);
-                            getRTTMergerTable(file, i);
+                            boolean isAccess = config.isLayerAccess(b4_layer.getLayerName(i));
+                            if(isAccess){
+                                mergeRoutingTable(file, i);
+                                getRTTMergerTable(file, i);
+                            }
                         }
                         if (file.getName().startsWith("RcvRTT_" + i)) {
                             mergeNeighbourTable(file, i);
@@ -732,7 +735,6 @@ public class RoutingManager {
                     log.error("Exception Occurred", e);
                 }
             }
-
         });
 
         fetchThread.start();
