@@ -22,8 +22,7 @@ import java.util.Random;
 
 public class CommunicationManagerSimulator {
     private static final Logger log = Logger.getLogger(CommunicationManagerSimulator.class);
-    public void returnRTTData(File file) {
-        RoutingManager rt = RoutingManager.getInstance();
+    public void returnRTTData(File file,RoutingManager rt) {
         if (!(file == null)) {
             String fileName = file.getName();
             if (fileName.startsWith("0")) {
