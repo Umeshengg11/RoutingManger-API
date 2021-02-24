@@ -84,14 +84,15 @@ class B4_NodeGeneration {
         return hash1ID;
     }
 
-     boolean verifySignature() {
+     boolean verifySignature(String hashID) {
         boolean verify = false;
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
         try {
             Signature signature = Signature.getInstance("SHA1WithRSA");
+            System.out.println(publicKey);
             signature.initVerify(publicKey);
             signature.update(data);
-            verify = signature.verify(signatureData);
+            verify = signature.verify(hashID.getBytes(StandardCharsets.UTF_8));
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             log.error("Exception Occurred",e);
         }

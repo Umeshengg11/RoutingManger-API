@@ -5,6 +5,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 import javax.security.auth.x500.X500Principal;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -29,14 +30,21 @@ class NodeCryptography {
     private KeyStore keyStore;
     private static NodeCryptography nodeCryptography;
     private static final Logger log = Logger.getLogger(NodeCryptography.class);
+    private final String filePath = "src/configuration/NodeDetails.txt";
 
-    private NodeCryptography() {
+     private NodeCryptography() {
         Provider provider = new BouncyCastleProvider();
         Security.addProvider(provider);
-        keyPairGeneration();
-        keyStoreCreation();
-        generateCertificate();
-        savePrivateKeyToKeyStore();
+         keyStoreCreation();
+         File nodeFile = new File(filePath);
+         boolean nodeDetailsExists = nodeFile.exists();
+         if (!nodeDetailsExists){
+             keyPairGeneration();
+             generateCertificate();
+             savePrivateKeyToKeyStore();
+         } else {
+
+         }
     }
 
     public static synchronized NodeCryptography getInstance() {
@@ -66,7 +74,7 @@ class NodeCryptography {
 
     private void keyStoreCreation() {
         try {
-            keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+           keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             char[] keyStorePassword = "123@abc".toCharArray();
             keyStore.load(null, null);
             FileOutputStream fos = new FileOutputStream("KeyStore.ks");
@@ -154,5 +162,18 @@ class NodeCryptography {
         byte[] bytePub = key.getEncoded();
         strPub = Base64.getEncoder().encodeToString(bytePub);
         return strPub;
+    }
+
+    private PrivateKey getFromKeyStore() {
+        char[] keyPassword = "123@abc".toCharArray();
+        KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
+        KeyStore.PrivateKeyEntry privateKeyEntry = null;
+        try {
+            privateKeyEntry = (KeyStore.PrivateKeyEntry) nodeCryptography.getKeyStore().getEntry("Private Key", protectionParameter);
+        } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableEntryException e) {
+            e.printStackTrace();
+        }
+        assert privateKeyEntry != null;
+        return privateKeyEntry.getPrivateKey();
     }
 }

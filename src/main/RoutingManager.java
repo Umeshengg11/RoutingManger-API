@@ -43,7 +43,7 @@ public class RoutingManager {
     private static RoutingManagerBuffer routingManagerBuffer;
     private static ConfigData config;
     private final ArrayList<B4_RoutingTable> routingTables;
-    private final NodeCryptography nodeCryptography;
+    private NodeCryptography nodeCryptography;
     private final int rt_dimension;
     private final int nt_dimension;
     private final long incrementTime;
@@ -68,7 +68,6 @@ public class RoutingManager {
      */
     private RoutingManager() {
         routingTables = new ArrayList<>();
-        nodeCryptography = NodeCryptography.getInstance();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
         config = ConfigData.getInstance();
         boolean nodeDetailsExists;
@@ -76,6 +75,7 @@ public class RoutingManager {
         nodeDetailsExists = nodeFile.exists();
 
         if (!nodeDetailsExists) {
+            nodeCryptography = NodeCryptography.getInstance();
             b4_nodeGeneration = new B4_NodeGeneration();
             try {
                 FileWriter writer = new FileWriter(nodeDetailFilePath);
@@ -105,6 +105,7 @@ public class RoutingManager {
                 selfIPAddress = properties.getProperty("IPAddress");
                 selfPortAddress = properties.getProperty("PortAddress");
                 selfTransportAddress = properties.getProperty("TransportAddress");
+                nodeCryptography = new NodeCryptography(true);
                 b4_nodeGeneration = new B4_NodeGeneration(selfNodeID, nodeCryptography.strToPub(selfPublicKey), selfHashID);
             } catch (IOException e) {
                 log.error("NodeDetails File not Found or Issue in file fetching\n", e);
@@ -247,8 +248,6 @@ public class RoutingManager {
      *                       <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
      */
     public void mergeRoutingTable(File fileFromBuffer, int layerID) {
-        System.out.println(fileFromBuffer.getName());
-        System.out.println(layerID);
         B4_Node[][] routingTableLayer = routingTables.get(layerID).getRoutingTable();
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         B4_Node[][] mergerRoutingTable = getMergerRoutingTable(fileFromBuffer.getAbsolutePath());
@@ -596,7 +595,7 @@ public class RoutingManager {
                     for (int i = 0; i < rt_dimension; i++) {
                         for (int j = 0; j < 3; j++) {
                             String ipAddressBase = routingTableName[i][j].getIpAddress();
-                            System.out.println(ipAddressBase);
+                            //System.out.println(ipAddressBase);
                             if (!ipAddressBase.isEmpty()) {
                                 try {
                                     InetAddress ping = InetAddress.getByName(ipAddressBase);
@@ -746,7 +745,7 @@ public class RoutingManager {
 
     public boolean verifySignature(String hashID) {
         boolean verify;
-        verify = b4_nodeGeneration.verifySignature();
+        verify = b4_nodeGeneration.verifySignature(hashID);
         return verify;
     }
 
@@ -1173,7 +1172,6 @@ public class RoutingManager {
                 Properties properties = new Properties();
                 properties.load(reader);
                 String layerName = properties.getProperty("" + i + "");
-                System.out.println(layerName);
                 boolean access = config.isLayerAccess(layerName);
                 if (access)
                     init(layerName, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());

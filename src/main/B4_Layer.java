@@ -49,7 +49,6 @@ public class B4_Layer {
                     Properties properties = new Properties();
                     properties.load(reader);
                     layerName = properties.getProperty(""+i+"");
-                    System.out.println(layerName);
                     if(layerName.equalsIgnoreCase(name)){
                         break;
                     }
