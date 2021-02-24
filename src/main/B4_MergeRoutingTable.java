@@ -25,7 +25,7 @@ public class B4_MergeRoutingTable {
     private static final Logger log = Logger.getLogger(B4_MergeRoutingTable.class);
 
     public B4_MergeRoutingTable(String mergerRTFile) {
-        NodeCryptography nodeCryptography = new NodeCryptography(true);
+        NodeCryptography nodeCryptography = NodeCryptography.getInstance();
         ConfigData config = ConfigData.getInstance();
         int rt_dimension = config.getRoutingTableLength();
         int nt_dimension = config.getNeighbourTableLength();

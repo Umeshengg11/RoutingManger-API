@@ -5,9 +5,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 import javax.security.auth.x500.X500Principal;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
@@ -25,26 +23,50 @@ import java.util.Date;
  * putting private key and certificate in the keystore, retrieval of private key from the keystore
  */
 class NodeCryptography {
-    private PublicKey publicKey;
-    private PrivateKey privateKey;
-    private KeyStore keyStore;
+    private static PublicKey publicKey;
+    private static PrivateKey privateKey;
+    private static KeyStore keyStore;
     private static NodeCryptography nodeCryptography;
     private static final Logger log = Logger.getLogger(NodeCryptography.class);
-    private final String filePath = "src/configuration/NodeDetails.txt";
+    private final String filePath = "KeyStore.ks";
 
-     private NodeCryptography() {
+    private NodeCryptography() {
         Provider provider = new BouncyCastleProvider();
         Security.addProvider(provider);
-         keyStoreCreation();
-         File nodeFile = new File(filePath);
-         boolean nodeDetailsExists = nodeFile.exists();
-         if (!nodeDetailsExists){
-             keyPairGeneration();
-             generateCertificate();
-             savePrivateKeyToKeyStore();
-         } else {
+        try {
+            keyStore = KeyStore.getInstance("JCEKS");
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+        File nodeFile = new File(filePath);
+        boolean nodeDetailsExists = nodeFile.exists();
+        if (!nodeDetailsExists) {
+            try {
+                keyStore.load(null, null);
+                keyPairGeneration();
+                savePrivateKeyToKeyStore();
+                saveKeyStore();
+            } catch (IOException | NoSuchAlgorithmException | CertificateException e) {
+                e.printStackTrace();
+            }
 
-         }
+        } else {
+            loadKeyStore();
+            char[] keyPassword = "123@abc".toCharArray();
+            KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
+            try {
+                System.out.println(keyStore);
+                KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("Private Key", protectionParameter);
+                privateKey = privateKeyEntry.getPrivateKey();
+                System.out.println(privateKey);
+                Certificate certificate = keyStore.getCertificate("Certificate");
+                publicKey = certificate.getPublicKey();
+                System.out.println(publicKey);
+            } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     public static synchronized NodeCryptography getInstance() {
@@ -54,9 +76,6 @@ class NodeCryptography {
         return nodeCryptography;
     }
 
-    PublicKey getPublicKey() {
-        return publicKey;
-    }
 
     private void keyPairGeneration() {
         try {
@@ -68,21 +87,30 @@ class NodeCryptography {
             publicKey = keyPair.getPublic();
             log.debug("Key Pair Generated");
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
     }
 
-    private void keyStoreCreation() {
+    private void saveKeyStore() {
+        char[] keyPassword = "123@abc".toCharArray();
+        FileOutputStream fos = null;
         try {
-           keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            char[] keyStorePassword = "123@abc".toCharArray();
-            keyStore.load(null, null);
-            FileOutputStream fos = new FileOutputStream("KeyStore.ks");
-            keyStore.store(fos, keyStorePassword);
-            fos.close();
+            fos = new FileOutputStream("KeyStore.ks");
+            keyStore.store(fos, keyPassword);
+        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadKeyStore() {
+        try {
+            char[] keyPassword = "123@abc".toCharArray();
+            FileInputStream fis = new FileInputStream("KeyStore.ks");
+            keyStore.load(fis, keyPassword);
+            fis.close();
             log.debug("Key Store Created");
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
-            log.error("Exception Occurred",e);
+        } catch (CertificateException | NoSuchAlgorithmException | IOException e) {
+            log.error("Exception Occurred", e);
         }
     }
 
@@ -95,14 +123,15 @@ class NodeCryptography {
         KeyStore.PrivateKeyEntry privateKeyEntry = new KeyStore.PrivateKeyEntry(privateKey, certChain);
         try {
             keyStore.setEntry("Private Key", privateKeyEntry, protectionParameter);
+            keyStore.setCertificateEntry("Certificate",certChain[0]);
             log.debug("Private key stored to KeyStore");
         } catch (KeyStoreException e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
     }
 
     @SuppressWarnings("deprecation")
-    private X509Certificate generateCertificate() {
+    private static X509Certificate generateCertificate() {
         // build a certificate generator
         X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
         String CERTIFICATE_DN = "CN = cn , O = o, L =L ,ST = i1, C = c";
@@ -126,20 +155,16 @@ class NodeCryptography {
             cert = certGen.generate(privateKey, "BC");
             log.debug("Certificate Generated");
         } catch (CertificateEncodingException | InvalidKeyException | NoSuchAlgorithmException | SignatureException | NoSuchProviderException e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
         return cert;
     }
 
-    KeyStore getKeyStore() {
-        return keyStore;
-    }
-
-    PublicKey strToPub(String str){
+    PublicKey strToPub(String str) {
         PublicKey publicKey = null;
         //converting string to byte initially and then back to public key
         byte[] bytePub1 = Base64.getDecoder().decode(str);
-        if (str.equals("")){
+        if (str.equals("")) {
             return null;
         }
         KeyFactory factory;
@@ -147,17 +172,17 @@ class NodeCryptography {
             factory = KeyFactory.getInstance("RSA");
             publicKey = factory.generatePublic(new X509EncodedKeySpec(bytePub1));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
         return publicKey;
     }
 
-    String pubToStr(PublicKey key){
+    String pubToStr(PublicKey key) {
         String strPub;
         //converting public key to byte[] and then convert it in to string
-        if(key==null){
+        if (key == null) {
             strPub = "";
-            return  strPub;
+            return strPub;
         }
         byte[] bytePub = key.getEncoded();
         strPub = Base64.getEncoder().encodeToString(bytePub);
@@ -168,6 +193,7 @@ class NodeCryptography {
         char[] keyPassword = "123@abc".toCharArray();
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
         KeyStore.PrivateKeyEntry privateKeyEntry = null;
+
         try {
             privateKeyEntry = (KeyStore.PrivateKeyEntry) nodeCryptography.getKeyStore().getEntry("Private Key", protectionParameter);
         } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableEntryException e) {
@@ -175,5 +201,18 @@ class NodeCryptography {
         }
         assert privateKeyEntry != null;
         return privateKeyEntry.getPrivateKey();
+    }
+
+    public static void main(String[] args) {
+        NodeCryptography nodeCryptography = NodeCryptography.getInstance();
+        System.out.println(nodeCryptography.getFromKeyStore());
+    }
+
+    PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    KeyStore getKeyStore() {
+        return keyStore;
     }
 }

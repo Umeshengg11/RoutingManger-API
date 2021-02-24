@@ -105,7 +105,7 @@ public class RoutingManager {
                 selfIPAddress = properties.getProperty("IPAddress");
                 selfPortAddress = properties.getProperty("PortAddress");
                 selfTransportAddress = properties.getProperty("TransportAddress");
-                nodeCryptography = new NodeCryptography(true);
+                nodeCryptography = NodeCryptography.getInstance();
                 b4_nodeGeneration = new B4_NodeGeneration(selfNodeID, nodeCryptography.strToPub(selfPublicKey), selfHashID);
             } catch (IOException e) {
                 log.error("NodeDetails File not Found or Issue in file fetching\n", e);

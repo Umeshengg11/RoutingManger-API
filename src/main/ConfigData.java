@@ -21,7 +21,7 @@ class ConfigData {
     private String transportAddress;
 
     private ConfigData() {
-       nodeCryptography = new NodeCryptography(true);
+       nodeCryptography = NodeCryptography.getInstance();
         try {
             reader = new FileReader(path);
             properties = new Properties();
