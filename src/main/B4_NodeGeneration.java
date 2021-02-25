@@ -70,7 +70,7 @@ class B4_NodeGeneration {
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
         try {
             Signature signature = Signature.getInstance("SHA1WithRSA");
-            signature.initSign(getFromKeyStore());
+            signature.initSign(nodeCryptography.getFromKeyStore());
             signature.update(data);
             signatureData = signature.sign();
             for (byte bytes : signatureData) {
@@ -84,35 +84,19 @@ class B4_NodeGeneration {
         return hash1ID;
     }
 
-     boolean verifySignature(String hashID) {
+     boolean verifySignature() {
         boolean verify = false;
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
         try {
             Signature signature = Signature.getInstance("SHA1WithRSA");
-            System.out.println(publicKey);
+            System.out.println(nodeCryptography.pubToStr(publicKey));
             signature.initVerify(publicKey);
             signature.update(data);
-            verify = signature.verify(hashID.getBytes(StandardCharsets.UTF_8));
+            verify = signature.verify(signatureData);
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             log.error("Exception Occurred",e);
         }
         return verify;
-    }
-
-    /**
-     * @return - private key is fetched from the key store and return it.
-     */
-    private PrivateKey getFromKeyStore() {
-        char[] keyPassword = "123@abc".toCharArray();
-        KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
-        KeyStore.PrivateKeyEntry privateKeyEntry = null;
-        try {
-            privateKeyEntry = (KeyStore.PrivateKeyEntry) nodeCryptography.getKeyStore().getEntry("Private Key", protectionParameter);
-        } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableEntryException e) {
-            e.printStackTrace();
-        }
-        assert privateKeyEntry != null;
-        return privateKeyEntry.getPrivateKey();
     }
 
     String getNodeID() {
@@ -125,5 +109,11 @@ class B4_NodeGeneration {
 
     String getHashID() {
         return hashID;
+    }
+
+    public static void main(String[] args) {
+        B4_NodeGeneration nodeGeneration = new B4_NodeGeneration();
+        System.out.println(nodeGeneration.verifySignature());
+
     }
 }

@@ -745,7 +745,7 @@ public class RoutingManager {
 
     public boolean verifySignature(String hashID) {
         boolean verify;
-        verify = b4_nodeGeneration.verifySignature(hashID);
+        verify = b4_nodeGeneration.verifySignature();
         return verify;
     }
 
