@@ -22,6 +22,7 @@ class B4_NodeGeneration {
         nodeCryptography = NodeCryptography.getInstance();
         publicKey = nodeCryptography.getPublicKey();
         nodeID = generateNodeId();
+        signatureData = generateSignatureData();
         hashID = signNodeIdUsingPrivateKey();
     }
 
@@ -29,6 +30,7 @@ class B4_NodeGeneration {
         this.nodeID = nodeID;
         this.publicKey = publicKey;
         this.hashID = hashID;
+        signatureData = generateSignatureData();
     }
 
     /**
@@ -36,7 +38,7 @@ class B4_NodeGeneration {
      * Return type is String
      */
     private String generateNodeId() {
-        String node1ID=null;
+        String node1ID = null;
         StringBuilder publicKeyToString = new StringBuilder();
         for (byte bytes : publicKey.getEncoded()) {
             publicKeyToString.append(String.format("%02x", bytes).toUpperCase());
@@ -54,9 +56,9 @@ class B4_NodeGeneration {
             }
             node1ID = hexString.toString();
             log.info("Node ID is generated Successfully");
-            log.info("Node ID -"+node1ID);
+            log.info("Node ID -" + node1ID);
         } catch (NoSuchAlgorithmException e) {
-           log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
         return node1ID;
     }
@@ -67,24 +69,30 @@ class B4_NodeGeneration {
     private String signNodeIdUsingPrivateKey() {
         String hash1ID = null;
         StringBuilder signData = new StringBuilder();
-        byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
-        try {
-            Signature signature = Signature.getInstance("SHA1WithRSA");
-            signature.initSign(nodeCryptography.getFromKeyStore());
-            signature.update(data);
-            signatureData = signature.sign();
-            for (byte bytes : signatureData) {
-                signData.append(String.format("%02x", bytes).toUpperCase());
-            }
-            log.info("NodeID signed using PrivateKey");
-            hash1ID = signData.toString();
-        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-            log.error("Exception Occurred",e);
+        for (byte bytes : signatureData) {
+            signData.append(String.format("%02x", bytes).toUpperCase());
         }
+        log.info("NodeID signed using PrivateKey");
+        hash1ID = signData.toString();
         return hash1ID;
     }
 
-     boolean verifySignature() {
+    private byte[] generateSignatureData() {
+        byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
+        Signature signature = null;
+        byte[] sigData = null;
+        try {
+            signature = Signature.getInstance("SHA1WithRSA");
+            signature.initSign(nodeCryptography.getFromKeyStore());
+            signature.update(data);
+            sigData = signature.sign();
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+            e.printStackTrace();
+        }
+        return sigData;
+    }
+
+    boolean verifySignature() {
         boolean verify = false;
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
         try {
@@ -94,7 +102,7 @@ class B4_NodeGeneration {
             signature.update(data);
             verify = signature.verify(signatureData);
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-            log.error("Exception Occurred",e);
+            log.error("Exception Occurred", e);
         }
         return verify;
     }
