@@ -41,6 +41,7 @@ class NodeCryptography {
             String filePath = "KeyStore.ks";
             File nodeFile = new File(filePath);
             boolean nodeDetailsExists = nodeFile.exists();
+            System.out.println(nodeDetailsExists);
             if (!nodeDetailsExists) {
                 keyStore.load(null, null);
                 keyPairGeneration();

@@ -32,6 +32,7 @@ class B4_NodeGeneration {
     }
 
     B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
+        nodeCryptography=NodeCryptography.getInstance();
         this.nodeID = nodeID;
         this.publicKey = publicKey;
         this.hashID = hashID;

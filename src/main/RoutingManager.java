@@ -1063,6 +1063,7 @@ public class RoutingManager {
         String selfNodeId = localNode.getB4node().getNodeID();
         String selfNodePub = nodeCryptography.pubToStr(localNode.getB4node().getPublicKey());
         String selfHashId = localNode.getB4node().getHashID();
+        String selfDigitalSignature = localNode.getB4node().getDigitalSignature();
         String selfIPAddress = localNode.getIpAddress();
         String selfPortAddress = localNode.getPortAddress();
         String selfTransport = localNode.getTransport();
@@ -1078,6 +1079,7 @@ public class RoutingManager {
             root.setAttribute("SELF_NODE_ID", selfNodeId);
             root.setAttribute("SELF_PUBLIC_KEY", selfNodePub);
             root.setAttribute("SELF_HASH_ID", selfHashId);
+            root.setAttribute("SELF_DIGITAL_SIGN",selfDigitalSignature);
             root.setAttribute("SELF_IP_ADDRESS", selfIPAddress);
             root.setAttribute("SELF_PORT_ADDRESS", selfPortAddress);
             root.setAttribute("SELF_TRANSPORT", selfTransport);
@@ -1099,6 +1101,10 @@ public class RoutingManager {
                     Element hashID = doc.createElement("HASHID");
                     hashID.appendChild(doc.createTextNode(routingTable[i][j].getB4node().getNodeID()));
                     row.appendChild(hashID);
+
+                    Element digitalSignature = doc.createElement("DIGITALSIGN");
+                    digitalSignature.appendChild(doc.createTextNode(routingTable[i][j].getB4node().getDigitalSignature()));
+                    row.appendChild(digitalSignature);
 
                     Element nodeIP = doc.createElement("NODEIP");
                     nodeIP.appendChild(doc.createTextNode(routingTable[i][j].getIpAddress()));
@@ -1129,6 +1135,10 @@ public class RoutingManager {
                 Element hashID = doc.createElement("HASHID");
                 hashID.appendChild(doc.createTextNode(neighbourTable[i].getB4node().getHashID()));
                 row1.appendChild(hashID);
+
+                Element digtalSignature = doc.createElement("DIGITALSIGN");
+                digtalSignature.appendChild(doc.createTextNode(neighbourTable[i].getB4node().getDigitalSignature()));
+                row1.appendChild(digtalSignature);
 
                 Element nodeIP = doc.createElement("NODEIP");
                 nodeIP.appendChild(doc.createTextNode(neighbourTable[i].getIpAddress()));
