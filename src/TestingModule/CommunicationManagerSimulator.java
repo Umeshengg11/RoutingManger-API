@@ -64,6 +64,7 @@ public class CommunicationManagerSimulator {
                     String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                     String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
                     String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                    String digitalSignature = element.getElementsByTagName("DIGITALSIGN").item(0).getTextContent();
                     String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
                     String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                     String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();

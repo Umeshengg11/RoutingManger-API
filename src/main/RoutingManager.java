@@ -19,6 +19,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -151,7 +152,7 @@ public class RoutingManager {
             /* Routing Table */
             for (int i = 0; i < rt_dimension; i++) {
                 for (int j = 0; j < 3; j++) {
-                    routingTable[i][j] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "");
+                    routingTable[i][j] = new B4_Node(new B4_NodeTuple("", null, "",""), "", "", "");
                 }
             }
             B4_Node bootStrapNode = config.getBootStrapNode();
@@ -159,7 +160,7 @@ public class RoutingManager {
 
             /* Neighbour Table */
             for (int i = 0; i < nt_dimension; i++) {
-                neighbourTable[i] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "", -1);
+                neighbourTable[i] = new B4_Node(new B4_NodeTuple("", null, "",""), "", "", "", -1);
             }
             localBaseTablesToXML(rtFileName, routingTable, neighbourTable);
 
@@ -184,6 +185,7 @@ public class RoutingManager {
                         String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                         String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
                         String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                        String digitalSignature = element.getElementsByTagName("DIGITALSIGN").item(0).getTextContent();
                         String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
                         String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                         String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
@@ -194,7 +196,7 @@ public class RoutingManager {
                         int index1 = Integer.parseInt(matcher.group(1));
                         matcher.find();
                         int index2 = Integer.parseInt(matcher.group(1));
-                        routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport);
+                        routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash,digitalSignature), nodeIP, nodePort, nodeTransport);
                     }
                 }
                 NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
@@ -209,6 +211,7 @@ public class RoutingManager {
                         String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                         String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
                         String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                        String digitalSignature = element.getElementsByTagName("DIGITALSIGN").item(0).getTextContent();
                         String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
                         String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                         String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
@@ -218,7 +221,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         int index1 = Integer.parseInt(matcher.group(1));
-                        neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                        neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash,digitalSignature), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
             } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
@@ -291,11 +294,12 @@ public class RoutingManager {
                 String selfNodeID = doc.getDocumentElement().getAttribute("SELF_NODE_ID");
                 String selfNodePub = doc.getDocumentElement().getAttribute("SELF_PUBLIC_KEY");
                 String selfNodeHash = doc.getDocumentElement().getAttribute("SELF_HASH_ID");
+                String selfDigitalSignature = doc.getDocumentElement().getAttribute("SELF_DIGITAL_SIGN");
                 String selfIPAddress = doc.getDocumentElement().getAttribute("SELF_IP_ADDRESS");
                 String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
                 String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
                 String selfRTT = doc.getDocumentElement().getAttribute("SELF_RTT");
-                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub), selfNodeHash), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
+                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub), selfNodeHash,selfDigitalSignature), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
 
                 NodeList nodeList = doc.getElementsByTagName("NEIGHBOUR");
                 for (int i = 0; i < nodeList.getLength(); i++) {
@@ -311,6 +315,7 @@ public class RoutingManager {
                         String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                         String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
                         String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                        String digitalSignature = element.getElementsByTagName("DIGITALSIGN").item(0).getTextContent();
                         String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
                         String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                         String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
@@ -319,7 +324,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         int index1 = Integer.parseInt(matcher.group(1));
-                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash,digitalSignature), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -378,6 +383,7 @@ public class RoutingManager {
         String selfNodeIdMerger = selfNodeOfMergerTable.getB4node().getNodeID();
         String selfNodePubMerger = nodeCryptography.pubToStr(selfNodeOfMergerTable.getB4node().getPublicKey());
         String selfHashIdMerger = selfNodeOfMergerTable.getB4node().getHashID();
+        String selfDigiSignMerger = selfNodeOfMergerTable.getB4node().getDigitalSignature();
         String selfIPAddressMerger = selfNodeOfMergerTable.getIpAddress();
         String selfPortAddressMerger = selfNodeOfMergerTable.getPortAddress();
         String selfTransportMerger = selfNodeOfMergerTable.getTransport();
@@ -394,6 +400,7 @@ public class RoutingManager {
             root.setAttribute("SELF_NODE_ID", selfNodeIdMerger);
             root.setAttribute("SELF_PUBLIC_KEY", selfNodePubMerger);
             root.setAttribute("SELF_HASH_ID", selfHashIdMerger);
+            root.setAttribute("SELF_DIGITAL_SIGN", selfDigiSignMerger);
             root.setAttribute("SELF_IP_ADDRESS", selfIPAddressMerger);
             root.setAttribute("SELF_PORT_ADDRESS", selfPortAddressMerger);
             root.setAttribute("SELF_TRANSPORT", selfTransportMerger);
@@ -416,6 +423,10 @@ public class RoutingManager {
                 Element hashID = doc.createElement("HASHID");
                 hashID.appendChild(doc.createTextNode(mergerNeighbourTable[i].getB4node().getHashID()));
                 row1.appendChild(hashID);
+
+                Element digitalSignature = doc.createElement("DIGITALSIGN");
+                digitalSignature.appendChild(doc.createTextNode(mergerNeighbourTable[i].getB4node().getDigitalSignature()));
+                row1.appendChild(digitalSignature);
 
                 Element nodeIP = doc.createElement("NODEIP");
                 nodeIP.appendChild(doc.createTextNode(mergerNeighbourTable[i].getIpAddress()));
@@ -743,9 +754,9 @@ public class RoutingManager {
         return routingManagerBuffer.fetchFromOutputBuffer();
     }
 
-    public boolean verifySignature(String hashID) {
+    public boolean verifySignature(String digitalSignature, PublicKey publicKey, String nodeID) {
         boolean verify;
-        verify = b4_nodeGeneration.verifySignature();
+        verify = b4_nodeGeneration.verifySignature(digitalSignature,publicKey,nodeID);
         return verify;
     }
 
@@ -833,7 +844,7 @@ public class RoutingManager {
      * <br>Presently it is hardcoded (will be amended later).
      */
     private void setLocalNode() {
-        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(), b4_nodeGeneration.getPublicKey(), b4_nodeGeneration.getHashID()), selfIPAddress, selfPortAddress, selfTransportAddress);
+        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(), b4_nodeGeneration.getPublicKey(), b4_nodeGeneration.getHashID(),b4_nodeGeneration.getDigitalSignature()), selfIPAddress, selfPortAddress, selfTransportAddress);
     }
 
     /**

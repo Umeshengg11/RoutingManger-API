@@ -55,6 +55,7 @@ public class B4_MergeRoutingTable {
                     String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                     String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
                     String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                    String digitalSignature = element.getElementsByTagName("DIGITALSIGN").item(0).getTextContent();
                     String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
                     String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                     String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
@@ -65,17 +66,18 @@ public class B4_MergeRoutingTable {
                     int index1 = Integer.parseInt(matcher.group(1));
                     matcher.find();
                     int index2 = Integer.parseInt(matcher.group(1));
-                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
+                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),nodeHash,digitalSignature), nodeIP, nodePort, nodeTransport);
                 }
             }
             doc.getDocumentElement().normalize();
             String selfNodeID = doc.getDocumentElement().getAttribute("SELF_NODE_ID");
             String selfNodePub = doc.getDocumentElement().getAttribute("SELF_PUBLIC_KEY");
             String selfNodeHash = doc.getDocumentElement().getAttribute("SELF_HASH_ID");
+            String selfDigitalSignature = doc.getDocumentElement().getAttribute("SELF_DIGITAL_SIGN");
             String selfIPAddress = doc.getDocumentElement().getAttribute("SELF_IP_ADDRESS");
             String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
             String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
-            selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub),selfNodeHash), selfIPAddress, selfPortAddress, selfTransport);
+            selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub),selfNodeHash,selfDigitalSignature), selfIPAddress, selfPortAddress, selfTransport);
 
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
             for (int i = 0; i < nodeList1.getLength(); i++) {
@@ -89,6 +91,7 @@ public class B4_MergeRoutingTable {
                     String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                     String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
                     String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                    String digitalSignature = element.getElementsByTagName("DIGITALSIGN").item(0).getTextContent();
                     String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
                     String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                     String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
@@ -99,7 +102,7 @@ public class B4_MergeRoutingTable {
                     matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
                     //System.out.println(index1);
-                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),nodeHash,digitalSignature), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {

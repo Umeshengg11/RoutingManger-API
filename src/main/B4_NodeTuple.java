@@ -10,11 +10,13 @@ public class B4_NodeTuple {
     private final String nodeID;
     private final PublicKey publicKey;
     private final String hashID;
+    private final String digitalSignature;
 
-    public B4_NodeTuple(String nodeID, PublicKey publicKey, String hashID) {
+    public B4_NodeTuple(String nodeID, PublicKey publicKey, String hashID,String digitalSignature) {
         this.nodeID = nodeID;
         this.publicKey = publicKey;
         this.hashID = hashID;
+        this.digitalSignature=digitalSignature;
     }
 
     public String getNodeID() {
@@ -28,5 +30,7 @@ public class B4_NodeTuple {
     public String getHashID() {
         return hashID;
     }
+
+    public String getDigitalSignature(){return digitalSignature;}
 
 }
