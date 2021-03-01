@@ -1,12 +1,9 @@
 package main;
 
 import org.apache.log4j.Logger;
-
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Locale;
 
 /**
  * This class is used to generate NodeID from the public key generated using the NodeCryptography class.
@@ -18,7 +15,7 @@ class B4_NodeGeneration {
     private final String nodeID;
     private final PublicKey publicKey;
     private final String hashID;
-    private NodeCryptography nodeCryptography;
+    private final NodeCryptography nodeCryptography;
     private final byte[] signatureData;
     private final String digitalSignature;
 
@@ -32,7 +29,7 @@ class B4_NodeGeneration {
     }
 
     B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
-        nodeCryptography=NodeCryptography.getInstance();
+        nodeCryptography = NodeCryptography.getInstance();
         this.nodeID = nodeID;
         this.publicKey = publicKey;
         this.hashID = hashID;
@@ -74,38 +71,38 @@ class B4_NodeGeneration {
      * @return - hashId obtained by signing the NodeID by private key
      */
     private String generateHashId() {
-        String hash1ID = null;
+        String hash1ID;
         StringBuilder signData = new StringBuilder();
         for (byte bytes : signatureData) {
             signData.append(String.format("%02x", bytes).toUpperCase());
         }
-        log.info("NodeID signed using PrivateKey");
+        log.info("HashID is generated");
         hash1ID = signData.toString();
         return hash1ID;
     }
 
     private byte[] signNodeIdUsingPvtKey() {
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
-        Signature signature = null;
+        Signature signature;
         byte[] sigData = null;
         try {
             signature = Signature.getInstance("SHA1WithRSA");
             signature.initSign(nodeCryptography.getFromKeyStore());
             signature.update(data);
             sigData = signature.sign();
+            log.info("NodeID is signed using Private Key");
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred", e);
         }
         return sigData;
     }
 
-    private byte[] hashIdToByteArray(String hashID){
-        String hashIdLower = hashID.toLowerCase(Locale.ROOT);
-        //System.out.println(hashIdLower);
-        return hashIdLower.getBytes();
+    private String generateDigitalSignature() {
+        byte[] base1 = Base64.getEncoder().encode(signatureData);
+        return new String(base1);
     }
 
-    boolean verifySignature(String digitalSignature,PublicKey publicKey,String nodeID) {
+    boolean verifySignature(String digitalSignature, PublicKey publicKey, String nodeID) {
         boolean verify = false;
         byte[] baseSign = Base64.getDecoder().decode(digitalSignature);
         byte[] data = nodeID.getBytes(StandardCharsets.UTF_8);
@@ -124,7 +121,9 @@ class B4_NodeGeneration {
         return nodeID;
     }
 
-    String getDigitalSignature(){return digitalSignature;}
+    String getDigitalSignature() {
+        return digitalSignature;
+    }
 
     PublicKey getPublicKey() {
         return publicKey;
@@ -133,11 +132,4 @@ class B4_NodeGeneration {
     String getHashID() {
         return hashID;
     }
-
-    private String generateDigitalSignature(){
-        byte[] base1 = Base64.getEncoder().encode(signatureData);
-        String digitalSign = new String(base1);
-        return digitalSign;
-    }
-
 }

@@ -65,7 +65,7 @@ public class B4_Layer {
         return isCreated;
     }
 
-    public int fetchMaxLayerID() {
+    int fetchMaxLayerID() {
         FileReader reader;
         int layerIDMax = 0;
         try {
@@ -80,7 +80,7 @@ public class B4_Layer {
         return layerIDMax;
     }
 
-    public boolean amendLayerFile() {
+    boolean amendLayerFile() {
         boolean isAmended = false;
         List<String> lines = new ArrayList<>();
         String line;
@@ -110,7 +110,7 @@ public class B4_Layer {
         return isAmended;
     }
 
-    public String getLayerName(int layerID){
+    String getLayerName(int layerID){
         String layerName = null;
         try {
             reader = new FileReader(filePath);
@@ -118,7 +118,7 @@ public class B4_Layer {
             properties.load(reader);
             layerName = properties.getProperty(""+layerID+"");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred", e);
         }
     return layerName;
     }
