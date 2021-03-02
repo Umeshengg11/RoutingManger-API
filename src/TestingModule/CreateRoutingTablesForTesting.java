@@ -25,7 +25,6 @@ public class CreateRoutingTablesForTesting {
         String selfNodeId = "7589ABAA1234ABA1234591111ABCDFE123456789";
         PublicKey selfPublicKey = keyPairGeneration();
         String selfHashID = "7589ABAA1234ABA1234591111ABCDFE1234567897589ABAA1234ABA1234591111ABCDFE123456789";
-        String selfDigitalSignature = "7589ABAA1234ABA1234591111ABCDFE1234567897589ABAA1234ABA1234591111ABCDFE123456789";
         String selfNodeIP = "192.168.10.5";
         String selfNodePort = "777";
         String selfNodeTransport = "UDP";
@@ -34,8 +33,7 @@ public class CreateRoutingTablesForTesting {
         B4_NodeSimulator[] testNeighbourTable = new B4_NodeSimulator[16];
         String testNodeID;
         PublicKey testPublicKey;
-        String testHashId;
-        String testDigitalSignature;
+        String testHashID;
         String testNodeIP;
         int testNodePort = 6666;
         String testTransport = "TCP";
@@ -43,10 +41,9 @@ public class CreateRoutingTablesForTesting {
             for (int j = 0; j < 3; j++) {
                 testNodeID = getNodeID();
                 testPublicKey = keyPairGeneration();
-                testHashId = getNodeID()+""+getNodeID();
-                testDigitalSignature = getNodeID()+""+getNodeID()+""+getNodeID();
+                testHashID = getNodeID()+""+getNodeID()+""+getNodeID();
                 testNodeIP = getIPaddress();
-                testRoutingtable[i][j] = new B4_NodeSimulator(new B4_NodeTuple(testNodeID,testPublicKey,testHashId,testDigitalSignature), testNodeIP, (testNodePort + i + j) + "", testTransport);
+                testRoutingtable[i][j] = new B4_NodeSimulator(new B4_NodeTuple(testNodeID,testPublicKey,testHashID), testNodeIP, (testNodePort + i + j) + "", testTransport);
             }
         }
 
@@ -54,9 +51,8 @@ public class CreateRoutingTablesForTesting {
             testNodeID = getNodeID();
             testNodeIP = getIPaddress();
             testPublicKey = keyPairGeneration();
-            testHashId = getNodeID()+""+getNodeID();
-            testDigitalSignature = getNodeID()+""+getNodeID()+""+getNodeID();
-            testNeighbourTable[i] = new B4_NodeSimulator(new B4_NodeTuple(testNodeID,testPublicKey,testHashId,testDigitalSignature), testNodeIP, (testNodePort + i) + "", (testTransport), (rtt + i));
+            testHashID = getNodeID()+""+getNodeID()+""+getNodeID();
+            testNeighbourTable[i] = new B4_NodeSimulator(new B4_NodeTuple(testNodeID,testPublicKey,testHashID), testNodeIP, (testNodePort + i) + "", (testTransport), (rtt + i));
         }
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -68,8 +64,7 @@ public class CreateRoutingTablesForTesting {
             doc.appendChild(root);
             root.setAttribute("SELF_NODE_ID", selfNodeId);
             root.setAttribute("SELF_PUBLIC_KEY", pubToStr(selfPublicKey));
-            root.setAttribute("SELF_HASH_ID", selfHashID);
-            root.setAttribute("SELF_DIGITAL_SIGN",selfDigitalSignature);
+            root.setAttribute("SELF_HASH_ID",selfHashID);
             root.setAttribute("SELF_IP_ADDRESS", selfNodeIP);
             root.setAttribute("SELF_PORT_ADDRESS", selfNodePort);
             root.setAttribute("SELF_TRANSPORT", selfNodeTransport);
@@ -91,10 +86,6 @@ public class CreateRoutingTablesForTesting {
                     Element hashID = doc.createElement("HASHID");
                     hashID.appendChild(doc.createTextNode(testRoutingtable[i][j].getB4node().getHashID()));
                     row.appendChild(hashID);
-
-                    Element digitalSignature = doc.createElement("DIGITALSIGN");
-                    digitalSignature.appendChild(doc.createTextNode(testRoutingtable[i][j].getB4node().getDigitalSignature()));
-                    row.appendChild(digitalSignature);
 
                     Element nodeIP = doc.createElement("NODEIP");
                     nodeIP.appendChild(doc.createTextNode(testRoutingtable[i][j].getIpAddress()));
@@ -126,10 +117,6 @@ public class CreateRoutingTablesForTesting {
                 Element hashID = doc.createElement("HASHID");
                 hashID.appendChild(doc.createTextNode(testNeighbourTable[i].getB4node().getHashID()));
                 row1.appendChild(hashID);
-
-                Element digitalSignature = doc.createElement("DIGITALSIGN");
-                digitalSignature.appendChild(doc.createTextNode(testNeighbourTable[i].getB4node().getDigitalSignature()));
-                row1.appendChild(digitalSignature);
 
                 Element nodeIP = doc.createElement("NODEIP");
                 nodeIP.appendChild(doc.createTextNode(testNeighbourTable[i].getIpAddress()));

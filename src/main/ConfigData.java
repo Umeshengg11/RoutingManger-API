@@ -79,11 +79,10 @@ class ConfigData {
             String bootStrapID = properties.getProperty("BootstrapND");
             String bootStrapPub = properties.getProperty("BootstrapPubKey");
             String bootStrapHash = properties.getProperty("BootstrapHashID");
-            String bootStrapDigitalSign = properties.getProperty("BootstrapDigitalSign");
             String bootStrapIP = properties.getProperty("BootstrapPvtIP");
             String bootStrapPort = properties.getProperty("BootstrapPort");
             String bootStrapAddress = properties.getProperty("BootstrapAddress");
-            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID, nodeCryptography.strToPub(bootStrapPub), bootStrapHash, bootStrapDigitalSign), bootStrapIP, bootStrapPort, bootStrapAddress);
+            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID, nodeCryptography.strToPub(bootStrapPub),bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
         } catch (IOException e) {
             log.error("Config file not Found or Issue in config file fetching\n", e);
         }
@@ -108,8 +107,7 @@ class ConfigData {
     }
 
     int getPortAddress() {
-        int portAddress = servicesInt("PortAddress");
-        return portAddress;
+        return servicesInt("PortAddress");
     }
 
     String getTransportAddress() {

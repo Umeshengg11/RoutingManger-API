@@ -3,7 +3,6 @@ package main;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
-
 import javax.security.auth.x500.X500Principal;
 import java.io.File;
 import java.io.FileInputStream;

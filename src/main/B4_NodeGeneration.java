@@ -14,18 +14,16 @@ class B4_NodeGeneration {
     private static final Logger log = Logger.getLogger(B4_NodeGeneration.class);
     private final String nodeID;
     private final PublicKey publicKey;
-    private final String hashID;
     private final NodeCryptography nodeCryptography;
     private final byte[] signatureData;
-    private final String digitalSignature;
+    private final String hashID;
 
     B4_NodeGeneration() {
         nodeCryptography = NodeCryptography.getInstance();
         publicKey = nodeCryptography.getPublicKey();
         nodeID = generateNodeId();
         signatureData = signNodeIdUsingPvtKey();
-        hashID = generateHashId();
-        digitalSignature = generateDigitalSignature();
+        hashID = generateDigitalSignature();
     }
 
     B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
@@ -34,7 +32,7 @@ class B4_NodeGeneration {
         this.publicKey = publicKey;
         this.hashID = hashID;
         signatureData = signNodeIdUsingPvtKey();
-        digitalSignature = generateDigitalSignature();
+
     }
 
     /**
@@ -65,20 +63,6 @@ class B4_NodeGeneration {
             log.error("Exception Occurred", e);
         }
         return node1ID;
-    }
-
-    /**
-     * @return - hashId obtained by signing the NodeID by private key
-     */
-    private String generateHashId() {
-        String hash1ID;
-        StringBuilder signData = new StringBuilder();
-        for (byte bytes : signatureData) {
-            signData.append(String.format("%02x", bytes).toUpperCase());
-        }
-        log.info("HashID is generated");
-        hash1ID = signData.toString();
-        return hash1ID;
     }
 
     private byte[] signNodeIdUsingPvtKey() {
@@ -121,15 +105,11 @@ class B4_NodeGeneration {
         return nodeID;
     }
 
-    String getDigitalSignature() {
-        return digitalSignature;
+    String getHashID() {
+        return hashID;
     }
 
     PublicKey getPublicKey() {
         return publicKey;
-    }
-
-    String getHashID() {
-        return hashID;
     }
 }
