@@ -94,14 +94,26 @@ class B4_NodeGeneration {
         return sigData;
     }
 
+    /**
+     * This function will generate hashID from signatureData
+     * @return - hashID
+     */
     private String generateHashID() {
         byte[] base1 = Base64.getEncoder().encode(signatureData);
         return new String(base1);
     }
 
-    boolean verifySignature(String digitalSignature, PublicKey publicKey, String nodeID) {
+    /**
+     * This function is used to verify whether the node is generated randomly from the publicKey and is signed by the
+     * corresponding private key to generate the hashID.
+     * @param hashID - hashID associated with the node.
+     * @param publicKey - public key associated with the node
+     * @param nodeID - nodeID associated with the node
+     * @return - boolean value if the signature is verified
+     */
+    boolean verifySignature(String hashID, PublicKey publicKey, String nodeID) {
         boolean verify = false;
-        byte[] baseSign = Base64.getDecoder().decode(digitalSignature);
+        byte[] baseSign = Base64.getDecoder().decode(hashID);
         byte[] data = nodeID.getBytes(StandardCharsets.UTF_8);
         try {
             Signature signature = Signature.getInstance("SHA1WithRSA");

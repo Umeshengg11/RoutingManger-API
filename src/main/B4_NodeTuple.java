@@ -11,20 +11,34 @@ public class B4_NodeTuple {
     private final PublicKey publicKey;
     private final String hashID;
 
+    /**
+     * @param nodeID
+     * @param publicKey
+     * @param hashID
+     */
     public B4_NodeTuple(String nodeID, PublicKey publicKey,String hashID) {
         this.nodeID = nodeID;
         this.publicKey = publicKey;
         this.hashID=hashID;
     }
 
+    /**
+     * @return
+     */
     public String getNodeID() {
         return nodeID;
     }
 
+    /**
+     * @return
+     */
     public PublicKey getPublicKey() {
         return publicKey;
     }
 
+    /**
+     * @return
+     */
     public String getHashID(){return hashID;}
 
 }
