@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 /**
  * This class is used to create an object of RoutingTable.
- * It can create routing and neighbour table for all layers associated with brihaspati-4
+ * This class creates routing and neighbour table for all layers associated with brihaspati-4
  */
 public class B4_MergeRoutingTable {
     private final B4_Node[][] routingTable;
@@ -24,6 +24,10 @@ public class B4_MergeRoutingTable {
     private B4_Node selfMergerNode ;
     private static final Logger log = Logger.getLogger(B4_MergeRoutingTable.class);
 
+    /**
+     * @param mergerRTFile - The file which needs to be merged is passed as an argument.
+     * It is the constructor for this class.
+     */
     public B4_MergeRoutingTable(String mergerRTFile) {
         NodeCryptography nodeCryptography = NodeCryptography.getInstance();
         ConfigData config = ConfigData.getInstance();
@@ -61,9 +65,9 @@ public class B4_MergeRoutingTable {
 
                     Pattern pattern = Pattern.compile("\\[([^]]+)\\]");
                     Matcher matcher = pattern.matcher(index);
-                    matcher.find();
+                    //matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
-                    matcher.find();
+                    //matcher.find();
                     int index2 = Integer.parseInt(matcher.group(1));
                     routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport);
                 }
@@ -96,7 +100,7 @@ public class B4_MergeRoutingTable {
 
                     Pattern pattern = Pattern.compile("\\[([^]]+)\\]");
                     Matcher matcher = pattern.matcher(index);
-                    matcher.find();
+                    //matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
                     //System.out.println(index1);
                     neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
@@ -107,15 +111,24 @@ public class B4_MergeRoutingTable {
         }
     }
 
-    public B4_Node[][] getRoutingTable() {
+    /**
+     * @return - routing table instance.
+     */
+    B4_Node[][] getRoutingTable() {
         return routingTable;
     }
 
-    public B4_Node getSelfNode() {
+    /**
+     * @return - self node.
+     */
+    B4_Node getSelfNode() {
         return selfMergerNode;
     }
 
-    public B4_Node[] getNeighbourTable() {
+    /**
+     * @return - neighbour table instance.
+     */
+    B4_Node[] getNeighbourTable() {
         return neighbourTable;
     }
 

@@ -14,7 +14,7 @@ class B4_Node {
     private float rtt;
 
     /**
-     * @param b4node -Its a main.resources.B4_NodeTuple Object
+     * @param b4node -Its a B4_NodeTuple Object
      * @param ipAddress - IpAddress of the node
      * @param portAddress - PortAddress of the node
      * @param transport - TransportAddress of the node
@@ -27,7 +27,7 @@ class B4_Node {
     }
 
     /**
-     * @param b4node -Its a main.resources.B4_NodeTuple Object
+     * @param b4node -Its a B4_NodeTuple Object
      * @param ipAddress- IpAddress of the node
      * @param portAddress - PortAddress of the node
      * @param transport - TransportAddress of the node
@@ -41,22 +41,37 @@ class B4_Node {
         this.rtt = rtt;
     }
 
+    /**
+     * @return - rtt value associated with the node
+     */
     float getRtt() {
         return rtt;
     }
 
+    /**
+     * @return - B4_NodeTuple object
+     */
     B4_NodeTuple getB4node() {
         return b4node;
     }
 
+    /**
+     * @return - IP address associated with the node
+     */
     String getIpAddress() {
         return ipAddress;
     }
 
+    /**
+     * @return - PortAddress associated with the node
+     */
     String getPortAddress() {
         return portAddress;
     }
 
+    /**
+     * @return - Transport address associated with the node
+     */
     String getTransport() {
         return transport;
     }

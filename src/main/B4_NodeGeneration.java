@@ -18,21 +18,30 @@ class B4_NodeGeneration {
     private final byte[] signatureData;
     private final String hashID;
 
+    /**
+     * It is the default constructor of the class
+     * Few functions are initialised/fetched using this constructor like NodeCryptography,publicKey,nodeID, SignatureDate,hashID
+     */
     B4_NodeGeneration() {
         nodeCryptography = NodeCryptography.getInstance();
         publicKey = nodeCryptography.getPublicKey();
         nodeID = generateNodeId();
         signatureData = signNodeIdUsingPvtKey();
-        hashID = generateDigitalSignature();
+        hashID = generateHashID();
     }
 
+    /**
+     * This is the Second constructor of this class
+     * @param nodeID - NodeID of the node
+     * @param publicKey - publicKey associated with the node.
+     * @param hashID - hashID associated with the node.
+     */
     B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
         nodeCryptography = NodeCryptography.getInstance();
         this.nodeID = nodeID;
         this.publicKey = publicKey;
         this.hashID = hashID;
         signatureData = signNodeIdUsingPvtKey();
-
     }
 
     /**
@@ -65,6 +74,10 @@ class B4_NodeGeneration {
         return node1ID;
     }
 
+    /**
+     * This function is used to sign the nodeID using privateKey to generate a digital signature
+     * @return - the sign date in the form of byte[]
+     */
     private byte[] signNodeIdUsingPvtKey() {
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
         Signature signature;
@@ -81,7 +94,7 @@ class B4_NodeGeneration {
         return sigData;
     }
 
-    private String generateDigitalSignature() {
+    private String generateHashID() {
         byte[] base1 = Base64.getEncoder().encode(signatureData);
         return new String(base1);
     }
@@ -101,14 +114,23 @@ class B4_NodeGeneration {
         return verify;
     }
 
+    /**
+     * @return - NodeID associate with the node.
+     */
     String getNodeID() {
         return nodeID;
     }
 
+    /**
+     * @return - HashID associated with the node.
+     */
     String getHashID() {
         return hashID;
     }
 
+    /**
+     * @return - publicKey associated with the node.
+     */
     PublicKey getPublicKey() {
         return publicKey;
     }
