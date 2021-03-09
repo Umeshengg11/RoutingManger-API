@@ -63,8 +63,7 @@ public class CommunicationManagerSimulator {
                     //Get value of all sub-Elements
                     String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                     String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
-                    String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
-                    String digitalSignature = element.getElementsByTagName("DIGITALSIGN").item(0).getTextContent();
+                    String hashID = element.getElementsByTagName("HASHID").item(0).getTextContent();
                     String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
                     String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                     String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
@@ -89,8 +88,7 @@ public class CommunicationManagerSimulator {
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
             log.error("Exception Occurred",e);
         }
-        File file1 = new File("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml");
-        return file1;
+        return new File("RcvRTT_" + layerID + "_"+ selfNodeID+ ".xml");
 
     }
 }

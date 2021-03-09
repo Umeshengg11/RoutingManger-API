@@ -9,19 +9,17 @@ import java.util.Properties;
  * This class is used to get all the data from the configuration file ie config.properties
  */
 class ConfigData {
+    private static final Logger log = Logger.getLogger(ConfigData.class);
     private static ConfigData config;
+    private final NodeCryptography nodeCryptography;
+    private final String path = "src/configuration/config.properties";
     private long sleepTime;
     private B4_Node bootStrapNode;
-    private final NodeCryptography nodeCryptography;
-    private static final Logger log = Logger.getLogger(ConfigData.class);
     private FileReader reader;
-    private final String path = "src/configuration/config.properties";
     private Properties properties;
-    private int portAddress;
-    private String transportAddress;
 
     private ConfigData() {
-       nodeCryptography = NodeCryptography.getInstance();
+        nodeCryptography = NodeCryptography.getInstance();
         try {
             reader = new FileReader(path);
             properties = new Properties();
@@ -81,11 +79,10 @@ class ConfigData {
             String bootStrapID = properties.getProperty("BootstrapND");
             String bootStrapPub = properties.getProperty("BootstrapPubKey");
             String bootStrapHash = properties.getProperty("BootstrapHashID");
-            String bootStrapDigitalSign = properties.getProperty("BootstrapDigitalSign");
             String bootStrapIP = properties.getProperty("BootstrapPvtIP");
             String bootStrapPort = properties.getProperty("BootstrapPort");
             String bootStrapAddress = properties.getProperty("BootstrapAddress");
-            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID, nodeCryptography.strToPub(bootStrapPub), bootStrapHash,bootStrapDigitalSign), bootStrapIP, bootStrapPort, bootStrapAddress);
+            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID, nodeCryptography.strToPub(bootStrapPub),bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
         } catch (IOException e) {
             log.error("Config file not Found or Issue in config file fetching\n", e);
         }
@@ -110,15 +107,11 @@ class ConfigData {
     }
 
     int getPortAddress() {
-        portAddress = servicesInt("PortAddress");
-        System.out.println("hiiii");
-        System.out.println(portAddress);
-        return portAddress;
+        return servicesInt("PortAddress");
     }
 
     String getTransportAddress() {
-        transportAddress = servicesString("TransportAddress");
-        return transportAddress;
+        return servicesString("TransportAddress");
     }
 
     long getIncrementTime() {
@@ -155,12 +148,12 @@ class ConfigData {
         }
     }
 
-    boolean checkLayerName(String layerName){
+    boolean checkLayerName(String layerName) {
         boolean access = false;
         try {
             properties.load(reader);
             String value = properties.getProperty(layerName);
-            if (value.equalsIgnoreCase("yes")||(value.equalsIgnoreCase("no"))) access = true;
+            if (value.equalsIgnoreCase("yes") || (value.equalsIgnoreCase("no"))) access = true;
 
         } catch (IOException e) {
             return false;

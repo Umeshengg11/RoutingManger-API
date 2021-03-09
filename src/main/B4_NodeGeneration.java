@@ -1,12 +1,9 @@
 package main;
 
 import org.apache.log4j.Logger;
-
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Locale;
 
 /**
  * This class is used to generate NodeID from the public key generated using the NodeCryptography class.
@@ -17,27 +14,34 @@ class B4_NodeGeneration {
     private static final Logger log = Logger.getLogger(B4_NodeGeneration.class);
     private final String nodeID;
     private final PublicKey publicKey;
-    private final String hashID;
-    private NodeCryptography nodeCryptography;
+    private final NodeCryptography nodeCryptography;
     private final byte[] signatureData;
-    private final String digitalSignature;
+    private final String hashID;
 
+    /**
+     * It is the default constructor of the class
+     * Few functions are initialised/fetched using this constructor like NodeCryptography,publicKey,nodeID, SignatureDate,hashID
+     */
     B4_NodeGeneration() {
         nodeCryptography = NodeCryptography.getInstance();
         publicKey = nodeCryptography.getPublicKey();
         nodeID = generateNodeId();
         signatureData = signNodeIdUsingPvtKey();
-        hashID = generateHashId();
-        digitalSignature = generateDigitalSignature();
+        hashID = generateHashID();
     }
 
+    /**
+     * This is the Second constructor of this class
+     * @param nodeID - NodeID of the node
+     * @param publicKey - publicKey associated with the node.
+     * @param hashID - hashID associated with the node.
+     */
     B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
-        nodeCryptography=NodeCryptography.getInstance();
+        nodeCryptography = NodeCryptography.getInstance();
         this.nodeID = nodeID;
         this.publicKey = publicKey;
         this.hashID = hashID;
         signatureData = signNodeIdUsingPvtKey();
-        digitalSignature = generateDigitalSignature();
     }
 
     /**
@@ -71,43 +75,45 @@ class B4_NodeGeneration {
     }
 
     /**
-     * @return - hashId obtained by signing the NodeID by private key
+     * This function is used to sign the nodeID using privateKey to generate a digital signature
+     * @return - the sign date in the form of byte[]
      */
-    private String generateHashId() {
-        String hash1ID = null;
-        StringBuilder signData = new StringBuilder();
-        for (byte bytes : signatureData) {
-            signData.append(String.format("%02x", bytes).toUpperCase());
-        }
-        log.info("NodeID signed using PrivateKey");
-        hash1ID = signData.toString();
-        return hash1ID;
-    }
-
     private byte[] signNodeIdUsingPvtKey() {
         byte[] data = getNodeID().getBytes(StandardCharsets.UTF_8);
-        Signature signature = null;
+        Signature signature;
         byte[] sigData = null;
         try {
             signature = Signature.getInstance("SHA1WithRSA");
             signature.initSign(nodeCryptography.getFromKeyStore());
             signature.update(data);
             sigData = signature.sign();
+            log.info("NodeID is signed using Private Key");
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred", e);
         }
         return sigData;
     }
 
-    private byte[] hashIdToByteArray(String hashID){
-        String hashIdLower = hashID.toLowerCase(Locale.ROOT);
-        //System.out.println(hashIdLower);
-        return hashIdLower.getBytes();
+    /**
+     * This function will generate hashID from signatureData
+     * @return - hashID
+     */
+    private String generateHashID() {
+        byte[] base1 = Base64.getEncoder().encode(signatureData);
+        return new String(base1);
     }
 
-    boolean verifySignature(String digitalSignature,PublicKey publicKey,String nodeID) {
+    /**
+     * This function is used to verify whether the node is generated randomly from the publicKey and is signed by the
+     * corresponding private key to generate the hashID.
+     * @param hashID - hashID associated with the node.
+     * @param publicKey - public key associated with the node
+     * @param nodeID - nodeID associated with the node
+     * @return - boolean value if the signature is verified
+     */
+    boolean verifySignature(String hashID, PublicKey publicKey, String nodeID) {
         boolean verify = false;
-        byte[] baseSign = Base64.getDecoder().decode(digitalSignature);
+        byte[] baseSign = Base64.getDecoder().decode(hashID);
         byte[] data = nodeID.getBytes(StandardCharsets.UTF_8);
         try {
             Signature signature = Signature.getInstance("SHA1WithRSA");
@@ -120,24 +126,24 @@ class B4_NodeGeneration {
         return verify;
     }
 
+    /**
+     * @return - NodeID associate with the node.
+     */
     String getNodeID() {
         return nodeID;
     }
 
-    String getDigitalSignature(){return digitalSignature;}
-
-    PublicKey getPublicKey() {
-        return publicKey;
-    }
-
+    /**
+     * @return - HashID associated with the node.
+     */
     String getHashID() {
         return hashID;
     }
 
-    private String generateDigitalSignature(){
-        byte[] base1 = Base64.getEncoder().encode(signatureData);
-        String digitalSign = new String(base1);
-        return digitalSign;
+    /**
+     * @return - publicKey associated with the node.
+     */
+    PublicKey getPublicKey() {
+        return publicKey;
     }
-
 }
