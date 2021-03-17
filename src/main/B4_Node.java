@@ -1,8 +1,8 @@
 package main;
 
 /**
- * Created by S/L Umesh Nair
- * This class hold all the information about the node - Node ID, Node IP, Node Port,Node Transport and rtt.
+ * Developed by S/L Umesh Nair
+ * This class hold all the information about the node - Node ID, Node IP, Node Port,Node Transport and RTT.
  * The routingTable and neighbourTable will be created using the object of this class and NodeTuple class.
  * Two constructor of this class is created - one without rtt value and other with rtt value.
  */
@@ -49,7 +49,7 @@ class B4_Node {
     }
 
     /**
-     * @return - B4_NodeTuple object
+     * @return - Object of B4_NodeTuple
      */
     B4_NodeTuple getB4node() {
         return b4node;

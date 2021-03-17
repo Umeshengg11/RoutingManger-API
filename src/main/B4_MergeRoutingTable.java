@@ -15,8 +15,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class is used to create an object of RoutingTable.
- * This class creates routing and neighbour table for all layers associated with brihaspati-4
+ * This class is used to create an object of MergerRoutingTable.
+ * MergerRoutingTable is an object which holds all the data associated with a routing table obtained from
+ * another node, to merge in to the routing table of source Node. This class is different from the B4_RoutingTable.
+ * This class can handle mergerRouting and mergerNeighbour table for all layers associated with Brihaspati-4
  */
 public class B4_MergeRoutingTable {
     private final B4_Node[][] routingTable;
@@ -65,9 +67,9 @@ public class B4_MergeRoutingTable {
 
                     Pattern pattern = Pattern.compile("\\[([^]]+)\\]");
                     Matcher matcher = pattern.matcher(index);
-                    //matcher.find();
+                    matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
-                    //matcher.find();
+                    matcher.find();
                     int index2 = Integer.parseInt(matcher.group(1));
                     routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport);
                 }
@@ -97,10 +99,9 @@ public class B4_MergeRoutingTable {
                     String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
                     String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
                     String nodeRTT = element.getElementsByTagName("NODERTT").item(0).getTextContent();
-
                     Pattern pattern = Pattern.compile("\\[([^]]+)\\]");
                     Matcher matcher = pattern.matcher(index);
-                    //matcher.find();
+                    matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
                     //System.out.println(index1);
                     neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
@@ -112,21 +113,21 @@ public class B4_MergeRoutingTable {
     }
 
     /**
-     * @return - routing table instance.
+     * @return - mergerRoutingTable instance.
      */
     B4_Node[][] getRoutingTable() {
         return routingTable;
     }
 
     /**
-     * @return - self node.
+     * @return - selfNode.
      */
     B4_Node getSelfNode() {
         return selfMergerNode;
     }
 
     /**
-     * @return - neighbour table instance.
+     * @return - mergerNeighbourTable instance.
      */
     B4_Node[] getNeighbourTable() {
         return neighbourTable;

@@ -3,8 +3,8 @@ package main;
 import java.security.PublicKey;
 
 /**
- * This class will is used to create an Object which contains a tuple- NodeID,PublicKey and HashID
- * This class is used along with main.resources.B4_Node to create a bigger Object used in the RoutingTable and NeighbourTable.
+ * This class will is used to create an Object which contains tuple(Three parameters)- NodeID,PublicKey and HashID
+ * This class is used to create another object called B4_Node.
  */
 public class B4_NodeTuple {
     private final String nodeID;
@@ -12,9 +12,10 @@ public class B4_NodeTuple {
     private final String hashID;
 
     /**
-     * @param nodeID
-     * @param publicKey
-     * @param hashID
+     * @param nodeID - nodeID is taken as the argument.
+     * @param publicKey - public is taken as the argument.
+     * @param hashID - hashID is taken as the argument.
+     * This is a constructor of B4_NodeTuple.This constructor override the default constructor.
      */
     public B4_NodeTuple(String nodeID, PublicKey publicKey,String hashID) {
         this.nodeID = nodeID;
@@ -23,21 +24,21 @@ public class B4_NodeTuple {
     }
 
     /**
-     * @return
+     * @return - nodeID associated with the current node.
      */
     public String getNodeID() {
         return nodeID;
     }
 
     /**
-     * @return
+     * @return - publicKey associated with the current node.
      */
     public PublicKey getPublicKey() {
         return publicKey;
     }
 
     /**
-     * @return
+     * @return - hashID associated with the current node.
      */
     public String getHashID(){return hashID;}
 

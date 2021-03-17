@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.Properties;
 
 /**
- * This class is used to get all the data from the configuration file ie config.properties
+ * This class is used to fetch all the data from the configuration file i.e config.properties
  */
 class ConfigData {
     private static final Logger log = Logger.getLogger(ConfigData.class);
@@ -28,7 +28,7 @@ class ConfigData {
         }
     }
 
-    public static synchronized ConfigData getInstance() {
+    static synchronized ConfigData getInstance() {
         if (config == null) {
             config = new ConfigData();
         }

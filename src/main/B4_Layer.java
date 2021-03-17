@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * This class is used to keep track of each layer formed dynamically in the system and also keep a note of it
- * for the future use when the system reboots
+/**`
+ * This class is used to keep track of each layer formed dynamically in the system and also keep note of it
+ * for the future use when the system reboots.
  * It create a NodeDetails file in the configuration folder.
  */
 public class B4_Layer {
@@ -75,7 +75,7 @@ public class B4_Layer {
     }
 
     /**
-     * @return - the maximum value of the layerID which is existing presently in the system.
+     * @return - layerIDMax that is the highest value of the layerID which is existing in the system at present.
      * return type is int.
      */
     int fetchMaxLayerID() {
@@ -94,7 +94,7 @@ public class B4_Layer {
     }
 
     /**
-     * @return -boolean value when the existing NodeDetails file is updated when new layer is added to the system.
+     * @return -boolean value when the existing NodeDetails file is updated and a new layer is added to the system.
      */
     boolean amendLayerFile() {
         boolean isAmended = false;
@@ -128,7 +128,7 @@ public class B4_Layer {
 
     /**
      * @param layerID - layerID is fed as argument to the function.
-     * @return - It will return corresponding layer name.
+     * @return - corresponding layer name.
      */
     String getLayerName(int layerID){
         String layerName = null;
