@@ -32,6 +32,16 @@ class NodeCryptography {
     private static NodeCryptography nodeCryptography;
     private final char[] keyPassword = "123@abc".toCharArray();
 
+    /**
+     * This is the default constructor for this class.
+     * This is made private so that it cannot be accessed from outside the class.
+     * All the initialization is done in the constructor.
+     * BountyCastle is used as the service provider.
+     * BountyCastle jar file is added to the class path.
+     * nodeDetailsFile is checked whether is available from the previous login to take all the relevant parameters from
+     * there and if it is not available it is created and all the parameters are added to the file.
+     *
+     */
     private NodeCryptography() {
         Provider provider = new BouncyCastleProvider();
         Security.addProvider(provider);
@@ -59,6 +69,10 @@ class NodeCryptography {
         }
     }
 
+    /**
+     * @return - Object of NodeCryptography.
+     * Singleton object is created so that the same instance of the object is provided when this class is called.
+     */
     public static synchronized NodeCryptography getInstance() {
         if (nodeCryptography == null) {
             nodeCryptography = new NodeCryptography();
@@ -66,6 +80,9 @@ class NodeCryptography {
         return nodeCryptography;
     }
 
+    /**
+     * This method is used to generate keyPair and associated public and private key from it.
+     */
     private void keyPairGeneration() {
         try {
             String ALGORITHM = "RSA";
@@ -80,6 +97,9 @@ class NodeCryptography {
         }
     }
 
+    /**
+     * This method will load keystore.
+     */
     private void loadKeyStore() {
         try {
             FileInputStream fis = new FileInputStream("KeyStore.ks");
@@ -91,6 +111,9 @@ class NodeCryptography {
         }
     }
 
+    /**
+     * This method will save the keystore to the location defined.
+     */
     private void saveKeyStore() {
         FileOutputStream fos;
         try {
@@ -103,6 +126,9 @@ class NodeCryptography {
         }
     }
 
+    /**
+     * This method is used to save private key and self signed certificate to the keystore.
+     */
     private void saveToKeyStore() {
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
         X509Certificate certificate = generateCertificate();
@@ -118,6 +144,11 @@ class NodeCryptography {
         }
     }
 
+    /**
+     * This method is used to convert the String format of public key to original Public Key format.
+     * @param str - The string format of public key is given as argument
+     * @return - Public Key
+     */
     PublicKey strToPub(String str) {
         PublicKey publicKey = null;
         //converting string to byte initially and then back to public key
@@ -135,6 +166,11 @@ class NodeCryptography {
         return publicKey;
     }
 
+    /**
+     * This method is used to convert Public key to String format.
+     * @param key - Public key is given as argument.
+     * @return - String format of public key.
+     */
     String pubToStr(PublicKey key) {
         String strPub;
         //converting public key to byte[] and then convert it in to string
@@ -147,6 +183,10 @@ class NodeCryptography {
         return strPub;
     }
 
+    /**
+     * This method will fetch Private key from the keystore and return it.
+     * @return - Private Key
+     */
      PrivateKey getFromKeyStore() {
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
         KeyStore.PrivateKeyEntry privateKeyEntry = null;
@@ -159,6 +199,9 @@ class NodeCryptography {
         return privateKeyEntry.getPrivateKey();
     }
 
+    /**
+     * @return - Self signed Certificate.
+     */
     @SuppressWarnings("deprecation")
     private static X509Certificate generateCertificate() {
         // build a certificate generator
@@ -189,10 +232,16 @@ class NodeCryptography {
         return cert;
     }
 
+    /**
+     * @return - Public Key.
+     */
     PublicKey getPublicKey() {
         return publicKey;
     }
 
+    /**
+     * @return - KeyStore.
+     */
     KeyStore getKeyStore() {
         return keyStore;
     }

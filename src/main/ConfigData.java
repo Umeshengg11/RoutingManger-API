@@ -18,6 +18,10 @@ class ConfigData {
     private FileReader reader;
     private Properties properties;
 
+    /**
+     * This is the default constructor for this class
+     * This is made private so that it cannot be accessed directly from any where.
+     */
     private ConfigData() {
         nodeCryptography = NodeCryptography.getInstance();
         try {
@@ -28,6 +32,11 @@ class ConfigData {
         }
     }
 
+    /**
+     * @return - object of ConfigData
+     * This is to ensure same instance of object is provided whenever this class is accessed.
+     * Hence it is made singleton.
+     */
     static synchronized ConfigData getInstance() {
         if (config == null) {
             config = new ConfigData();

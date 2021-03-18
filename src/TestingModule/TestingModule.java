@@ -4,6 +4,10 @@ import main.RoutingManager;
 
 import java.io.IOException;
 
+/**
+ * This is the main Test class for this API.
+ * All the function are tested from this class.
+ */
 public class TestingModule {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();

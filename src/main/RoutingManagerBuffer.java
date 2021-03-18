@@ -7,6 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * This class is used to create object of RoutingManagerBuffer.
+ * There are inputRoutingBuffer and outputRoutingBuffer.
+ */
 class RoutingManagerBuffer {
 
     private static final List<File> inputRoutingBuffer = new LinkedList<>();
@@ -16,19 +20,35 @@ class RoutingManagerBuffer {
     private static RoutingManagerBuffer routingManagerBuffer;
     private static final Logger log = Logger.getLogger(RoutingManagerBuffer.class);
 
+    /**
+     * This is the default constructor of the class.
+     * However this is made private so that it cannot be accessed from outside the class.
+     */
     private RoutingManagerBuffer() {
     }
 
+    /**
+     * @return - Object of RoutingManagerBuffer.
+     * This is made singleton object as only one instance can be accessed.
+     */
     public static RoutingManagerBuffer getInstance() {
         if (routingManagerBuffer == null) {
             routingManagerBuffer = new RoutingManagerBuffer();
         }
         return routingManagerBuffer;
     }
+
+    /**
+     * @return - object of inputRoutingBuffer
+     */
     private List<File> getInputRoutingBuffer() {
         return inputRoutingBuffer;
     }
 
+    /**
+     * @param file - The File object is given as input argument.
+     * @return - boolean value true if the file is added successfully.
+     */
     boolean addToInputBuffer(File file) {
         inputBufferLock.lock();
         inputRoutingBuffer.add(file);
@@ -37,6 +57,10 @@ class RoutingManagerBuffer {
         return true;
     }
 
+    /**
+     * This method is used to fetch file from the inputBuffer one by one.
+     * @return - File
+     */
     File fetchFromInputBuffer() {
         inputBufferLock.lock();
         File file = null;
@@ -50,6 +74,10 @@ class RoutingManagerBuffer {
         return file;
     }
 
+    /**
+     * @param file - File object is given as input argument.
+     * @return - true if the file is added successfully.
+     */
     boolean addToOutputBuffer(File file) {
         outputBufferLock.lock();
         outputRoutingBuffer.add(file);
@@ -58,6 +86,10 @@ class RoutingManagerBuffer {
         return true;
     }
 
+    /**
+     * This method is used to fetch file from the outputBuffer.
+     * @return - File.
+     */
     File fetchFromOutputBuffer() {
         outputBufferLock.lock();
         File file = null;

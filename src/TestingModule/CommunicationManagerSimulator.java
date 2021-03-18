@@ -20,6 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
+/**
+ * This class is a simulation class used to act as communication manager for testing purpose.
+ */
 public class CommunicationManagerSimulator {
     private static final Logger log = Logger.getLogger(CommunicationManagerSimulator.class);
     public void returnRTTData(File file,RoutingManager rt) {

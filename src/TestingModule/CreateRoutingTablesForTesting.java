@@ -20,6 +20,11 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Random;
 
+/**
+ * This class is a Simulation class used for the testing purpose.
+ * This main function of this class is to generate mergerRouting and mergerNeighbour Table.
+ * This tables act as the table transferred from the neighbouring nodes for merging with the self node.
+ */
 public class CreateRoutingTablesForTesting {
     public static File createXML(String fileName) {
         String selfNodeId = "7589ABAA1234ABA1234591111ABCDFE123456789";

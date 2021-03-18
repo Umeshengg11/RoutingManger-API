@@ -3,7 +3,7 @@ package TestingModule;
 import main.B4_NodeTuple;
 
 /**
- * Created by S/L Umesh Nair
+ * This is simulation class used for testing purpose.
  * This class hold all the information about the node - Node ID, Node IP, Node Port,Node Transport and rtt.
  * The routingTable and neighbourTable will be created using the object of this class and NodeTuple class.
  * Two constructor of this class is created - one without rtt value and other with rtt value.
