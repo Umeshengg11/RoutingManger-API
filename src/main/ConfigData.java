@@ -12,7 +12,7 @@ class ConfigData {
     private static final Logger log = Logger.getLogger(ConfigData.class);
     private static ConfigData config;
     private final NodeCryptography nodeCryptography;
-    private final String path = "src/configuration/config.properties";
+    private final String path;
     private long sleepTime;
     private B4_Node bootStrapNode;
     private FileReader reader;
@@ -23,6 +23,7 @@ class ConfigData {
      * This is made private so that it cannot be accessed directly from any where.
      */
     private ConfigData() {
+        path = getFilePath("ConfigPath");
         nodeCryptography = NodeCryptography.getInstance();
         try {
             reader = new FileReader(path);
@@ -168,5 +169,16 @@ class ConfigData {
             return false;
         }
         return access;
+    }
+
+    String getFilePath(String fileName){
+        String filePath = null;
+        try {
+            properties.load(reader);
+            filePath = properties.getProperty(fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+       return filePath;
     }
 }

@@ -17,9 +17,10 @@ public class B4_Layer {
     private FileWriter writer;
     private PrintWriter printWriter;
     private FileReader reader;
-    private final String filePath = "src/configuration/LayerDetails.txt";
+    private final String filePath;
 
     public B4_Layer() {
+        filePath = ConfigData.getInstance().getFilePath("LayerDetailsPath");
         File layerFile = new File(filePath);
         boolean layerDetailsExists = layerFile.exists();
         if (!layerDetailsExists) {

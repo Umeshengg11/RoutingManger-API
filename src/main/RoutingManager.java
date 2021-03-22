@@ -29,10 +29,9 @@ import java.util.regex.Pattern;
 /**
  * Created by S/L Umesh U Nair
  * <br> Aim is to create an Routing Manager API for Brihaspati-4
- * <br> Various layers presently implemented by default are:-
+ * <br> Few  layers were implemented as default:-
  * <br> 1. BaseRoutingTable - LayerID = 0
  * <br> 2. StorageRoutingTable - LayerID = 1
- * ...........................................
  * <br> 3. VoipRoutingTable - LayerID = 2
  * <br> 4. MailRoutingTable - LayerID = 3
  * <br> Excess to this layers except base layer can be changed in the config.properties file.
@@ -45,12 +44,11 @@ public class RoutingManager {
     private static ConfigData config;
     private final ArrayList<B4_RoutingTable> routingTables;
     private NodeCryptography nodeCryptography;
+    private final String layerFile;
     private final int rt_dimension;
     private final int nt_dimension;
     private final long incrementTime;
     private final long sleepTime;
-    private final String nodeDetailFilePath = "src/configuration/NodeDetails.txt";
-    private final String layerFile = "src/configuration/LayerDetails.txt";
     private B4_Node localNode;
     private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
@@ -71,6 +69,8 @@ public class RoutingManager {
         routingTables = new ArrayList<>();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
         config = ConfigData.getInstance();
+        String nodeDetailFilePath = config.getFilePath("NodeDetailsPath");
+        layerFile = config.getFilePath("LayerDetailsPath");
         boolean nodeDetailsExists;
         File nodeFile = new File(nodeDetailFilePath);
         nodeDetailsExists = nodeFile.exists();
@@ -575,9 +575,9 @@ public class RoutingManager {
     }
 
     /**
-     * @param rtFileName
-     * @param routingTableName
-     * @param neighbourTableName
+     * @param rtFileName - routing Table file path is given as argument.
+     * @param routingTableName - routing Table name based on the layer which it defines.
+     * @param neighbourTableName - neighbour table name based on layer which it defines.
      */
     public void purgeRTEntry(String rtFileName, B4_Node[][] routingTableName, B4_Node[] neighbourTableName) {
         //Two counter arrays were created to keep track of no of failed ping.
@@ -1172,7 +1172,6 @@ public class RoutingManager {
         FileReader reader;
         for (int i = 0; i <= totalLayer; i++) {
             try {
-                String layerFile = "src/configuration/LayerDetails.txt";
                 reader = new FileReader(layerFile);
                 Properties properties = new Properties();
                 properties.load(reader);

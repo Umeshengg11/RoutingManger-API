@@ -50,7 +50,6 @@ class NodeCryptography {
             String filePath = "KeyStore.ks";
             File nodeFile = new File(filePath);
             boolean nodeDetailsExists = nodeFile.exists();
-            System.out.println(nodeDetailsExists);
             if (!nodeDetailsExists) {
                 keyStore.load(null, null);
                 keyPairGeneration();
@@ -105,7 +104,7 @@ class NodeCryptography {
             FileInputStream fis = new FileInputStream("KeyStore.ks");
             keyStore.load(fis, keyPassword);
             fis.close();
-            log.debug("Key Store Created");
+            log.debug("Key Store Loaded");
         } catch (CertificateException | NoSuchAlgorithmException | IOException e) {
             log.error("Exception Occurred", e);
         }
