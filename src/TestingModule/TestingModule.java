@@ -19,6 +19,7 @@ public class TestingModule {
         rt.addFileToInputBuffer(xm.createXML("3VoipRoutingLayer"));
         CommunicationManagerSimulator in = new CommunicationManagerSimulator();
 
+
         Thread th = new Thread(new Runnable() {
             @Override
             public void run() {

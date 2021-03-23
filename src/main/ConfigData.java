@@ -23,7 +23,7 @@ class ConfigData {
      * This is made private so that it cannot be accessed directly from any where.
      */
     private ConfigData() {
-        path = getFilePath("ConfigPath");
+        path = "src/configuration/config.properties";
         nodeCryptography = NodeCryptography.getInstance();
         try {
             reader = new FileReader(path);
