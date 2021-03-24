@@ -274,7 +274,7 @@ public class RoutingManager {
         B4_Node selfMergerNode = null;
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
         String mergerNodeID = selfNodeOfMergerTable.getB4node().getNodeID();
-//        String fileName = "RcvRTT_" + layerID + "_" + mergerNodeID;
+        //String fileName = "RcvRTT_" + layerID + "_" + mergerNodeID;
         File rttFile = new File(fileFromBuffer.getName());
         rttFileExists = rttFile.exists();
         if (!rttFileExists) {
@@ -285,7 +285,6 @@ public class RoutingManager {
             DocumentBuilder documentBuilder;
             try {
                 documentBuilder = builderFactory.newDocumentBuilder();
-                //Load the input XML document,parse it and return an instance of Document class
                 Document doc = documentBuilder.parse(new File(fileFromBuffer.getName()));
                 doc.getDocumentElement().normalize();
                 String selfNodeID = doc.getDocumentElement().getAttribute("SELF_NODE_ID");
@@ -388,7 +387,6 @@ public class RoutingManager {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.newDocument();
-
             //create root Element
             Element root = doc.createElement("Merger_Neighbour_table");
             doc.appendChild(root);
@@ -553,29 +551,29 @@ public class RoutingManager {
 
     /**
      * @param rtFileName Routing Table file path is given as argument.
-     * @param routingTableName Routing Table name based on the layer which it defines.
-     * @param neighbourTableName Neighbour table name based on layer which it defines.
+     * @param routingTable Routing Table name based on the layer which it defines.
+     * @param neighbourTable Neighbour table name based on layer which it defines.
+     * <p>
+     * <br>The number of times the loop will run to check whether the node is reachable/alive can be changed by changing the PurgeLoopCount
+     * value in the config file.
      */
-    public void purgeRTEntry(String rtFileName, B4_Node[][] routingTableName, B4_Node[] neighbourTableName) {
+    public void purgeRTEntry(String rtFileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         //Two counter arrays were created to keep track of no of failed ping.
         int[][] counter_rtable = new int[rt_dimension][3];
         int[] counter_neighbour = new int[nt_dimension];
-        long currentTime = System.currentTimeMillis();
+        int purgeLoopCount = config.getPurgeLoopCount();
 
         // New thread is created
         Thread purgeThread = new Thread(() -> {
-            // System.out.println("Thread is started");
-            //count will decide the number of times the while loop will run.
-            //I have chosen count value four here.It can be changed to any other value depending on the requirment
             int count = 0;
             int dataPurged_RT = 0;
             int dataPurged_Neighbour = 0;
             long sleepingTime = 0;
             while (true) {
-                while (!(count >= 4)) {
+                while (!(count >= purgeLoopCount)) {
                     for (int i = 0; i < rt_dimension; i++) {
                         for (int j = 0; j < 3; j++) {
-                            String ipAddressBase = routingTableName[i][j].getIpAddress();
+                            String ipAddressBase = routingTable[i][j].getIpAddress();
                             //System.out.println(ipAddressBase);
                             if (!ipAddressBase.isEmpty()) {
                                 try {
@@ -591,16 +589,16 @@ public class RoutingManager {
                                     e.printStackTrace();
                                 }
                             }
-                            if (counter_rtable[i][j] == 4) {
-                                routingTableName[i][j] = new B4_Node(null, "", "", "");
+                            if (counter_rtable[i][j] == purgeLoopCount) {
+                                routingTable[i][j] = new B4_Node(new B4_NodeTuple("",null,""), "", "", "");
                                 System.out.println("Data is purged");
                                 dataPurged_RT = dataPurged_RT + 1;
                                 counter_rtable[i][j] = 0;
                             }
                         }
                     }
-                    for (int k = 0; k < 16; k++) {
-                        String ipAddressNeighbour = neighbourTableName[k].getIpAddress();
+                    for (int k = 0; k < nt_dimension; k++) {
+                        String ipAddressNeighbour = neighbourTable[k].getIpAddress();
                         if (!ipAddressNeighbour.isEmpty()) {
                             try {
                                 InetAddress ping = InetAddress.getByName(ipAddressNeighbour);
@@ -615,23 +613,21 @@ public class RoutingManager {
                                 e.printStackTrace();
                             }
                         }
-                        if (counter_neighbour[k] == 4) {
-                            neighbourTableName[k] = new B4_Node(null, "", "", "", -1);
+                        if (counter_neighbour[k] == purgeLoopCount) {
+                            neighbourTable[k] = new B4_Node(new B4_NodeTuple("",null,""), "", "", "", -1);
                             System.out.println("Data is purged");
                             dataPurged_Neighbour = dataPurged_Neighbour + 1;
                             counter_neighbour[k] = 0;
                         }
                     }
-                    localBaseTablesToXML(rtFileName, routingTableName, neighbourTableName);
+                    localBaseTablesToXML(rtFileName, routingTable, neighbourTable);
                     count = count + 1;
                 }
                 count = 0;
-                System.out.println(dataPurged_Neighbour);
-                System.out.println(dataPurged_RT);
                 if (dataPurged_RT == 0 && dataPurged_Neighbour == 0) {
                     try {
                         sleepingTime = sleepingTime + incrementTime;
-                        log.debug("Going to sleeping for " + sleepingTime);
+                        log.debug("Purge function sleeping for " + sleepingTime);
                         Thread.sleep(sleepingTime);
                         dataPurged_Neighbour = 0;
                         dataPurged_RT = 0;

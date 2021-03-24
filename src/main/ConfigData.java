@@ -45,16 +45,11 @@ class ConfigData {
         return config;
     }
 
-    private int servicesInt(String key) {
+    private int servicesInt(String key) throws IOException {
         int length = 0;
-        try {
             properties.load(reader);
             String value = properties.getProperty(key);
             length = Integer.parseInt(value);
-
-        } catch (IOException e) {
-            log.error("RT_length parameter not found in config file\n", e);
-        }
         return length;
     }
 
@@ -75,7 +70,7 @@ class ConfigData {
         try {
             properties.load(reader);
             String slp_time = properties.getProperty(key);
-            sleepTime = Long.parseLong(slp_time);
+            time = Long.parseLong(slp_time);
 
         } catch (IOException e) {
             log.error("Config file not Found or Issue in config file fetching\n", e);
@@ -117,7 +112,13 @@ class ConfigData {
     }
 
     int getPortAddress() {
-        return servicesInt("PortAddress");
+        int portAddress = 0;
+        try {
+            portAddress= servicesInt("PortAddress");
+        } catch (IOException e) {
+            log.error("PortAddress parameter not found in config file\n", e);
+        }
+        return portAddress;
     }
 
     String getTransportAddress() {
@@ -129,11 +130,23 @@ class ConfigData {
     }
 
     int getNeighbourTableLength() {
-        return servicesInt("NT_length");
+        int ntLength=0;
+        try {
+           ntLength=servicesInt("NT_length");
+        } catch (IOException e) {
+            log.error("NeighbourTable Length parameter not found in config file\n", e);
+        }
+        return ntLength;
     }
 
     int getRoutingTableLength() {
-        return servicesInt("RT_length");
+        int rtLength=0;
+        try {
+            rtLength= servicesInt("RT_length");
+        } catch (IOException e) {
+            log.error("RT Length parameter not found in config file\n", e);
+        }
+        return rtLength;
     }
 
     boolean isLayerAccess(String layerName) {
@@ -180,5 +193,15 @@ class ConfigData {
             e.printStackTrace();
         }
        return filePath;
+    }
+
+    int getPurgeLoopCount(){
+        int purgeCount=0;
+        try {
+            purgeCount=servicesInt("PurgeLoopCount");
+        } catch (IOException e) {
+            log.error("Purge Loop Count parameter not found in config file\n", e);
+        }
+        return purgeCount;
     }
 }
