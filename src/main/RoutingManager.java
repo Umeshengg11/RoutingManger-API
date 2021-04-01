@@ -128,7 +128,7 @@ public class RoutingManager {
     /**
      * @return RoutingManger Object
      * <br>This method is required to create an instance of RoutingManager.
-     * <br>Instance of main.resources.RoutingManager will be obtained by calling this function.
+     * <br>Instance of RoutingManager will be obtained by calling this function.
      */
     public static synchronized RoutingManager getInstance() {
         if (routingManager == null) {
@@ -138,7 +138,7 @@ public class RoutingManager {
     }
 
     /**
-     * @param rtFileName Desired name of the Routing Table.
+     * @param rtFileName Name of the routing table which we desired to give for later identification.
      * @param routingTable Object of Routing Table.
      * @param neighbourTable Object of Neighbour Table.
      * <br>All the initialisation w.r.t routing Manager will be performed here.
@@ -163,73 +163,15 @@ public class RoutingManager {
             for (int i = 0; i < nt_dimension; i++) {
                 neighbourTable[i] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "", -1);
             }
-            localBaseTablesToXML(rtFileName, routingTable, neighbourTable);
+            routingTableToXML(rtFileName, routingTable, neighbourTable);
         } else {
-            try {
-                DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
-                Document doc = documentBuilder.parse(new File(rtFileName + ".xml"));
-                doc.getDocumentElement().normalize();
-                //String rootElement = doc.getDocumentElement().getNodeName();
-
-                NodeList nodeList = doc.getElementsByTagName("B4_Node");
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Node node = nodeList.item(i);
-                    if (node.getNodeType() == node.ELEMENT_NODE) {
-                        Element element = (Element) node;
-
-                        //Get the value of ID attribute
-                        String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
-
-                        //Get value of all sub-Elements
-                        String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
-                        String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
-                        String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
-                        String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
-                        String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
-                        String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
-                        Pattern pattern = Pattern.compile("\\[([^]]+)\\]");
-                        Matcher matcher = pattern.matcher(index);
-                        matcher.find();
-                        int index1 = Integer.parseInt(matcher.group(1));
-                        matcher.find();
-                        int index2 = Integer.parseInt(matcher.group(1));
-                        routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
-                    }
-                }
-                NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
-                for (int i = 0; i < nodeList1.getLength(); i++) {
-                    Node node = nodeList1.item(i);
-
-                    if (node.getNodeType() == node.ELEMENT_NODE) {
-                        Element element = (Element) node;
-                        String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
-
-                        //Get value of all sub-Elements
-                        String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
-                        String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
-                        String hashID = element.getElementsByTagName("HASHID").item(0).getTextContent();
-                        String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
-                        String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
-                        String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
-                        String nodeRTT = element.getElementsByTagName("NODERTT").item(0).getTextContent();
-
-                        Pattern pattern = Pattern.compile("\\[([^]]+)\\]");
-                        Matcher matcher = pattern.matcher(index);
-                        matcher.find();
-                        int index1 = Integer.parseInt(matcher.group(1));
-                        neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
-                    }
-                }
-            } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
-                log.error("Exception Occurred", e);
-            }
+            fetchFromXML(rtFileName,routingTable,neighbourTable);
             log.debug("New RoutingTable file created for future use");
         }
     }
 
     /**
-     * @return main.resources.B4_Node Object
+     * @return B4_Node Object
      * <br>This method is used for getting Local Node Information.
      * <br>This method can be called by any function to get complete information about the current Node.
      */
@@ -238,14 +180,14 @@ public class RoutingManager {
     }
 
     /**
-     * @param fileFromBuffer The file that is fetched from the input buffer of the routing Table.
-     * @param layerID        Specify the layer Id of the routing table which needs to be merged
-     * <br>This method is used for merging routing table obtained from other main.resources.B4_Node in to localBaseRoutingTable.
+     * @param fileFromBuffer Name of the file that is fetched from the input buffer of the routingManger API.
+     * @param layerID Specify the layer Id of the routing table which needs to be merged.
+     * <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
      * <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
      * <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
      * <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
      * Array at which the data is to be updated.
-     * <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor ,successor or middle row of the obtained column.
+     * <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor, successor or middle row of the obtained column.
      */
     public void mergeRoutingTable(File fileFromBuffer, int layerID) {
         B4_Node[][] routingTableLayer = routingTables.get(layerID).getRoutingTable();
@@ -259,7 +201,7 @@ public class RoutingManager {
         }
         B4_Layer b4_layer = new B4_Layer();
         String layerName = b4_layer.getLayerName(layerID);
-        localBaseTablesToXML(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        routingTableToXML(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         log.info(layerName + " Merging completed Successfully");
     }
 
@@ -361,7 +303,7 @@ public class RoutingManager {
             }
             B4_Layer b4_layer = new B4_Layer();
             String layerName = b4_layer.getLayerName(layerID);
-            localBaseTablesToXML(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+            routingTableToXML(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
             log.info(layerName + " Merged successfully");
         }
     }
@@ -620,7 +562,7 @@ public class RoutingManager {
                             counter_neighbour[k] = 0;
                         }
                     }
-                    localBaseTablesToXML(rtFileName, routingTable, neighbourTable);
+                    routingTableToXML(rtFileName, routingTable, neighbourTable);
                     count = count + 1;
                 }
                 count = 0;
@@ -1061,7 +1003,7 @@ public class RoutingManager {
      * <br>This function is used to convert the Routing Table in the form of an array to xml format
      * <br>Here XML parsing is used.
      */
-    private void localBaseTablesToXML(String fileHeading, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
+    private void routingTableToXML(String fileHeading, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         String selfNodeId = localNode.getB4node().getNodeID();
         String selfNodePub = nodeCryptography.pubToStr(localNode.getB4node().getPublicKey());
         String selfHashID = localNode.getB4node().getHashID();
@@ -1203,4 +1145,72 @@ public class RoutingManager {
         }
 
     }
+
+    /**
+     * @param rtFileName Name of the routing table which we desired to give for later identification.
+     * @param routingTable Object of Routing Table.
+     * @param neighbourTable Object of Neighbour Table.
+     * <br>This function is used to fetch the file from XML and convert it into routing table and neighbour table object.
+     */
+    private void fetchFromXML(String rtFileName,B4_Node[][] routingTable,B4_Node[] neighbourTable){
+        try {
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
+            Document doc = documentBuilder.parse(new File(rtFileName + ".xml"));
+            doc.getDocumentElement().normalize();
+            //String rootElement = doc.getDocumentElement().getNodeName();
+
+            NodeList nodeList = doc.getElementsByTagName("B4_Node");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                if (node.getNodeType() == node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+
+                    //Get the value of ID attribute
+                    String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
+                    //Get value of all sub-Elements
+                    String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
+                    String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
+                    String nodeHash = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                    String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
+                    String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
+                    String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
+                    Pattern pattern = Pattern.compile("\\[([^]]+)\\]");
+                    Matcher matcher = pattern.matcher(index);
+                    matcher.find();
+                    int index1 = Integer.parseInt(matcher.group(1));
+                    matcher.find();
+                    int index2 = Integer.parseInt(matcher.group(1));
+                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
+                }
+            }
+            NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
+            for (int i = 0; i < nodeList1.getLength(); i++) {
+                Node node = nodeList1.item(i);
+
+                if (node.getNodeType() == node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+                    String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
+
+                    //Get value of all sub-Elements
+                    String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
+                    String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
+                    String hashID = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                    String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
+                    String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
+                    String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
+                    String nodeRTT = element.getElementsByTagName("NODERTT").item(0).getTextContent();
+
+                    Pattern pattern = Pattern.compile("\\[([^]]+)\\]");
+                    Matcher matcher = pattern.matcher(index);
+                    matcher.find();
+                    int index1 = Integer.parseInt(matcher.group(1));
+                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                }
+            }
+        } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
+            log.error("Exception Occurred", e);
+        }
+    }
+
 }
