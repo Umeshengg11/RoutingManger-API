@@ -67,9 +67,9 @@ public class RoutingManager {
      * <br> Initial entries of localBaseRoutingTable and localBaseNeighbourTable should be object of main.resources.B4_Node with only bootstrap node entry.
      */
     private RoutingManager() {
+        config = ConfigData.getInstance();
         routingTables = new ArrayList<>();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
-        config = ConfigData.getInstance();
         String nodeDetailFilePath = config.getFilePath("NodeDetailsPath");
         layerFile = config.getFilePath("LayerDetailsPath");
         boolean nodeDetailsExists;
@@ -719,6 +719,7 @@ public class RoutingManager {
                         if (file.getName().startsWith("" + i + "")) {
                             boolean isAccess = config.isLayerAccess(b4_layer.getLayerName(i));
                             if(isAccess){
+                                System.out.println(file);
                                 mergeRoutingTable(file, i);
                                 getRTTMergerTable(file, i);
                             }

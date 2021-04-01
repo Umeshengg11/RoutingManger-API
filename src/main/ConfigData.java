@@ -12,19 +12,22 @@ class ConfigData {
     private static final Logger log = Logger.getLogger(ConfigData.class);
     private static ConfigData config;
     private final NodeCryptography nodeCryptography;
-    private final String path;
     private long sleepTime;
     private B4_Node bootStrapNode;
     private FileReader reader;
     private Properties properties;
+    private final String path ="src/configuration/config.properties";
 
     /**
      * This is the default constructor for this class
      * This is made private so that it cannot be accessed directly from any where.
      */
     private ConfigData() {
-        path = "src/configuration/config.properties";
         nodeCryptography = NodeCryptography.getInstance();
+        boolean configFileExist;
+        File configFile = new File(path);
+        configFileExist = configFile.exists();
+        if (!configFileExist) generateDefaultConfigFile();
         try {
             reader = new FileReader(path);
             properties = new Properties();
@@ -203,5 +206,36 @@ class ConfigData {
             log.error("Purge Loop Count parameter not found in config file\n", e);
         }
         return purgeCount;
+    }
+
+    public void generateDefaultConfigFile(){
+        Properties properties = new Properties();
+        properties.setProperty("BootstrapND","ED38EE69F98BDF529CC05E34A19D04647A487B71");
+        properties.setProperty("BootstrapPubKey","MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDJtY6SHzQ1fIpQxflwvbQpNfOS9ul0XJBHq42vFafTaVNZaTi9f1YZfybvGY67zPw2jmrW/jx89HnyMfzld/nSDzS8xRltjzIqxck+Xg5n0aWTTyt0zv/uO6pVDiecgJ9j46YsevJ/zf85hC3fL/jl6nhLdV0zaHyZGcCms/J1JQIDAQAB");
+        properties.setProperty("BootstrapHashID","E5B9ABAA1234ABA1234591111ABCDFE1234567897589ABAA1234ABA1234591111ABCDFE123456789");
+        properties.setProperty("LayerDetailsPath","src/configuration/LayerDetails.txt");
+        properties.setProperty("NodeDetailsPath","src/configuration/NodeDetails.txt");
+        properties.setProperty("PurgeLoopCount","4");
+        properties.setProperty("BootstrapPvtIP","172.20.160.56");
+        properties.setProperty("BootstrapPort","1022");
+        properties.setProperty("BootstrapAddress","TCP");
+        properties.setProperty("PortAddress","1024");
+        properties.setProperty("TransportAddress","TCP");
+        properties.setProperty("RT_length","40");
+        properties.setProperty("NT_length","16");
+        properties.setProperty("Increment_time","30000");
+        properties.setProperty("Sleep_time","30000");
+        properties.setProperty("BaseRoutingTable","yes");
+        properties.setProperty("StorageRoutingTable","no");
+        properties.setProperty("MessageRoutingTable","no");
+        properties.setProperty("VoipRoutingTable","no");
+        properties.setProperty("OverCastingLayer","no");
+        try {
+            FileOutputStream outputStream = new FileOutputStream(path);
+            properties.store(outputStream,"Configuration File");
+            log.info("Default configuration file is created");
+        } catch (IOException e) {
+            log.error("Configuration file cannot be created, check error",e);
+        }
     }
 }
