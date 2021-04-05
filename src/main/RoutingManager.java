@@ -661,7 +661,6 @@ public class RoutingManager {
                         if (file.getName().startsWith("" + i + "")) {
                             boolean isAccess = config.isLayerAccess(b4_layer.getLayerName(i));
                             if(isAccess){
-                                System.out.println(file);
                                 mergeRoutingTable(file, i);
                                 getRTTMergerTable(file, i);
                             }
@@ -1211,6 +1210,13 @@ public class RoutingManager {
         } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
             log.error("Exception Occurred", e);
         }
+    }
+
+    public File getRoutingTableFile(String routingTableName){
+        File routingTableFile = new File(routingTableName);
+        boolean isExist = routingTableFile.exists();
+        if (isExist)return routingTableFile;
+        else return null;
     }
 
 }

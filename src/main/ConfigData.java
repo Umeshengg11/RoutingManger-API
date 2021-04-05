@@ -12,17 +12,32 @@ class ConfigData {
     private static final Logger log = Logger.getLogger(ConfigData.class);
     private static ConfigData config;
     private final NodeCryptography nodeCryptography;
-    private long sleepTime;
     private B4_Node bootStrapNode;
     private FileReader reader;
     private Properties properties;
     private final String path ="src/configuration/config.properties";
+    private final String path1 = "src/configuration";
+    private final String path2 = "src/LogFiles";
 
     /**
      * This is the default constructor for this class
      * This is made private so that it cannot be accessed directly from any where.
      */
     private ConfigData() {
+        File file = new File(path1);
+        boolean isDirExist = file.exists();
+        if(!isDirExist){
+            boolean isDirCreated = createConfigDir(path1);
+            if(!isDirCreated)  log.error("Configuration Directory is not created");
+            else  log.info("Configuration directory is created");
+        }
+        File logfile = new File(path2);
+        boolean isDirLogExist = logfile.exists();
+        if(!isDirLogExist){
+            boolean isDirLogCreated = createConfigDir(path2);
+            if (!isDirLogCreated) log.error("LogFile Directory is not created");
+            else log.info("LogFile directory is created");
+        }
         nodeCryptography = NodeCryptography.getInstance();
         boolean configFileExist;
         File configFile = new File(path);
@@ -49,7 +64,7 @@ class ConfigData {
     }
 
     private int servicesInt(String key) throws IOException {
-        int length = 0;
+        int length;
             properties.load(reader);
             String value = properties.getProperty(key);
             length = Integer.parseInt(value);
@@ -110,8 +125,7 @@ class ConfigData {
     }
 
     long getSleepTime() {
-        sleepTime = servicesLong("Sleep_time");
-        return sleepTime;
+        return servicesLong("Sleep_time");
     }
 
     int getPortAddress() {
@@ -237,5 +251,12 @@ class ConfigData {
         } catch (IOException e) {
             log.error("Configuration file cannot be created, check error",e);
         }
+    }
+
+    private boolean createConfigDir(String location){
+        boolean isDirCreated;
+        File file = new File(location);
+        isDirCreated = file.mkdir();
+        return isDirCreated;
     }
 }

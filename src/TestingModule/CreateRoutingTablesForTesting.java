@@ -1,4 +1,4 @@
-package TestingModule;;
+package TestingModule;
 import main.B4_NodeTuple;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

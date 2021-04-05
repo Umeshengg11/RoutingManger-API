@@ -6,7 +6,7 @@ package main;
  * The routingTable and neighbourTable will be created using the object of this class and NodeTuple class.
  * Two constructor of this class is created - one without rtt value and other with rtt value.
  */
-class B4_Node {
+public class B4_Node {
     private final B4_NodeTuple b4node;
     private final String ipAddress;
     private final String portAddress;
@@ -19,7 +19,7 @@ class B4_Node {
      * @param portAddress - PortAddress of the node
      * @param transport - TransportAddress of the node
      */
-    B4_Node(B4_NodeTuple b4node, String ipAddress, String portAddress, String transport) {
+    public B4_Node(B4_NodeTuple b4node, String ipAddress, String portAddress, String transport) {
         this.b4node = b4node;
         this.ipAddress = ipAddress;
         this.portAddress = portAddress;
@@ -33,7 +33,7 @@ class B4_Node {
      * @param transport - TransportAddress of the node
      * @param rtt - rtt value of the particular node form the selfNode
      */
-    B4_Node(B4_NodeTuple b4node, String ipAddress, String portAddress, String transport, float rtt) {
+    public B4_Node(B4_NodeTuple b4node, String ipAddress, String portAddress, String transport, float rtt) {
         this.b4node = b4node;
         this.ipAddress = ipAddress;
         this.portAddress = portAddress;
@@ -44,35 +44,35 @@ class B4_Node {
     /**
      * @return - rtt value associated with the node
      */
-    float getRtt() {
+   public float getRtt() {
         return rtt;
     }
 
     /**
      * @return - Object of B4_NodeTuple
      */
-    B4_NodeTuple getB4node() {
+   public B4_NodeTuple getB4node() {
         return b4node;
     }
 
     /**
      * @return - IP address associated with the node
      */
-    String getIpAddress() {
+   public String getIpAddress() {
         return ipAddress;
     }
 
     /**
      * @return - PortAddress associated with the node
      */
-    String getPortAddress() {
+   public String getPortAddress() {
         return portAddress;
     }
 
     /**
      * @return - Transport address associated with the node
      */
-    String getTransport() {
+   public String getTransport() {
         return transport;
     }
 }
