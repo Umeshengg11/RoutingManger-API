@@ -240,8 +240,8 @@ class ConfigData {
         properties.setProperty("Increment_time","30000");
         properties.setProperty("Sleep_time","30000");
         properties.setProperty("BaseRoutingTable","yes");
-        properties.setProperty("StorageRoutingTable","no");
-        properties.setProperty("MessageRoutingTable","no");
+        properties.setProperty("StorageRoutingTable","yes");
+        properties.setProperty("MessageRoutingTable","yes");
         properties.setProperty("VoipRoutingTable","no");
         properties.setProperty("OverCastingLayer","no");
         try {

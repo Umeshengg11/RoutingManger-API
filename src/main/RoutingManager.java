@@ -138,6 +138,7 @@ public class RoutingManager {
     }
 
     /**
+     * @param rtTag Tag name to be added to the XML file.
      * @param rtFileName Name of the routing table which we desired to give for later identification.
      * @param routingTable Object of Routing Table.
      * @param neighbourTable Object of Neighbour Table.
@@ -145,7 +146,7 @@ public class RoutingManager {
      * <br>This function is called by the constructor for initialisation of routing manager.
      * <br>Initialisation includes creating routingTable and neighbour table,creating a routing table file for future references etc.
      */
-    private void init(String rtFileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
+    private void init(String rtTag, String rtFileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         boolean rtExists;
         File rtFile = new File(rtFileName + ".xml");
         rtExists = rtFile.exists();
@@ -163,7 +164,8 @@ public class RoutingManager {
             for (int i = 0; i < nt_dimension; i++) {
                 neighbourTable[i] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "", -1);
             }
-            routingTableToXML(rtFileName, routingTable, neighbourTable);
+
+            routingTableToXML(rtTag,rtFileName, routingTable, neighbourTable);
         } else {
             fetchFromXML(rtFileName,routingTable,neighbourTable);
             log.debug("New RoutingTable file created for future use");
@@ -201,7 +203,7 @@ public class RoutingManager {
         }
         B4_Layer b4_layer = new B4_Layer();
         String layerName = b4_layer.getLayerName(layerID);
-        routingTableToXML(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        routingTableToXML(layerName,String.valueOf(layerID)+"_"+layerName+"_"+localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         log.info(layerName + " Merging completed Successfully");
     }
 
@@ -303,7 +305,7 @@ public class RoutingManager {
             }
             B4_Layer b4_layer = new B4_Layer();
             String layerName = b4_layer.getLayerName(layerID);
-            routingTableToXML(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+            routingTableToXML(layerName,String.valueOf(layerID)+"_"+layerName+"_"+localNode.getB4node().getNodeID(),routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
             log.info(layerName + " Merged successfully");
         }
     }
@@ -492,18 +494,20 @@ public class RoutingManager {
     }
 
     /**
-     * @param rtFileName Routing Table file path is given as argument.
+     * @param layerID layerID of the routing table.
      * @param routingTable Routing Table name based on the layer which it defines.
      * @param neighbourTable Neighbour table name based on layer which it defines.
      * <p>
      * <br>The number of times the loop will run to check whether the node is reachable/alive can be changed by changing the PurgeLoopCount
      * value in the config file.
      */
-    public void purgeRTEntry(String rtFileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
+    public void purgeRTEntry(int layerID, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         //Two counter arrays were created to keep track of no of failed ping.
         int[][] counter_rtable = new int[rt_dimension][3];
         int[] counter_neighbour = new int[nt_dimension];
         int purgeLoopCount = config.getPurgeLoopCount();
+        B4_Layer b4_layer = new B4_Layer();
+        String layerName = b4_layer.getLayerName(layerID);
 
         // New thread is created
         Thread purgeThread = new Thread(() -> {
@@ -562,7 +566,7 @@ public class RoutingManager {
                             counter_neighbour[k] = 0;
                         }
                     }
-                    routingTableToXML(rtFileName, routingTable, neighbourTable);
+                    routingTableToXML(layerName,String.valueOf(layerID)+"_"+layerName+"_"+localNode.getB4node().getNodeID(), routingTable, neighbourTable);
                     count = count + 1;
                 }
                 count = 0;
@@ -770,21 +774,23 @@ public class RoutingManager {
      * @param layerName Layer name is given as input argument.
      * @return True if the layer is created successfully.
      */
-    public boolean createNewLayer(String layerName) {
-        boolean isCreated = false;
+    public int createNewLayer(String layerName) {
         boolean hasAccess;
+        int layerID = 0;
         B4_Layer newLayer = new B4_Layer();
+        String nodeID = getLocalNode().getB4node().getNodeID();
         boolean isAdded = newLayer.addToLayeringDetailsFile(layerName);
         if (isAdded) {
-            isCreated = newLayer.amendLayerFile();
+            newLayer.amendLayerFile();
             hasAccess = config.checkLayerName(layerName);
             if (!hasAccess) {
                 config.addToConfigFile(layerName);
             }
-            int layerID = addNewLayerToArrayList();
-            init(layerName, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+            layerID = addNewLayerToArrayList();
+            System.out.println(String.valueOf(layerID)+"_"+layerName+"_"+nodeID);
+            init(layerName,String.valueOf(layerID)+"_"+layerName+"_"+nodeID, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         }
-        return isCreated;
+        return layerID;
     }
 
     /**
@@ -996,13 +1002,14 @@ public class RoutingManager {
     }
 
     /**
-     * @param fileHeading Desired name
+     * @param rtTag XML tag
+     * @param fileName Desired name of the file
      * @param routingTable Object of Routing table which need to be converted to XML
      * @param neighbourTable Object of Neighbour table which need to be converted to XML
      * <br>This function is used to convert the Routing Table in the form of an array to xml format
      * <br>Here XML parsing is used.
      */
-    private void routingTableToXML(String fileHeading, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
+    private void routingTableToXML(String rtTag, String fileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         String selfNodeId = localNode.getB4node().getNodeID();
         String selfNodePub = nodeCryptography.pubToStr(localNode.getB4node().getPublicKey());
         String selfHashID = localNode.getB4node().getHashID();
@@ -1016,7 +1023,7 @@ public class RoutingManager {
             Document doc = builder.newDocument();
 
             //create root Element
-            Element root = doc.createElement(fileHeading);
+            Element root = doc.createElement(rtTag);
             doc.appendChild(root);
             root.setAttribute("SELF_NODE_ID", selfNodeId);
             root.setAttribute("SELF_PUBLIC_KEY", selfNodePub);
@@ -1092,9 +1099,9 @@ public class RoutingManager {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(doc);
-            StreamResult streamResult = new StreamResult(new File(fileHeading + ".xml"));
+            StreamResult streamResult = new StreamResult(new File(fileName + ".xml"));
             transformer.transform(domSource, streamResult);
-            log.debug(fileHeading + " file updated");
+            log.debug(fileName + " file updated");
         } catch (ParserConfigurationException | TransformerException e) {
             log.error("Exception Occurred", e);
         }
@@ -1128,6 +1135,7 @@ public class RoutingManager {
         B4_Layer b4_layer = new B4_Layer();
         int totalLayer = b4_layer.fetchMaxLayerID();
         FileReader reader;
+        String nodeID = getLocalNode().getB4node().getNodeID();
         for (int i = 0; i <= totalLayer; i++) {
             try {
                 reader = new FileReader(layerFile);
@@ -1136,8 +1144,8 @@ public class RoutingManager {
                 String layerName = properties.getProperty("" + i + "");
                 boolean access = config.isLayerAccess(layerName);
                 if (access)
-                    init(layerName, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
-
+                    System.out.println(String.valueOf(i)+"_"+layerName+"_"+nodeID);
+                    init(layerName,String.valueOf(i)+"_"+layerName+"_"+nodeID, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
             } catch (IOException e) {
                 log.error("Exception Occurred", e);
             }
