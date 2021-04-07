@@ -624,7 +624,6 @@ public class RoutingManager {
         return routingTables.get(1).getNeighbourTable();
     }
 
-
     public RoutingManagerBuffer getRoutingManagerBuffer() {
         return routingManagerBuffer;
     }

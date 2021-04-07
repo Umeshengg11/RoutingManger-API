@@ -27,7 +27,7 @@ import java.util.Random;
  */
 public class CreateRoutingTablesForTesting {
     public static File createXML(String fileName,int layerID) {
-        String selfNodeId = "7589ABAA1234ABA1234591111ABCDFE123456789";
+        String selfNodeId = getNodeID();
         PublicKey selfPublicKey = keyPairGeneration();
         String selfHashID = "7589ABAA1234ABA1234591111ABCDFE1234567897589ABAA1234ABA1234591111ABCDFE123456789";
         String selfNodeIP = "192.168.10.5";
