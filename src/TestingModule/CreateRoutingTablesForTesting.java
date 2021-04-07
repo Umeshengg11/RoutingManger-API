@@ -26,7 +26,7 @@ import java.util.Random;
  * This tables act as the table transferred from the neighbouring nodes for merging with the self node.
  */
 public class CreateRoutingTablesForTesting {
-    public static File createXML(String fileName) {
+    public static File createXML(String fileName,int layerID) {
         String selfNodeId = "7589ABAA1234ABA1234591111ABCDFE123456789";
         PublicKey selfPublicKey = keyPairGeneration();
         String selfHashID = "7589ABAA1234ABA1234591111ABCDFE1234567897589ABAA1234ABA1234591111ABCDFE123456789";
@@ -51,7 +51,6 @@ public class CreateRoutingTablesForTesting {
                 testRoutingtable[i][j] = new B4_NodeSimulator(new B4_NodeTuple(testNodeID,testPublicKey,testHashID), testNodeIP, (testNodePort + i + j) + "", testTransport);
             }
         }
-
         for (int i = 0; i < 16; i++) {
             testNodeID = getNodeID();
             testNodeIP = getIPaddress();
@@ -149,30 +148,25 @@ public class CreateRoutingTablesForTesting {
              * StreamResult streamResult = new StreamResult(System.out);
              **/
 
-            StreamResult streamResult = new StreamResult(new File(fileName+".xml"));
+            StreamResult streamResult = new StreamResult(new File(layerID +"_"+fileName+"_"+selfNodeId+".xml"));
             transformer.transform(domSource, streamResult);
         } catch (ParserConfigurationException | TransformerConfigurationException e) {
             e.printStackTrace();
         } catch (TransformerException e) {
             e.printStackTrace();
         }
-
-        File file1 = new File(fileName+".xml");
+        File file1 = new File(layerID +"_"+fileName+"_"+selfNodeId+".xml");
         return file1;
-
     }
 
     public static String getNodeID() {
-
         String hex1 = "";
-
-        for (int i = 0; i < 60; i++) {
+        for (int i = 0; i < 40; i++) {
             Random random = new Random();
             int randInt = random.nextInt(15);
-            String[] hex = new String[60];
+            String[] hex = new String[40];
             hex[i] = Integer.toHexString(randInt).toUpperCase();
             hex1 = hex1.concat(hex[i]);
-
         }
         return hex1;
     }
@@ -182,9 +176,7 @@ public class CreateRoutingTablesForTesting {
         int randInt12 = rand.nextInt(100);
         String randIntS = Integer.toString(randInt12);
         String ipAddressRandom = "192.168.2.".concat(randIntS);
-
         return ipAddressRandom;
-
     }
 
     private static PublicKey keyPairGeneration() {
@@ -221,7 +213,7 @@ public class CreateRoutingTablesForTesting {
         KeyFactory factory = null;
         try {
             factory = KeyFactory.getInstance("RSA");
-            publicKey = (RSAPublicKey)factory.generatePublic(new X509EncodedKeySpec(bytePub1));
+            publicKey = factory.generatePublic(new X509EncodedKeySpec(bytePub1));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             e.printStackTrace();
         }

@@ -203,7 +203,7 @@ public class RoutingManager {
         }
         B4_Layer b4_layer = new B4_Layer();
         String layerName = b4_layer.getLayerName(layerID);
-        routingTableToXML(layerName,String.valueOf(layerID)+"_"+layerName+"_"+localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        routingTableToXML(layerName, layerID +"_"+layerName+"_"+localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         log.info(layerName + " Merging completed Successfully");
     }
 
@@ -305,7 +305,7 @@ public class RoutingManager {
             }
             B4_Layer b4_layer = new B4_Layer();
             String layerName = b4_layer.getLayerName(layerID);
-            routingTableToXML(layerName,String.valueOf(layerID)+"_"+layerName+"_"+localNode.getB4node().getNodeID(),routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+            routingTableToXML(layerName, layerID +"_"+layerName+"_"+localNode.getB4node().getNodeID(),routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
             log.info(layerName + " Merged successfully");
         }
     }
@@ -566,7 +566,7 @@ public class RoutingManager {
                             counter_neighbour[k] = 0;
                         }
                     }
-                    routingTableToXML(layerName,String.valueOf(layerID)+"_"+layerName+"_"+localNode.getB4node().getNodeID(), routingTable, neighbourTable);
+                    routingTableToXML(layerName, layerID +"_"+layerName+"_"+localNode.getB4node().getNodeID(), routingTable, neighbourTable);
                     count = count + 1;
                 }
                 count = 0;
@@ -787,8 +787,8 @@ public class RoutingManager {
                 config.addToConfigFile(layerName);
             }
             layerID = addNewLayerToArrayList();
-            System.out.println(String.valueOf(layerID)+"_"+layerName+"_"+nodeID);
-            init(layerName,String.valueOf(layerID)+"_"+layerName+"_"+nodeID, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+            System.out.println(layerID +"_"+layerName+"_"+nodeID);
+            init(layerName, layerID +"_"+layerName+"_"+nodeID, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         }
         return layerID;
     }
@@ -1144,8 +1144,8 @@ public class RoutingManager {
                 String layerName = properties.getProperty("" + i + "");
                 boolean access = config.isLayerAccess(layerName);
                 if (access)
-                    System.out.println(String.valueOf(i)+"_"+layerName+"_"+nodeID);
-                    init(layerName,String.valueOf(i)+"_"+layerName+"_"+nodeID, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
+                    System.out.println(i +"_"+layerName+"_"+nodeID);
+                    init(layerName, i +"_"+layerName+"_"+nodeID, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
             } catch (IOException e) {
                 log.error("Exception Occurred", e);
             }
