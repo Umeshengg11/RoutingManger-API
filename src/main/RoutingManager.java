@@ -44,12 +44,12 @@ public class RoutingManager {
     private static RoutingManagerBuffer routingManagerBuffer;
     private static ConfigData config;
     private final ArrayList<B4_RoutingTable> routingTables;
-    private NodeCryptography nodeCryptography;
     private final String layerFile;
     private final int rt_dimension;
     private final int nt_dimension;
     private final long incrementTime;
     private final long sleepTime;
+    private NodeCryptography nodeCryptography;
     private B4_Node localNode;
     private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
@@ -138,13 +138,13 @@ public class RoutingManager {
     }
 
     /**
-     * @param rtTag Tag name to be added to the XML file.
-     * @param rtFileName Name of the routing table which we desired to give for later identification.
-     * @param routingTable Object of Routing Table.
+     * @param rtTag          Tag name to be added to the XML file.
+     * @param rtFileName     Name of the routing table which we desired to give for later identification.
+     * @param routingTable   Object of Routing Table.
      * @param neighbourTable Object of Neighbour Table.
-     * <br>All the initialisation w.r.t routing Manager will be performed here.
-     * <br>This function is called by the constructor for initialisation of routing manager.
-     * <br>Initialisation includes creating routingTable and neighbour table,creating a routing table file for future references etc.
+     *                       <br>All the initialisation w.r.t routing Manager will be performed here.
+     *                       <br>This function is called by the constructor for initialisation of routing manager.
+     *                       <br>Initialisation includes creating routingTable and neighbour table,creating a routing table file for future references etc.
      */
     private void init(String rtTag, String rtFileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         boolean rtExists;
@@ -163,9 +163,9 @@ public class RoutingManager {
             for (int i = 0; i < nt_dimension; i++) {
                 neighbourTable[i] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "", -1);
             }
-            routingTableToXML(rtTag,rtFileName, routingTable, neighbourTable);
+            routingTableToXML(rtTag, rtFileName, routingTable, neighbourTable);
         } else {
-            fetchFromXML(rtFileName,routingTable,neighbourTable);
+            fetchFromXML(rtFileName, routingTable, neighbourTable);
             log.debug("New RoutingTable file created for future use");
         }
     }
@@ -181,13 +181,13 @@ public class RoutingManager {
 
     /**
      * @param fileName Name of the file that is fetched from the input buffer of the routingManger API.
-     * @param layerID Specify the layer Id of the routing table which needs to be merged.
-     * <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
-     * <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
-     * <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
-     * <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
-     * Array at which the data is to be updated.
-     * <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor, successor or middle row of the obtained column.
+     * @param layerID  Specify the layer Id of the routing table which needs to be merged.
+     *                 <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
+     *                 <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
+     *                 <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
+     *                 <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
+     *                 Array at which the data is to be updated.
+     *                 <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor, successor or middle row of the obtained column.
      */
 
     public void mergeRoutingTable(File fileName, int layerID) {
@@ -202,14 +202,14 @@ public class RoutingManager {
         }
         B4_Layer b4_layer = new B4_Layer();
         String layerName = b4_layer.getLayerName(layerID);
-        routingTableToXML(layerName, layerID +"_"+layerName+"_"+localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        routingTableToXML(layerName, layerID + "_" + layerName + "_" + localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         log.info(layerName + " Merging completed Successfully");
     }
 
     /**
      * @param fileName File fetched from the inputBuffer of routing Table
-     * @param layerID The layer in which the operation is to be performed
-     * Function is used to merge neighbour table received file from other nodes with the neighbour table of current node.
+     * @param layerID  The layer in which the operation is to be performed
+     *                 Function is used to merge neighbour table received file from other nodes with the neighbour table of current node.
      */
     public void mergeNeighbourTable(File fileName, int layerID) {
         B4_Node[] neighbourTable = routingTables.get(layerID).getNeighbourTable();
@@ -238,7 +238,7 @@ public class RoutingManager {
                 String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
                 String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
                 String selfRTT = doc.getDocumentElement().getAttribute("SELF_RTT");
-                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub),selfHashID), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
+                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub), selfHashID), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
 
                 NodeList nodeList = doc.getElementsByTagName("NEIGHBOUR");
                 for (int i = 0; i < nodeList.getLength(); i++) {
@@ -259,7 +259,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         int index1 = Integer.parseInt(matcher.group(1));
-                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -302,13 +302,13 @@ public class RoutingManager {
             }
             B4_Layer b4_layer = new B4_Layer();
             String layerName = b4_layer.getLayerName(layerID);
-            routingTableToXML(layerName, layerID +"_"+layerName+"_"+localNode.getB4node().getNodeID(),routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+            routingTableToXML(layerName, layerID + "_" + layerName + "_" + localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
             log.info(layerName + " Merged successfully");
         }
     }
 
     /**
-     * @param hashID hash ID received as a query to find the next hop.
+     * @param hashID  hash ID received as a query to find the next hop.
      * @param layerID layer id on which the operation is to be performed.
      * @return null if next hop is selfNode else return B4_Node object.
      * <p>
@@ -408,12 +408,12 @@ public class RoutingManager {
     }
 
     /**
-     * @param layerID layerID of the routing table.
-     * @param routingTable Routing Table name based on the layer which it defines.
+     * @param layerID        layerID of the routing table.
+     * @param routingTable   Routing Table name based on the layer which it defines.
      * @param neighbourTable Neighbour table name based on layer which it defines.
-     * <p>
-     * <br>The number of times the loop will run to check whether the node is reachable/alive can be changed by changing the PurgeLoopCount
-     * value in the config file.
+     *                       <p>
+     *                       <br>The number of times the loop will run to check whether the node is reachable/alive can be changed by changing the PurgeLoopCount
+     *                       value in the config file.
      */
     public void purgeRTEntry(int layerID, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         //Two counter arrays were created to keep track of no of failed ping.
@@ -448,7 +448,7 @@ public class RoutingManager {
                                 }
                             }
                             if (counter_rtable[i][j] == purgeLoopCount) {
-                                routingTable[i][j] = new B4_Node(new B4_NodeTuple("",null,""), "", "", "");
+                                routingTable[i][j] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "");
                                 System.out.println("Data is purged");
                                 dataPurged_RT = dataPurged_RT + 1;
                                 counter_rtable[i][j] = 0;
@@ -472,13 +472,13 @@ public class RoutingManager {
                             }
                         }
                         if (counter_neighbour[k] == purgeLoopCount) {
-                            neighbourTable[k] = new B4_Node(new B4_NodeTuple("",null,""), "", "", "", -1);
+                            neighbourTable[k] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "", -1);
                             System.out.println("Data is purged");
                             dataPurged_Neighbour = dataPurged_Neighbour + 1;
                             counter_neighbour[k] = 0;
                         }
                     }
-                    routingTableToXML(layerName, layerID +"_"+layerName+"_"+localNode.getB4node().getNodeID(), routingTable, neighbourTable);
+                    routingTableToXML(layerName, layerID + "_" + layerName + "_" + localNode.getB4node().getNodeID(), routingTable, neighbourTable);
                     count = count + 1;
                 }
                 count = 0;
@@ -506,34 +506,6 @@ public class RoutingManager {
             }
         });
         purgeThread.start();
-    }
-
-    /**
-     * @return localBaseRoutingTable
-     */
-    public B4_Node[][] getLocalBaseRoutingTable() {
-        return routingTables.get(0).getRoutingTable();
-    }
-
-    /**
-     * @return localBaseNeighbourTable
-     */
-    public B4_Node[] getLocalBaseNeighbourTable() {
-        return routingTables.get(0).getNeighbourTable();
-    }
-
-    /**
-     * @return StorageRoutingTable
-     */
-    public B4_Node[][] getStorageRoutingTable() {
-        return routingTables.get(1).getRoutingTable();
-    }
-
-    /**
-     * @return StorageNeighbourTable
-     */
-    public B4_Node[] getStorageNeighbourTable() {
-        return routingTables.get(1).getNeighbourTable();
     }
 
     /**
@@ -571,7 +543,7 @@ public class RoutingManager {
                     for (int i = 0; i <= layerID; i++) {
                         if (file.getName().startsWith("" + i + "")) {
                             boolean isAccess = config.isLayerAccess(b4_layer.getLayerName(i));
-                            if(isAccess){
+                            if (isAccess) {
                                 mergeRoutingTable(file, i);
                                 getRTTMergerTable(file, i);
                             }
@@ -599,13 +571,13 @@ public class RoutingManager {
 
     /**
      * @param digitalSignature Digital signature as input argument.
-     * @param publicKey Public key as input argument.
-     * @param nodeID NodeID as input argument.
+     * @param publicKey        Public key as input argument.
+     * @param nodeID           NodeID as input argument.
      * @return True if the signature is verified successfully.
      */
     public boolean verifySignature(String digitalSignature, PublicKey publicKey, String nodeID) {
         boolean verify;
-        verify = b4_nodeGeneration.verifySignature(digitalSignature,publicKey,nodeID);
+        verify = b4_nodeGeneration.verifySignature(digitalSignature, publicKey, nodeID);
         return verify;
     }
 
@@ -694,34 +666,42 @@ public class RoutingManager {
                 config.addToConfigFile(layerName);
             }
             layerID = addNewLayerToArrayList();
-            System.out.println(layerID +"_"+layerName+"_"+nodeID);
-            init(layerName, layerID +"_"+layerName+"_"+nodeID, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+            System.out.println(layerID + "_" + layerName + "_" + nodeID);
+            init(layerName, layerID + "_" + layerName + "_" + nodeID, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         }
         return layerID;
     }
 
-    public String getIPAddress(){
+    public String getIPAddress() {
         return localNode.getIpAddress();
     }
 
-    public String getNodeID(){
+    public String getNodeID() {
         return localNode.getB4node().getNodeID();
     }
 
-    public String getPortAddress(){
+    public String getPortAddress() {
         return localNode.getPortAddress();
     }
 
-    public float getRTT(){
+    public float getRTT() {
         return localNode.getRtt();
     }
 
-    public String getHashID(){
+    public String getHashID() {
         return localNode.getB4node().getHashID();
     }
 
-    public PublicKey getPublicKey(){
+    public PublicKey getPublicKey() {
         return localNode.getB4node().getPublicKey();
+    }
+
+    public B4_Node[][] getRoutingTable(int layerID) {
+        return routingTables.get(layerID).getRoutingTable();
+    }
+
+    public B4_Node[] getNeighbourTable(int layerID) {
+        return routingTables.get(layerID).getNeighbourTable();
     }
 
     /**
@@ -729,7 +709,7 @@ public class RoutingManager {
      * <br>Presently it is hardcoded (will be amended later).
      */
     private void setLocalNode() {
-        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(), b4_nodeGeneration.getPublicKey(),b4_nodeGeneration.getHashID()), selfIPAddress, selfPortAddress, selfTransportAddress);
+        localNode = new B4_Node(new B4_NodeTuple(b4_nodeGeneration.getNodeID(), b4_nodeGeneration.getPublicKey(), b4_nodeGeneration.getHashID()), selfIPAddress, selfPortAddress, selfTransportAddress);
     }
 
     /**
@@ -760,24 +740,24 @@ public class RoutingManager {
     }
 
     /**
-     * @param mergerNode - The node which need to be merged.
+     * @param mergerNode   - The node which need to be merged.
      * @param routingTable All the algorithm for merging the routing and neighbour table is defined in this function.
-     * <br>Check for the first mismatch in nibble between mergerNodeId and localNodeId.
-     * <br>IF predecessor,successor and middle entry is empty, mergerNode is added to predecessor and successor.
-     * <br>Else, conditions were checked one by one.
-     * <br>First condition is if mergerNodeId lies between the existing predecessor and localNodeId
-     * <br>Second condition is mergerNodeId lies between the localNodeId and existing SuccessorNodeId
-     * <br>Third condition is if mergerNodeId lies between successor and predecessor.
-     * <br>Following is for checking the first Condition ie mergerNodeId lies between predecessor and localNodeId.
-     * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
-     * <br>Like Predecessor > LocalNodeId or Predecessor < LocalNodeId  and similarly for all cases of mergerNodeId.
-     * <br>Like mergerNodeId > LocalNodeId or mergerNodeId < LocalNodeId.
-     * <br>Following is for checking the second condition ie mergerNodeId lies between successor and localNodeId.
-     * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
-     * <br>Like Successor > LocalNodeId or Successor < LocalNodeId  and similarly for all cases of mergerNodeId.
-     * <br>Like mergerNodeId > LocalNodeId or mergerNodeId < LocalNodeId.
-     * <br>Following is for checking the Third condition ie mergerNodeId lies between predecessor and successor.
-     * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
+     *                     <br>Check for the first mismatch in nibble between mergerNodeId and localNodeId.
+     *                     <br>IF predecessor,successor and middle entry is empty, mergerNode is added to predecessor and successor.
+     *                     <br>Else, conditions were checked one by one.
+     *                     <br>First condition is if mergerNodeId lies between the existing predecessor and localNodeId
+     *                     <br>Second condition is mergerNodeId lies between the localNodeId and existing SuccessorNodeId
+     *                     <br>Third condition is if mergerNodeId lies between successor and predecessor.
+     *                     <br>Following is for checking the first Condition ie mergerNodeId lies between predecessor and localNodeId.
+     *                     <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
+     *                     <br>Like Predecessor > LocalNodeId or Predecessor < LocalNodeId  and similarly for all cases of mergerNodeId.
+     *                     <br>Like mergerNodeId > LocalNodeId or mergerNodeId < LocalNodeId.
+     *                     <br>Following is for checking the second condition ie mergerNodeId lies between successor and localNodeId.
+     *                     <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
+     *                     <br>Like Successor > LocalNodeId or Successor < LocalNodeId  and similarly for all cases of mergerNodeId.
+     *                     <br>Like mergerNodeId > LocalNodeId or mergerNodeId < LocalNodeId.
+     *                     <br>Following is for checking the Third condition ie mergerNodeId lies between predecessor and successor.
+     *                     <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
      */
     private void mergerRT(B4_Node mergerNode, B4_Node[][] routingTable) {
         int preNodeIdInHex;
@@ -931,12 +911,12 @@ public class RoutingManager {
     }
 
     /**
-     * @param rtTag XML tag
-     * @param fileName Desired name of the file
-     * @param routingTable Object of Routing table which need to be converted to XML
+     * @param rtTag          XML tag
+     * @param fileName       Desired name of the file
+     * @param routingTable   Object of Routing table which need to be converted to XML
      * @param neighbourTable Object of Neighbour table which need to be converted to XML
-     * <br>This function is used to convert the Routing Table in the form of an array to xml format
-     * <br>Here XML parsing is used.
+     *                       <br>This function is used to convert the Routing Table in the form of an array to xml format
+     *                       <br>Here XML parsing is used.
      */
     private void routingTableToXML(String rtTag, String fileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         String selfNodeId = localNode.getB4node().getNodeID();
@@ -956,7 +936,7 @@ public class RoutingManager {
             doc.appendChild(root);
             root.setAttribute("SELF_NODE_ID", selfNodeId);
             root.setAttribute("SELF_PUBLIC_KEY", selfNodePub);
-            root.setAttribute("SELF_HASHID",selfHashID);
+            root.setAttribute("SELF_HASHID", selfHashID);
             root.setAttribute("SELF_IP_ADDRESS", selfIPAddress);
             root.setAttribute("SELF_PORT_ADDRESS", selfPortAddress);
             root.setAttribute("SELF_TRANSPORT", selfTransport);
@@ -1073,8 +1053,8 @@ public class RoutingManager {
                 String layerName = properties.getProperty("" + i + "");
                 boolean access = config.isLayerAccess(layerName);
                 if (access)
-                    System.out.println(i +"_"+layerName+"_"+nodeID);
-                    init(layerName, i +"_"+layerName+"_"+nodeID, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
+                    System.out.println(i + "_" + layerName + "_" + nodeID);
+                init(layerName, i + "_" + layerName + "_" + nodeID, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
             } catch (IOException e) {
                 log.error("Exception Occurred", e);
             }
@@ -1082,12 +1062,12 @@ public class RoutingManager {
     }
 
     /**
-     * @param rtFileName Name of the routing table which we desired to give for later identification.
-     * @param routingTable Object of Routing Table.
+     * @param rtFileName     Name of the routing table which we desired to give for later identification.
+     * @param routingTable   Object of Routing Table.
      * @param neighbourTable Object of Neighbour Table.
-     * <br>This function is used to fetch the file from XML and convert it into routing table and neighbour table object.
+     *                       <br>This function is used to fetch the file from XML and convert it into routing table and neighbour table object.
      */
-    private void fetchFromXML(String rtFileName,B4_Node[][] routingTable,B4_Node[] neighbourTable){
+    private void fetchFromXML(String rtFileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         try {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
@@ -1116,7 +1096,7 @@ public class RoutingManager {
                     int index1 = Integer.parseInt(matcher.group(1));
                     matcher.find();
                     int index2 = Integer.parseInt(matcher.group(1));
-                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),nodeHash), nodeIP, nodePort, nodeTransport);
+                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport);
                 }
             }
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
@@ -1125,7 +1105,6 @@ public class RoutingManager {
                 if (node.getNodeType() == node.ELEMENT_NODE) {
                     Element element = (Element) node;
                     String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
-
                     //Get value of all sub-Elements
                     String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                     String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
@@ -1139,7 +1118,7 @@ public class RoutingManager {
                     Matcher matcher = pattern.matcher(index);
                     matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
-                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
@@ -1147,16 +1126,16 @@ public class RoutingManager {
         }
     }
 
-    public File getRoutingTableFile(String routingTableName){
+    public File getRoutingTableFile(String routingTableName) {
         File routingTableFile = new File(routingTableName);
         boolean isExist = routingTableFile.exists();
-        if (isExist)return routingTableFile;
+        if (isExist) return routingTableFile;
         else return null;
     }
 
     /**
      * @param mergerTableDataFile The routingTable file for which the rtt value of the neighbour table need to be calculated. <br>
-     * @param layerID layer Id on which the operation needs to be performed.
+     * @param layerID             layer Id on which the operation needs to be performed.
      * @return getRTT file is created, containing only the neighbour table nodeIDs for which the rtt needs to be found.
      */
     private File getRTTMergerTable(File mergerTableDataFile, int layerID) {
@@ -1235,5 +1214,4 @@ public class RoutingManager {
     private RoutingManagerBuffer getRoutingManagerBuffer() {
         return routingManagerBuffer;
     }
-
 }
