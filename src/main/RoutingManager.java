@@ -122,7 +122,7 @@ public class RoutingManager {
         setLocalNode();
         addToArrayList();
         initialLayerLoading();
-        fetchFileFromInputBuffer();
+        getFileFromInputBuffer();
     }
 
     /**
@@ -159,12 +159,10 @@ public class RoutingManager {
             }
             B4_Node bootStrapNode = config.getBootStrapNode();
             mergerRT(bootStrapNode, routingTable);
-
             /* Neighbour Table */
             for (int i = 0; i < nt_dimension; i++) {
                 neighbourTable[i] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "", -1);
             }
-
             routingTableToXML(rtTag,rtFileName, routingTable, neighbourTable);
         } else {
             fetchFromXML(rtFileName,routingTable,neighbourTable);
@@ -182,7 +180,7 @@ public class RoutingManager {
     }
 
     /**
-     * @param fileFromBuffer Name of the file that is fetched from the input buffer of the routingManger API.
+     * @param fileName Name of the file that is fetched from the input buffer of the routingManger API.
      * @param layerID Specify the layer Id of the routing table which needs to be merged.
      * <br>This method is used for merging routing table obtained from other B4_Node in to localBaseRoutingTable.
      * <br>Merging is performed by one by one comparing of nodeID obtained from the received node with existing nodeID in the localBaseRoutingTable.
@@ -191,10 +189,11 @@ public class RoutingManager {
      * Array at which the data is to be updated.
      * <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor, successor or middle row of the obtained column.
      */
-    public void mergeRoutingTable(File fileFromBuffer, int layerID) {
+
+    public void mergeRoutingTable(File fileName, int layerID) {
         B4_Node[][] routingTableLayer = routingTables.get(layerID).getRoutingTable();
-        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
-        B4_Node[][] mergerRoutingTable = getMergerRoutingTable(fileFromBuffer.getAbsolutePath());
+        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileName.getAbsolutePath());
+        B4_Node[][] mergerRoutingTable = getMergerRoutingTable(fileName.getAbsolutePath());
         mergerRT(selfNodeOfMergerTable, routingTableLayer);
         for (int i = 0; i < rt_dimension; i++) {
             for (int j = 0; j < 3; j++) {
@@ -208,18 +207,19 @@ public class RoutingManager {
     }
 
     /**
-     * @param fileFromBuffer File fetched from the inputBuffer of routing Table
+     * @param fileName File fetched from the inputBuffer of routing Table
      * @param layerID The layer in which the operation is to be performed
+     * Function is used to merge neighbour table received file from other nodes with the neighbour table of current node.
      */
-    public void mergeNeighbourTable(File fileFromBuffer, int layerID) {
+    public void mergeNeighbourTable(File fileName, int layerID) {
         B4_Node[] neighbourTable = routingTables.get(layerID).getNeighbourTable();
         boolean rttFileExists;
         B4_Node[] mergerNeighbourTable = new B4_Node[nt_dimension];
         B4_Node selfMergerNode = null;
-        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileFromBuffer.getAbsolutePath());
+        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileName.getAbsolutePath());
         String mergerNodeID = selfNodeOfMergerTable.getB4node().getNodeID();
         //String fileName = "RcvRTT_" + layerID + "_" + mergerNodeID;
-        File rttFile = new File(fileFromBuffer.getName());
+        File rttFile = new File(fileName.getName());
         rttFileExists = rttFile.exists();
         if (!rttFileExists) {
             log.error("RTT updated file does not exist");
@@ -229,7 +229,7 @@ public class RoutingManager {
             DocumentBuilder documentBuilder;
             try {
                 documentBuilder = builderFactory.newDocumentBuilder();
-                Document doc = documentBuilder.parse(new File(fileFromBuffer.getName()));
+                Document doc = documentBuilder.parse(new File(fileName.getName()));
                 doc.getDocumentElement().normalize();
                 String selfNodeID = doc.getDocumentElement().getAttribute("SELF_NODE_ID");
                 String selfNodePub = doc.getDocumentElement().getAttribute("SELF_PUBLIC_KEY");
@@ -243,13 +243,10 @@ public class RoutingManager {
                 NodeList nodeList = doc.getElementsByTagName("NEIGHBOUR");
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Node node = nodeList.item(i);
-
                     if (node.getNodeType() == node.ELEMENT_NODE) {
                         Element element = (Element) node;
-
                         //Get the value of ID attribute
                         String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
-
                         //Get value of all sub-Elements
                         String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
                         String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
@@ -311,87 +308,7 @@ public class RoutingManager {
     }
 
     /**
-     * @param mergerTableDataFile The routingTable file for which the rtt value of the neighbour table need to be calculated. <br>
-     * @param layerID layer Id on which the operation needs to be performed.
-     * @return getRTT file is created, containing only the neighbour table nodeIDs for which the rtt needs to be found.
-     */
-    public File getRTTMergerTable(File mergerTableDataFile, int layerID) {
-        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile.getName());
-        B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile.getName());
-
-        String selfNodeIdMerger = selfNodeOfMergerTable.getB4node().getNodeID();
-        String selfNodePubMerger = nodeCryptography.pubToStr(selfNodeOfMergerTable.getB4node().getPublicKey());
-        String selfHashIDMerger = selfNodeOfMergerTable.getB4node().getHashID();
-        String selfIPAddressMerger = selfNodeOfMergerTable.getIpAddress();
-        String selfPortAddressMerger = selfNodeOfMergerTable.getPortAddress();
-        String selfTransportMerger = selfNodeOfMergerTable.getTransport();
-        String selfRTTMerger = "-1";
-
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.newDocument();
-            //create root Element
-            Element root = doc.createElement("Merger_Neighbour_table");
-            doc.appendChild(root);
-            root.setAttribute("SELF_NODE_ID", selfNodeIdMerger);
-            root.setAttribute("SELF_PUBLIC_KEY", selfNodePubMerger);
-            root.setAttribute("SELF_HASHID", selfHashIDMerger);
-            root.setAttribute("SELF_IP_ADDRESS", selfIPAddressMerger);
-            root.setAttribute("SELF_PORT_ADDRESS", selfPortAddressMerger);
-            root.setAttribute("SELF_TRANSPORT", selfTransportMerger);
-            root.setAttribute("SELF_RTT", selfRTTMerger);
-
-            for (int i = 0; i < nt_dimension; i++) {
-                Element row1 = doc.createElement("NEIGHBOUR");
-                root.appendChild(row1);
-                row1.setAttribute("INDEX", "[" + i + "]");
-
-                Element nodeID = doc.createElement("NODEID");
-                nodeID.appendChild(doc.createTextNode(mergerNeighbourTable[i].getB4node().getNodeID()));
-                row1.appendChild(nodeID);
-
-                Element nodePub = doc.createElement("PUBLICKEY");
-                nodePub.appendChild(doc.createTextNode(nodeCryptography.pubToStr(mergerNeighbourTable[i].getB4node().getPublicKey())));
-                row1.appendChild(nodePub);
-
-                Element hashID = doc.createElement("HASHID");
-                hashID.appendChild(doc.createTextNode(mergerNeighbourTable[i].getB4node().getHashID()));
-                row1.appendChild(hashID);
-
-                Element nodeIP = doc.createElement("NODEIP");
-                nodeIP.appendChild(doc.createTextNode(mergerNeighbourTable[i].getIpAddress()));
-                row1.appendChild(nodeIP);
-
-                Element nodePort = doc.createElement("NODEPORT");
-                nodePort.appendChild(doc.createTextNode(mergerNeighbourTable[i].getPortAddress()));
-                row1.appendChild(nodePort);
-
-                Element nodeTransport = doc.createElement("NODETRANSPORT");
-                nodeTransport.appendChild(doc.createTextNode(mergerNeighbourTable[i].getTransport()));
-                row1.appendChild(nodeTransport);
-
-                Element nodeRTT = doc.createElement("NODERTT");
-                nodeRTT.appendChild(doc.createTextNode("-1"));
-                row1.appendChild(nodeRTT);
-            }
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource domSource = new DOMSource(doc);
-
-            StreamResult streamResult = new StreamResult(new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml"));
-            transformer.transform(domSource, streamResult);
-            log.debug("getRTT File is created");
-        } catch (ParserConfigurationException | TransformerException e) {
-            log.error("Exception Occurred", e);
-        }
-        File file1 = new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml");
-        addFileToOutputBuffer(file1);
-        return file1;
-    }
-
-    /**
-     * @param hashID hash id received as a query to find the next hop.
+     * @param hashID hash ID received as a query to find the next hop.
      * @param layerID layer id on which the operation is to be performed.
      * @return null if next hop is selfNode else return B4_Node object.
      * <p>
@@ -413,7 +330,6 @@ public class RoutingManager {
      * <br>Else Check whether hashId/NodeId lies between middle and predecessor.
      * <br>Since nibbles are arranged in the form of a ring ranging from 0-15, all possible conditions needs to be checked.
      * <br>If true return middleNodeId.
-     *
      */
     public B4_Node findNextHop(String hashID, int layerID) {
         B4_Node[][] routingTable = routingTables.get(layerID).getRoutingTable();
@@ -473,11 +389,9 @@ public class RoutingManager {
                             } else return null;
                         } else if (sucNodeIdHex >= hashIdHex && hashIdHex > localNodeIdInHex || sucNodeIdHex < localNodeIdInHex && sucNodeIdHex + 16 >= hashIdHex && hashIdHex > localNodeIdInHex || sucNodeIdHex < localNodeIdInHex && sucNodeIdHex + 16 >= hashIdHex + 16 && hashIdHex + 16 > localNodeIdInHex) {
                             return routingTable[k][1];
-
                         } else if (!routingTable[k][2].getB4node().getNodeID().isEmpty()) {
                             String midNodeIdChar = Character.toString(routingTable[k][2].getB4node().getNodeID().charAt(k));
                             int midNodeIdHex = Integer.parseInt(midNodeIdChar, 16);
-
                             if (sucNodeIdHex < hashIdHex && hashIdHex < midNodeIdHex || sucNodeIdHex > midNodeIdHex && sucNodeIdHex - 16 < hashIdHex && hashIdHex < midNodeIdHex || sucNodeIdHex > midNodeIdHex && sucNodeIdHex - 16 < hashIdHex - 16 && hashIdHex - 16 < midNodeIdHex) {
                                 return routingTable[k][1];
                             } else if (preNodeIdHex > hashIdHex && hashIdHex > midNodeIdHex || preNodeIdHex < midNodeIdHex && preNodeIdHex + 16 > hashIdHex && hashIdHex > midNodeIdHex || preNodeIdHex < midNodeIdHex && preNodeIdHex + 16 > hashIdHex + 16 && hashIdHex + 16 > midNodeIdHex) {
@@ -508,8 +422,6 @@ public class RoutingManager {
         int purgeLoopCount = config.getPurgeLoopCount();
         B4_Layer b4_layer = new B4_Layer();
         String layerName = b4_layer.getLayerName(layerID);
-
-        // New thread is created
         Thread purgeThread = new Thread(() -> {
             int count = 0;
             int dataPurged_RT = 0;
@@ -624,10 +536,6 @@ public class RoutingManager {
         return routingTables.get(1).getNeighbourTable();
     }
 
-    public RoutingManagerBuffer getRoutingManagerBuffer() {
-        return routingManagerBuffer;
-    }
-
     /**
      * @param file File needs to be added to the inputBuffer.
      * @return True if file is added successfully.
@@ -651,7 +559,7 @@ public class RoutingManager {
     /**
      * This method is used to fetch file from the input buffer one by one.
      */
-    public void fetchFileFromInputBuffer() {
+    public void getFileFromInputBuffer() {
         Thread fetchThread = new Thread(() -> {
             while (true) {
                 File file = routingManagerBuffer.fetchFromInputBuffer();
@@ -685,7 +593,7 @@ public class RoutingManager {
         fetchThread.start();
     }
 
-    public File fetchFileFromOutputBuffer() {
+    public File getFileFromOutputBuffer() {
         return routingManagerBuffer.fetchFromOutputBuffer();
     }
 
@@ -751,7 +659,7 @@ public class RoutingManager {
     /**
      * @return System MAC Address.
      */
-    public String getMACAddress() {
+    public String getSystemMACAddress() {
         String macaddr = "";
         try {
             String ipAddress = getSystemIP();
@@ -792,6 +700,30 @@ public class RoutingManager {
         return layerID;
     }
 
+    public String getIPAddress(){
+        return localNode.getIpAddress();
+    }
+
+    public String getNodeID(){
+        return localNode.getB4node().getNodeID();
+    }
+
+    public String getPortAddress(){
+        return localNode.getPortAddress();
+    }
+
+    public float getRTT(){
+        return localNode.getRtt();
+    }
+
+    public String getHashID(){
+        return localNode.getB4node().getHashID();
+    }
+
+    public PublicKey getPublicKey(){
+        return localNode.getB4node().getPublicKey();
+    }
+
     /**
      * This method is used for setting Local Node information.
      * <br>Presently it is hardcoded (will be amended later).
@@ -830,6 +762,22 @@ public class RoutingManager {
     /**
      * @param mergerNode - The node which need to be merged.
      * @param routingTable All the algorithm for merging the routing and neighbour table is defined in this function.
+     * <br>Check for the first mismatch in nibble between mergerNodeId and localNodeId.
+     * <br>IF predecessor,successor and middle entry is empty, mergerNode is added to predecessor and successor.
+     * <br>Else, conditions were checked one by one.
+     * <br>First condition is if mergerNodeId lies between the existing predecessor and localNodeId
+     * <br>Second condition is mergerNodeId lies between the localNodeId and existing SuccessorNodeId
+     * <br>Third condition is if mergerNodeId lies between successor and predecessor.
+     * <br>Following is for checking the first Condition ie mergerNodeId lies between predecessor and localNodeId.
+     * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
+     * <br>Like Predecessor > LocalNodeId or Predecessor < LocalNodeId  and similarly for all cases of mergerNodeId.
+     * <br>Like mergerNodeId > LocalNodeId or mergerNodeId < LocalNodeId.
+     * <br>Following is for checking the second condition ie mergerNodeId lies between successor and localNodeId.
+     * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
+     * <br>Like Successor > LocalNodeId or Successor < LocalNodeId  and similarly for all cases of mergerNodeId.
+     * <br>Like mergerNodeId > LocalNodeId or mergerNodeId < LocalNodeId.
+     * <br>Following is for checking the Third condition ie mergerNodeId lies between predecessor and successor.
+     * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
      */
     private void mergerRT(B4_Node mergerNode, B4_Node[][] routingTable) {
         int preNodeIdInHex;
@@ -839,24 +787,6 @@ public class RoutingManager {
         char[] mergerNodeidInCharArray = mergerNodeID.toCharArray();
         char[] localNodeidInCharArray = localNodeID.toCharArray();
 
-        /**
-         * <br>Check for the first mismatch in nibble between mergerNodeId and localNodeId.
-         * <br>IF predecessor,successor and middle entry is empty, mergerNode is added to predecessor and successor.
-         * <br>Else, conditions were checked one by one.
-         * <br>First condition is if mergerNodeId lies between the existing predecessor and localNodeId
-         * <br>Second condition is mergerNodeId lies between the localNodeId and existing SuccessorNodeId
-         * <br>Third condition is if mergerNodeId lies between successor and predecessor.
-         * <br>Following is for checking the first Condition ie mergerNodeId lies between predecessor and localNodeId.
-         * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
-         * <br>Like Predecessor > LocalNodeId or Predecessor < LocalNodeId  and similarly for all cases of mergerNodeId.
-         * <br>Like mergerNodeId > LocalNodeId or mergerNodeId < LocalNodeId.
-         * <br>Following is for checking the second condition ie mergerNodeId lies between successor and localNodeId.
-         * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
-         * <br>Like Successor > LocalNodeId or Successor < LocalNodeId  and similarly for all cases of mergerNodeId.
-         * <br>Like mergerNodeId > LocalNodeId or mergerNodeId < LocalNodeId.
-         * <br>Following is for checking the Third condition ie mergerNodeId lies between predecessor and successor.
-         * <br>Since we are looking into a circular ring with nibble value range from 0-15,all possible conditions need to be checked.
-         */
         for (int k = 0; k < rt_dimension; k++) {
             char[] preNodeIdCharArray = routingTable[k][0].getB4node().getNodeID().toCharArray();
             char[] sucNodeIdCharArray = routingTable[k][1].getB4node().getNodeID().toCharArray();
@@ -1149,7 +1079,6 @@ public class RoutingManager {
                 log.error("Exception Occurred", e);
             }
         }
-
     }
 
     /**
@@ -1193,7 +1122,6 @@ public class RoutingManager {
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
             for (int i = 0; i < nodeList1.getLength(); i++) {
                 Node node = nodeList1.item(i);
-
                 if (node.getNodeType() == node.ELEMENT_NODE) {
                     Element element = (Element) node;
                     String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
@@ -1224,6 +1152,88 @@ public class RoutingManager {
         boolean isExist = routingTableFile.exists();
         if (isExist)return routingTableFile;
         else return null;
+    }
+
+    /**
+     * @param mergerTableDataFile The routingTable file for which the rtt value of the neighbour table need to be calculated. <br>
+     * @param layerID layer Id on which the operation needs to be performed.
+     * @return getRTT file is created, containing only the neighbour table nodeIDs for which the rtt needs to be found.
+     */
+    private File getRTTMergerTable(File mergerTableDataFile, int layerID) {
+        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile.getName());
+        B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile.getName());
+        String selfNodeIdMerger = selfNodeOfMergerTable.getB4node().getNodeID();
+        String selfNodePubMerger = nodeCryptography.pubToStr(selfNodeOfMergerTable.getB4node().getPublicKey());
+        String selfHashIDMerger = selfNodeOfMergerTable.getB4node().getHashID();
+        String selfIPAddressMerger = selfNodeOfMergerTable.getIpAddress();
+        String selfPortAddressMerger = selfNodeOfMergerTable.getPortAddress();
+        String selfTransportMerger = selfNodeOfMergerTable.getTransport();
+        String selfRTTMerger = "-1";
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.newDocument();
+            //create root Element
+            Element root = doc.createElement("Merger_Neighbour_table");
+            doc.appendChild(root);
+            root.setAttribute("SELF_NODE_ID", selfNodeIdMerger);
+            root.setAttribute("SELF_PUBLIC_KEY", selfNodePubMerger);
+            root.setAttribute("SELF_HASHID", selfHashIDMerger);
+            root.setAttribute("SELF_IP_ADDRESS", selfIPAddressMerger);
+            root.setAttribute("SELF_PORT_ADDRESS", selfPortAddressMerger);
+            root.setAttribute("SELF_TRANSPORT", selfTransportMerger);
+            root.setAttribute("SELF_RTT", selfRTTMerger);
+
+            for (int i = 0; i < nt_dimension; i++) {
+                Element row1 = doc.createElement("NEIGHBOUR");
+                root.appendChild(row1);
+                row1.setAttribute("INDEX", "[" + i + "]");
+
+                Element nodeID = doc.createElement("NODEID");
+                nodeID.appendChild(doc.createTextNode(mergerNeighbourTable[i].getB4node().getNodeID()));
+                row1.appendChild(nodeID);
+
+                Element nodePub = doc.createElement("PUBLICKEY");
+                nodePub.appendChild(doc.createTextNode(nodeCryptography.pubToStr(mergerNeighbourTable[i].getB4node().getPublicKey())));
+                row1.appendChild(nodePub);
+
+                Element hashID = doc.createElement("HASHID");
+                hashID.appendChild(doc.createTextNode(mergerNeighbourTable[i].getB4node().getHashID()));
+                row1.appendChild(hashID);
+
+                Element nodeIP = doc.createElement("NODEIP");
+                nodeIP.appendChild(doc.createTextNode(mergerNeighbourTable[i].getIpAddress()));
+                row1.appendChild(nodeIP);
+
+                Element nodePort = doc.createElement("NODEPORT");
+                nodePort.appendChild(doc.createTextNode(mergerNeighbourTable[i].getPortAddress()));
+                row1.appendChild(nodePort);
+
+                Element nodeTransport = doc.createElement("NODETRANSPORT");
+                nodeTransport.appendChild(doc.createTextNode(mergerNeighbourTable[i].getTransport()));
+                row1.appendChild(nodeTransport);
+
+                Element nodeRTT = doc.createElement("NODERTT");
+                nodeRTT.appendChild(doc.createTextNode("-1"));
+                row1.appendChild(nodeRTT);
+            }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource domSource = new DOMSource(doc);
+
+            StreamResult streamResult = new StreamResult(new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml"));
+            transformer.transform(domSource, streamResult);
+            log.debug("getRTT File is created");
+        } catch (ParserConfigurationException | TransformerException e) {
+            log.error("Exception Occurred", e);
+        }
+        File file1 = new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml");
+        addFileToOutputBuffer(file1);
+        return file1;
+    }
+
+    private RoutingManagerBuffer getRoutingManagerBuffer() {
+        return routingManagerBuffer;
     }
 
 }
