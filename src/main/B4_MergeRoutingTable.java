@@ -31,7 +31,7 @@ public class B4_MergeRoutingTable {
      * It is the constructor for this class.
      */
     public B4_MergeRoutingTable(String mergerRTFile) {
-        NodeCryptography nodeCryptography = NodeCryptography.getInstance();
+       Utility utility = new Utility();
         ConfigData config = ConfigData.getInstance();
         int rt_dimension = config.getRoutingTableLength();
         int nt_dimension = config.getNeighbourTableLength();
@@ -71,7 +71,7 @@ public class B4_MergeRoutingTable {
                     int index1 = Integer.parseInt(matcher.group(1));
                     matcher.find();
                     int index2 = Integer.parseInt(matcher.group(1));
-                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport);
+                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, utility.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport);
                 }
             }
             doc.getDocumentElement().normalize();
@@ -81,7 +81,7 @@ public class B4_MergeRoutingTable {
             String selfIPAddress = doc.getDocumentElement().getAttribute("SELF_IP_ADDRESS");
             String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
             String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
-            selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub),selfHashID), selfIPAddress, selfPortAddress, selfTransport);
+            selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, utility.strToPub(selfNodePub),selfHashID), selfIPAddress, selfPortAddress, selfTransport);
 
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
             for (int i = 0; i < nodeList1.getLength(); i++) {
@@ -104,7 +104,7 @@ public class B4_MergeRoutingTable {
                     matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
                     //System.out.println(index1);
-                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, utility.strToPub(nodePub),hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {

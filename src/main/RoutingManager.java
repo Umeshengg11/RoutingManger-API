@@ -49,7 +49,7 @@ public class RoutingManager {
     private final int nt_dimension;
     private final long incrementTime;
     private final long sleepTime;
-    private NodeCryptography nodeCryptography;
+    private Utility utility;
     private B4_Node localNode;
     private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
@@ -76,7 +76,7 @@ public class RoutingManager {
         File nodeFile = new File(nodeDetailFilePath);
         nodeDetailsExists = nodeFile.exists();
         if (!nodeDetailsExists) {
-            nodeCryptography = NodeCryptography.getInstance();
+            utility = new Utility();
             b4_nodeGeneration = new B4_NodeGeneration();
             try {
                 selfIPAddress = getSystemIP();
@@ -87,7 +87,7 @@ public class RoutingManager {
                 printWriter.println("#  Self Node Details  #");
                 printWriter.println("..................................");
                 printWriter.println("NodeID=" + b4_nodeGeneration.getNodeID());
-                printWriter.println("PublicKey=" + nodeCryptography.pubToStr(b4_nodeGeneration.getPublicKey()));
+                printWriter.println("PublicKey=" + utility.pubToStr(b4_nodeGeneration.getPublicKey()));
                 printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
                 printWriter.println("IPAddress=" + selfIPAddress);
                 printWriter.println("PortAddress=" + selfPortAddress);
@@ -109,8 +109,8 @@ public class RoutingManager {
                 selfIPAddress = properties.getProperty("IPAddress");
                 selfPortAddress = properties.getProperty("PortAddress");
                 selfTransportAddress = properties.getProperty("TransportAddress");
-                nodeCryptography = NodeCryptography.getInstance();
-                b4_nodeGeneration = new B4_NodeGeneration(selfNodeID, nodeCryptography.strToPub(selfPublicKey), selfHashID);
+                utility = new Utility();
+                b4_nodeGeneration = new B4_NodeGeneration(selfNodeID, utility.strToPub(selfPublicKey), selfHashID);
             } catch (IOException e) {
                 log.error("NodeDetails File not Found or Issue in file fetching\n", e);
             }
@@ -238,7 +238,7 @@ public class RoutingManager {
                 String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
                 String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
                 String selfRTT = doc.getDocumentElement().getAttribute("SELF_RTT");
-                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, nodeCryptography.strToPub(selfNodePub), selfHashID), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
+                selfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, utility.strToPub(selfNodePub), selfHashID), selfIPAddress, selfPortAddress, selfTransport, Float.parseFloat(selfRTT));
 
                 NodeList nodeList = doc.getElementsByTagName("NEIGHBOUR");
                 for (int i = 0; i < nodeList.getLength(); i++) {
@@ -259,7 +259,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         int index1 = Integer.parseInt(matcher.group(1));
-                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                        mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, utility.strToPub(nodePub), hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -920,7 +920,7 @@ public class RoutingManager {
      */
     private void routingTableToXML(String rtTag, String fileName, B4_Node[][] routingTable, B4_Node[] neighbourTable) {
         String selfNodeId = localNode.getB4node().getNodeID();
-        String selfNodePub = nodeCryptography.pubToStr(localNode.getB4node().getPublicKey());
+        String selfNodePub = utility.pubToStr(localNode.getB4node().getPublicKey());
         String selfHashID = localNode.getB4node().getHashID();
         String selfIPAddress = localNode.getIpAddress();
         String selfPortAddress = localNode.getPortAddress();
@@ -952,7 +952,7 @@ public class RoutingManager {
                     row.appendChild(nodeID);
 
                     Element nodePub = doc.createElement("PUBLICKEY");
-                    nodePub.appendChild(doc.createTextNode(nodeCryptography.pubToStr(routingTable[i][j].getB4node().getPublicKey())));
+                    nodePub.appendChild(doc.createTextNode(utility.pubToStr(routingTable[i][j].getB4node().getPublicKey())));
                     row.appendChild(nodePub);
 
                     Element hashID = doc.createElement("HASHID");
@@ -982,7 +982,7 @@ public class RoutingManager {
                 row1.appendChild(nodeID);
 
                 Element nodePub = doc.createElement("PUBLICKEY");
-                nodePub.appendChild(doc.createTextNode(nodeCryptography.pubToStr(neighbourTable[i].getB4node().getPublicKey())));
+                nodePub.appendChild(doc.createTextNode(utility.pubToStr(neighbourTable[i].getB4node().getPublicKey())));
                 row1.appendChild(nodePub);
 
                 Element hashID = doc.createElement("HASHID");
@@ -1096,7 +1096,7 @@ public class RoutingManager {
                     int index1 = Integer.parseInt(matcher.group(1));
                     matcher.find();
                     int index2 = Integer.parseInt(matcher.group(1));
-                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport);
+                    routingTable[index1][index2] = new B4_Node(new B4_NodeTuple(nodeID, utility.strToPub(nodePub), nodeHash), nodeIP, nodePort, nodeTransport);
                 }
             }
             NodeList nodeList1 = doc.getElementsByTagName("NEIGHBOUR");
@@ -1118,7 +1118,7 @@ public class RoutingManager {
                     Matcher matcher = pattern.matcher(index);
                     matcher.find();
                     int index1 = Integer.parseInt(matcher.group(1));
-                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, nodeCryptography.strToPub(nodePub), hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
+                    neighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, utility.strToPub(nodePub), hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException | NullPointerException e) {
@@ -1142,7 +1142,7 @@ public class RoutingManager {
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile.getName());
         B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile.getName());
         String selfNodeIdMerger = selfNodeOfMergerTable.getB4node().getNodeID();
-        String selfNodePubMerger = nodeCryptography.pubToStr(selfNodeOfMergerTable.getB4node().getPublicKey());
+        String selfNodePubMerger = utility.pubToStr(selfNodeOfMergerTable.getB4node().getPublicKey());
         String selfHashIDMerger = selfNodeOfMergerTable.getB4node().getHashID();
         String selfIPAddressMerger = selfNodeOfMergerTable.getIpAddress();
         String selfPortAddressMerger = selfNodeOfMergerTable.getPortAddress();
@@ -1173,7 +1173,7 @@ public class RoutingManager {
                 row1.appendChild(nodeID);
 
                 Element nodePub = doc.createElement("PUBLICKEY");
-                nodePub.appendChild(doc.createTextNode(nodeCryptography.pubToStr(mergerNeighbourTable[i].getB4node().getPublicKey())));
+                nodePub.appendChild(doc.createTextNode(utility.pubToStr(mergerNeighbourTable[i].getB4node().getPublicKey())));
                 row1.appendChild(nodePub);
 
                 Element hashID = doc.createElement("HASHID");

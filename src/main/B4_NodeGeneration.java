@@ -3,6 +3,8 @@ package main;
 import org.apache.log4j.Logger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 /**
@@ -146,4 +148,5 @@ class B4_NodeGeneration {
     PublicKey getPublicKey() {
         return publicKey;
     }
+
 }

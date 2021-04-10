@@ -11,7 +11,7 @@ import java.util.Properties;
 class ConfigData {
     private static final Logger log = Logger.getLogger(ConfigData.class);
     private static ConfigData config;
-    private final NodeCryptography nodeCryptography;
+    private static Utility utility;
     private final String path = "src/configuration/config.properties";
     private final String path1 = "src/configuration";
     private final String path2 = "src/LogFiles";
@@ -38,7 +38,7 @@ class ConfigData {
             if (!isDirLogCreated) log.error("LogFile Directory is not created");
             else log.info("LogFile directory is created");
         }
-        nodeCryptography = NodeCryptography.getInstance();
+        utility = new Utility();
         try {
             boolean configFileExist;
             File configFile = new File(path);
@@ -108,7 +108,7 @@ class ConfigData {
             String bootStrapIP = properties.getProperty("BootstrapPvtIP");
             String bootStrapPort = properties.getProperty("BootstrapPort");
             String bootStrapAddress = properties.getProperty("BootstrapAddress");
-            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID, nodeCryptography.strToPub(bootStrapPub), bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
+            bootStrapNode = new B4_Node(new B4_NodeTuple(bootStrapID, utility.strToPub(bootStrapPub), bootStrapHash), bootStrapIP, bootStrapPort, bootStrapAddress);
         } catch (IOException e) {
             log.error("Config file not Found or Issue in config file fetching\n", e);
         }
@@ -245,6 +245,12 @@ class ConfigData {
         properties.setProperty("MessageRoutingTable", "yes");
         properties.setProperty("VoipRoutingTable", "no");
         properties.setProperty("OverCastingLayer", "no");
+        properties.setProperty("Email", "umesh@iitk.ac.in");
+        properties.setProperty("OrgUnit", "IITK");
+        properties.setProperty("Organisation", "IITK");
+        properties.setProperty("City", "Kanpur");
+        properties.setProperty("State", "UP");
+        properties.setProperty("Country", "India");
         try {
             FileOutputStream outputStream = new FileOutputStream(path);
             properties.store(outputStream, "RoutingManager Configuration File");

@@ -1,9 +1,11 @@
 package main;
 
 import org.apache.log4j.Logger;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
-import javax.security.auth.x500.X500Principal;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,10 +16,9 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * This class deals with all the cryptographic work associated with the Node like
@@ -40,7 +41,6 @@ class NodeCryptography {
      * BountyCastle jar file is added to the class path.
      * nodeDetailsFile is checked whether is available from the previous login to take all the relevant parameters from
      * there and if it is not available it is created and all the parameters are added to the file.
-     *
      */
     private NodeCryptography() {
         Provider provider = new BouncyCastleProvider();
@@ -77,6 +77,62 @@ class NodeCryptography {
             nodeCryptography = new NodeCryptography();
         }
         return nodeCryptography;
+    }
+
+    /**
+     * @return - Self signed Certificate.
+     */
+    @SuppressWarnings("deprecation")
+    private  X509Certificate createSelfSignedCert(String eMail, String orgUnit, String organisation, String city, String state, String country) {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        try {
+            X509V3CertificateGenerator x500Name = new X509V3CertificateGenerator();
+            Vector<ASN1ObjectIdentifier> order = new Vector<>();
+            Hashtable<ASN1ObjectIdentifier, String> attributeMap = new Hashtable<>();
+            if (eMail != null) {
+                attributeMap.put(X509Name.CN, eMail);
+                order.add(X509Name.CN);
+            }
+            if (orgUnit != null) {
+                attributeMap.put(X509Name.OU, orgUnit);
+                order.add(X509Name.OU);
+            }
+            if (organisation != null) {
+                attributeMap.put(X509Name.O, organisation);
+                order.add(X509Name.O);
+            }
+            if (city != null) {
+                attributeMap.put(X509Name.L, city);
+                order.add(X509Name.L);
+            }
+            if (state != null) {
+                attributeMap.put(X509Name.ST, state);
+                order.add(X509Name.ST);
+            }
+            if (country != null) {
+                attributeMap.put(X509Name.C, country);
+                order.add(X509Name.C);
+            }
+            X509Name issuerDN = new X509Name(order, attributeMap);
+            Calendar calendar = Calendar.getInstance();
+            x500Name.setNotBefore(calendar.getTime());
+            System.out.println(calendar.getTime());
+            calendar.add(Calendar.YEAR, 1);
+            System.out.println(calendar.getTime());
+            x500Name.setNotAfter(calendar.getTime());
+            x500Name.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
+            x500Name.setSignatureAlgorithm("SHA256WithRSAEncryption");
+            x500Name.setIssuerDN(issuerDN);
+            x500Name.setSubjectDN(issuerDN);
+            x500Name.setPublicKey(publicKey);
+            X509Certificate[] chain = new X509Certificate[1];
+            chain[0] = x500Name.generate(privateKey, "BC");
+            log.debug("Certificate Generated");
+            return chain[0];
+        } catch (CertificateEncodingException | NoSuchProviderException | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            log.error("Exception Occurred", e);
+        }
+        return null;
     }
 
     /**
@@ -129,9 +185,16 @@ class NodeCryptography {
      * This method is used to save private key and self signed certificate to the keystore.
      */
     private void saveToKeyStore() {
+        ConfigData configData = ConfigData.getInstance();
+        String eMail = configData.getValue("Email");
+        String orgUnit = configData.getValue("OrgUnit");
+        String organisation = configData.getValue("Organisation");
+        String city = configData.getValue("City");
+        String state = configData.getValue("State");
+        String country = configData.getValue("Country");
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
-        X509Certificate certificate = generateCertificate();
-        java.security.cert.Certificate[] certChain = new Certificate[1];
+        X509Certificate certificate = createSelfSignedCert(eMail, orgUnit, organisation, city, state, country);
+        X509Certificate[] certChain = new X509Certificate[1];
         certChain[0] = certificate;
         KeyStore.PrivateKeyEntry privateKeyEntry = new KeyStore.PrivateKeyEntry(privateKey, certChain);
         try {
@@ -143,50 +206,13 @@ class NodeCryptography {
         }
     }
 
-    /**
-     * This method is used to convert the String format of public key to original Public Key format.
-     * @param str - The string format of public key is given as argument
-     * @return - Public Key
-     */
-    PublicKey strToPub(String str) {
-        PublicKey publicKey = null;
-        //converting string to byte initially and then back to public key
-        byte[] bytePub1 = Base64.getDecoder().decode(str);
-        if (str.equals("")) {
-            return null;
-        }
-        KeyFactory factory;
-        try {
-            factory = KeyFactory.getInstance("RSA");
-            publicKey = factory.generatePublic(new X509EncodedKeySpec(bytePub1));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.error("Exception Occurred", e);
-        }
-        return publicKey;
-    }
-
-    /**
-     * This method is used to convert Public key to String format.
-     * @param key - Public key is given as argument.
-     * @return - String format of public key.
-     */
-    String pubToStr(PublicKey key) {
-        String strPub;
-        //converting public key to byte[] and then convert it in to string
-        if (key == null) {
-            strPub = "";
-            return strPub;
-        }
-        byte[] bytePub = key.getEncoded();
-        strPub = Base64.getEncoder().encodeToString(bytePub);
-        return strPub;
-    }
 
     /**
      * This method will fetch Private key from the keystore and return it.
+     *
      * @return - Private Key
      */
-     PrivateKey getFromKeyStore() {
+    PrivateKey getFromKeyStore() {
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
         KeyStore.PrivateKeyEntry privateKeyEntry = null;
         try {
@@ -196,39 +222,6 @@ class NodeCryptography {
         }
         assert privateKeyEntry != null;
         return privateKeyEntry.getPrivateKey();
-    }
-
-    /**
-     * @return - Self signed Certificate.
-     */
-    @SuppressWarnings("deprecation")
-    private static X509Certificate generateCertificate() {
-        // build a certificate generator
-        X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-        String CERTIFICATE_DN = "CN = cn , O = o, L =L ,ST = i1, C = c";
-        X500Principal dnName = new X500Principal(CERTIFICATE_DN);
-
-        // add some options
-        certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
-        certGen.setSubjectDN(dnName);
-        certGen.setIssuerDN(dnName);
-        // Set not before Yesterday
-        certGen.setNotBefore(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000));
-        // Set not after 2 years
-        certGen.setNotAfter(new Date(System.currentTimeMillis() + 2L * 365 * 24 * 60 * 60 * 1000));
-        certGen.setPublicKey(publicKey);
-        certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
-        //certGen.addExtension(X509Extensions.ExtendedKeyUsage, true,new ExtendedKeyUsage(KeyPurposeId.id_kp_timeStamping));
-
-        // Finally, sign the certificate with the private key
-        X509Certificate cert = null;
-        try {
-            cert = certGen.generate(privateKey, "BC");
-            log.debug("Certificate Generated");
-        } catch (CertificateEncodingException | InvalidKeyException | NoSuchAlgorithmException | SignatureException | NoSuchProviderException e) {
-            log.error("Exception Occurred", e);
-        }
-        return cert;
     }
 
     /**
