@@ -19,7 +19,7 @@ public class B4_Layer {
     private final String filePath;
 
     public B4_Layer() {
-        filePath = ConfigData.getInstance().getFilePath("LayerDetailsPath");
+        filePath = ConfigData.getInstance().getValue("LayerDetailsPath");
         File layerFile = new File(filePath);
         boolean layerDetailsExists = layerFile.exists();
         if (!layerDetailsExists) {

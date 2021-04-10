@@ -70,8 +70,8 @@ public class RoutingManager {
         config = ConfigData.getInstance();
         routingTables = new ArrayList<>();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
-        String nodeDetailFilePath = config.getFilePath("NodeDetailsPath");
-        layerFile = config.getFilePath("LayerDetailsPath");
+        String nodeDetailFilePath = config.getValue("NodeDetailsPath");
+        layerFile = config.getValue("LayerDetailsPath");
         boolean nodeDetailsExists;
         File nodeFile = new File(nodeDetailFilePath);
         nodeDetailsExists = nodeFile.exists();
