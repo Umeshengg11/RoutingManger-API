@@ -1,10 +1,5 @@
 package main;
 
-//It carries out a date time check of the system with the network server so that the user is not able to forge validity of the certificate.
-//The code retrieves a network packet from B4 or Google server (or any server defined) and extracts timestamp from it as Date1.
-//Date1 is compared with system date and time (Date2). The system date has to be equal or ahead of server time so as to ensure that user is not able to forge
-//certificate validity.
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -22,18 +17,18 @@ import java.util.Map;
  * ServerDateTime is compared with system date and time (LocalDateTime). The system date has to be equal or ahead of server time so as to ensure that user is not able to forge
  * certificate validity.
  */
-public class DateTimeCheck {
+class DateTimeCheck {
     private static String lastLogoutTime;
     private static ConfigData config;
 
-    public DateTimeCheck() {
+    DateTimeCheck() {
         config = ConfigData.getInstance();
     }
 
     /**
      * @return flag returns true if date time is correct or false if incorrect.
      */
-    public boolean checkDateTime() {
+    boolean checkDateTime() {
         System.out.println("DATE AND TIME CHECK OF YOUR SYSTEM IS UNDER PROGRESS");
         boolean flag = false;
         //String serverUrl = "http://172.20.82.6:8080/b4server";
@@ -44,9 +39,9 @@ public class DateTimeCheck {
         try {
             String serverDate = getServerHttpDate(serverUrl);
             if (serverDate == null) {
-                try{
+                try {
                     serverDateTime = simpleDateFormat1.parse(getLastLogoutTime());
-                }catch(NullPointerException e){
+                } catch (NullPointerException e) {
                     System.out.println("Network Connection not available and Last login details not available in config file");
                     return false;
                 }
@@ -87,18 +82,18 @@ public class DateTimeCheck {
         return null;
     }
 
-    public String getCurrentDateTime() {
+     String getCurrentDateTime() {
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         Date date = new Date();
         return dateFormat.format(date);
     }
 
-    private String getLastLogoutTime() {
+     String getLastLogoutTime() {
         lastLogoutTime = config.getValue("LastLogoutTime");
         return lastLogoutTime;
     }
 
-    void setLastLogoutTime() {
+     void setLastLogoutTime() {
         lastLogoutTime = getCurrentDateTime();
         config.addLastLogOutToConfigFile(lastLogoutTime);
     }

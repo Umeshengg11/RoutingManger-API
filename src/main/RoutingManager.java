@@ -50,6 +50,7 @@ public class RoutingManager {
     private final long incrementTime;
     private final long sleepTime;
     private Utility utility;
+    private DateTimeCheck dateTimeCheck;
     private B4_Node localNode;
     private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
@@ -69,6 +70,7 @@ public class RoutingManager {
     private RoutingManager() {
         config = ConfigData.getInstance();
         routingTables = new ArrayList<>();
+        dateTimeCheck = new DateTimeCheck();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
         String nodeDetailFilePath = config.getValue("NodeDetailsPath");
         layerFile = config.getValue("LayerDetailsPath");
@@ -1213,5 +1215,21 @@ public class RoutingManager {
 
     private RoutingManagerBuffer getRoutingManagerBuffer() {
         return routingManagerBuffer;
+    }
+
+    public boolean dateTimeCheck(){
+        return dateTimeCheck.checkDateTime();
+    }
+
+    public String getCurrentDateTime(){
+        return dateTimeCheck.getCurrentDateTime();
+    }
+
+    public String getLastLogoutTime(){
+        return dateTimeCheck.getLastLogoutTime();
+    }
+
+    public void setLastLogoutTime(){
+        dateTimeCheck.setLastLogoutTime();
     }
 }
