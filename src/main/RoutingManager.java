@@ -73,6 +73,7 @@ public class RoutingManager {
         routingTables = new ArrayList<>();
         dateTimeCheck = new DateTimeCheck();
         routingManagerBuffer = RoutingManagerBuffer.getInstance();
+        nodeCryptography = NodeCryptography.getInstance();
         String nodeDetailFilePath = config.getValue("NodeDetailsPath");
         layerFile = config.getValue("LayerDetailsPath");
         boolean nodeDetailsExists;

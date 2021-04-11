@@ -33,9 +33,12 @@ public class TestingModule {
 
             }
         });th.start();
-        B4_Node b4_node = rt.getLocalNode();
-        rt.dateTimeCheck();
+//        B4_Node b4_node = rt.getLocalNode();
+//        rt.dateTimeCheck();
+        rt.getKeystore
+        rt.renewSelfSignedCertificate();
 
+        System.out.println(rt.verifySignature(rt.getHashID(),rt.getPublicKey(),rt.getNodeID()));
 //rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());
 
     }
