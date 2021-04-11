@@ -49,9 +49,10 @@ public class RoutingManager {
     private final int nt_dimension;
     private final long incrementTime;
     private final long sleepTime;
+    private final DateTimeCheck dateTimeCheck;
     private Utility utility;
-    private DateTimeCheck dateTimeCheck;
     private B4_Node localNode;
+    private NodeCryptography nodeCryptography;
     private B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
     private String selfTransportAddress;
@@ -125,6 +126,12 @@ public class RoutingManager {
         addToArrayList();
         initialLayerLoading();
         getFileFromInputBuffer();
+        Runtime runtime = Runtime.getRuntime();
+        runtime.addShutdownHook(new Thread(() -> {
+            log.info("System is going to shutdown");
+            log.info("Backing up system configuration ");
+            dateTimeCheck.setLastLogoutTime();
+        }));
     }
 
     /**
@@ -218,9 +225,6 @@ public class RoutingManager {
         boolean rttFileExists;
         B4_Node[] mergerNeighbourTable = new B4_Node[nt_dimension];
         B4_Node selfMergerNode = null;
-        B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(fileName.getAbsolutePath());
-        String mergerNodeID = selfNodeOfMergerTable.getB4node().getNodeID();
-        //String fileName = "RcvRTT_" + layerID + "_" + mergerNodeID;
         File rttFile = new File(fileName.getName());
         rttFileExists = rttFile.exists();
         if (!rttFileExists) {
@@ -1217,19 +1221,19 @@ public class RoutingManager {
         return routingManagerBuffer;
     }
 
-    public boolean dateTimeCheck(){
+    public boolean dateTimeCheck() {
         return dateTimeCheck.checkDateTime();
     }
 
-    public String getCurrentDateTime(){
+    public String getCurrentDateTime() {
         return dateTimeCheck.getCurrentDateTime();
     }
 
-    public String getLastLogoutTime(){
+    public String getLastLogoutTime() {
         return dateTimeCheck.getLastLogoutTime();
     }
 
-    public void setLastLogoutTime(){
-        dateTimeCheck.setLastLogoutTime();
+    public boolean renewSelfSignedCertificate(){
+        return nodeCryptography.updateCertificate();
     }
 }

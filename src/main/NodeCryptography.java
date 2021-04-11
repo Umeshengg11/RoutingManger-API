@@ -31,7 +31,7 @@ class NodeCryptography {
     private static PrivateKey privateKey;
     private static KeyStore keyStore;
     private static NodeCryptography nodeCryptography;
-    private final char[] keyPassword = "123@abc".toCharArray();
+    private static final char[] keyPassword = "123@abc".toCharArray();
 
     /**
      * This is the default constructor for this class.
@@ -48,9 +48,9 @@ class NodeCryptography {
         try {
             keyStore = KeyStore.getInstance("JCEKS");
             String filePath = "KeyStore.ks";
-            File nodeFile = new File(filePath);
-            boolean nodeDetailsExists = nodeFile.exists();
-            if (!nodeDetailsExists) {
+            File keyStoreFile = new File(filePath);
+            boolean keystoreExist = keyStoreFile.exists();
+            if (!keystoreExist) {
                 keyStore.load(null, null);
                 keyPairGeneration();
                 saveToKeyStore();
@@ -83,7 +83,7 @@ class NodeCryptography {
      * @return - Self signed Certificate.
      */
     @SuppressWarnings("deprecation")
-    private  X509Certificate createSelfSignedCert(String eMail, String orgUnit, String organisation, String city, String state, String country) {
+    private X509Certificate createSelfSignedCert(String eMail, String orgUnit, String organisation, String city, String state, String country) {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         try {
             X509V3CertificateGenerator x500Name = new X509V3CertificateGenerator();
@@ -237,4 +237,28 @@ class NodeCryptography {
     KeyStore getKeyStore() {
         return keyStore;
     }
+
+     boolean updateCertificate(){
+        boolean isUpdated = false;
+        try {
+            String filePath = "KeyStore.ks";
+            File keyStoreFile = new File(filePath);
+            boolean isDeleted = keyStoreFile.delete();
+            keyStore = KeyStore.getInstance("JCEKS");
+            keyStore.load(null, null);
+            saveToKeyStore();
+            saveKeyStore();
+            loadKeyStore();
+            KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
+            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry("Private Key", protectionParameter);
+            privateKey = privateKeyEntry.getPrivateKey();
+            Certificate certificate = keyStore.getCertificate("Certificate");
+            publicKey = certificate.getPublicKey();
+            isUpdated = true;
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | UnrecoverableEntryException e) {
+            e.printStackTrace();
+        }
+        return isUpdated;
+    }
+
 }

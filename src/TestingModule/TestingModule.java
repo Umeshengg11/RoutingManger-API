@@ -34,9 +34,6 @@ public class TestingModule {
             }
         });th.start();
         B4_Node b4_node = rt.getLocalNode();
-
-
-
         rt.dateTimeCheck();
 
 //rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());
