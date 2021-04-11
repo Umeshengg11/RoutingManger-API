@@ -1,5 +1,7 @@
 package main;
 
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,6 +20,7 @@ import java.util.Map;
  * certificate validity.
  */
 class DateTimeCheck {
+    private static final Logger log = Logger.getLogger(DateTimeCheck.class);
     private static String lastLogoutTime;
     private static ConfigData config;
 
@@ -29,7 +32,7 @@ class DateTimeCheck {
      * @return flag returns true if date time is correct or false if incorrect.
      */
     boolean checkDateTime() {
-        System.out.println("DATE AND TIME CHECK OF YOUR SYSTEM IS UNDER PROGRESS");
+        log.info("Date and Time check of your system is under Process");
         boolean flag = false;
         //String serverUrl = "http://172.20.82.6:8080/b4server";
         String serverUrl = "https://www.google.co.in";
@@ -42,10 +45,10 @@ class DateTimeCheck {
                 try {
                     serverDateTime = simpleDateFormat1.parse(getLastLogoutTime());
                 } catch (NullPointerException e) {
-                    System.out.println("Network Connection not available and Last login details not available in config file");
+                    log.warn("Network Connection not available and Last login details not available in config file");
                     return false;
                 }
-                System.out.println("last logout  Date & Time is :   " + serverDateTime);
+                log.info("Last logout  Date & Time is :   " + serverDateTime);
             } else {
                 serverDateTime = simpleDateFormat.parse(serverDate);
             }
@@ -53,13 +56,13 @@ class DateTimeCheck {
             e.printStackTrace();
         }
         if (simpleDateFormat1.format(serverDateTime).compareTo(getCurrentDateTime()) <= 0) {
-            System.out.println("Server Date & Time is :   " + simpleDateFormat1.format(serverDateTime));
-            System.out.println("Time is correct");
+            log.info("Server Date & Time is :   " + simpleDateFormat1.format(serverDateTime));
+            log.info("System Time is correct");
             setLastLogoutTime();
             flag = true;
         } else {
-            System.out.println("Server Date & Time is :   " + simpleDateFormat1.format(serverDateTime));
-            System.out.println("Time is Incorrect");
+            log.info("Server Date & Time is :   " + simpleDateFormat1.format(serverDateTime));
+            log.info(" System Time is Incorrect,update your data and time and come back");
         }
         return flag;
     }
@@ -76,7 +79,7 @@ class DateTimeCheck {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("The error is " + ex);
+            log.info("Exception Occurred",ex);
             return null;
         }
         return null;

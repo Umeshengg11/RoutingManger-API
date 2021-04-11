@@ -64,7 +64,7 @@ class NodeCryptography {
                 publicKey = certificate.getPublicKey();
             }
         } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | UnrecoverableEntryException e) {
-            e.printStackTrace();
+            log.info("Exception Occurred",e);
         }
     }
 
@@ -116,9 +116,7 @@ class NodeCryptography {
             X509Name issuerDN = new X509Name(order, attributeMap);
             Calendar calendar = Calendar.getInstance();
             x500Name.setNotBefore(calendar.getTime());
-            System.out.println(calendar.getTime());
             calendar.add(Calendar.YEAR, 1);
-            System.out.println(calendar.getTime());
             x500Name.setNotAfter(calendar.getTime());
             x500Name.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
             x500Name.setSignatureAlgorithm("SHA256WithRSAEncryption");
@@ -177,7 +175,7 @@ class NodeCryptography {
             fos.flush();
             fos.close();
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred", e);
         }
     }
 
@@ -218,7 +216,7 @@ class NodeCryptography {
         try {
             privateKeyEntry = (KeyStore.PrivateKeyEntry) nodeCryptography.getKeyStore().getEntry("Private Key", protectionParameter);
         } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableEntryException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred", e);
         }
         assert privateKeyEntry != null;
         return privateKeyEntry.getPrivateKey();
@@ -256,7 +254,7 @@ class NodeCryptography {
             publicKey = certificate.getPublicKey();
             isUpdated = true;
         } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | UnrecoverableEntryException e) {
-            e.printStackTrace();
+            log.error("Exception Occurred", e);
         }
         return isUpdated;
     }

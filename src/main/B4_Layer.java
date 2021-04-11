@@ -28,11 +28,9 @@ public class B4_Layer {
                 printWriter = new PrintWriter(writer);
                 printWriter.println("#  Layering Details  #");
                 printWriter.println("..................................");
-                printWriter.println("Heightens=3");
+                printWriter.println("Heightens=1");
                 printWriter.println("0=BaseRoutingTable");
                 printWriter.println("1=StorageRoutingTable");
-                printWriter.println("2=MessageRoutingTable");
-                printWriter.println("3=VoipRoutingTable");
                 printWriter.flush();
                 printWriter.close();
                 log.debug("LayerDetails File created successfully");

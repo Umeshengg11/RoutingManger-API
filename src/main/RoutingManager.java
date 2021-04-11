@@ -19,6 +19,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.security.KeyStore;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -1236,5 +1237,9 @@ public class RoutingManager {
 
     public boolean renewSelfSignedCertificate(){
         return nodeCryptography.updateCertificate();
+    }
+
+    public KeyStore getKeystore(){
+        return nodeCryptography.getKeyStore();
     }
 }

@@ -191,12 +191,14 @@ class ConfigData {
     }
 
     boolean checkLayerName(String layerName) {
-        boolean access = false;
+        boolean access =false;
         try {
             properties.load(reader);
             String value = properties.getProperty(layerName);
-            if (value.equalsIgnoreCase("yes") || (value.equalsIgnoreCase("no"))) access = true;
+            if (value==null) return false;
+            else if (value.equalsIgnoreCase("yes") || (value.equalsIgnoreCase("no"))) access = true;
         } catch (IOException e) {
+            log.error("Exception Occurred", e);
             return false;
         }
         return access;
@@ -242,9 +244,6 @@ class ConfigData {
         properties.setProperty("Sleep_time", "30000");
         properties.setProperty("BaseRoutingTable", "yes");
         properties.setProperty("StorageRoutingTable", "yes");
-        properties.setProperty("MessageRoutingTable", "yes");
-        properties.setProperty("VoipRoutingTable", "no");
-        properties.setProperty("OverCastingLayer", "no");
         properties.setProperty("Email", "umesh@iitk.ac.in");
         properties.setProperty("OrgUnit", "IITK");
         properties.setProperty("Organisation", "IITK");
