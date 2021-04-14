@@ -53,8 +53,8 @@ public class RoutingManager {
     private final DateTimeCheck dateTimeCheck;
     private Utility utility;
     private B4_Node localNode;
-    private NodeCryptography nodeCryptography;
-    private B4_NodeGeneration b4_nodeGeneration;
+    private final NodeCryptography nodeCryptography;
+    private final B4_NodeGeneration b4_nodeGeneration;
     private String selfIPAddress;
     private String selfTransportAddress;
     private String selfPortAddress;
@@ -1064,7 +1064,6 @@ public class RoutingManager {
                 String layerName = properties.getProperty("" + i + "");
                 boolean access = config.isLayerAccess(layerName);
                 if (access)
-                    System.out.println(i + "_" + layerName + "_" + nodeID);
                 init(layerName, i + "_" + layerName + "_" + nodeID, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
             } catch (IOException e) {
                 log.error("Exception Occurred", e);
@@ -1282,6 +1281,9 @@ public class RoutingManager {
             log.error("Exception Occurred", e);
         }
         setLocalNode();
+        addToArrayList();
+        initialLayerLoading();
+        getFileFromInputBuffer();
     }
 
 }
