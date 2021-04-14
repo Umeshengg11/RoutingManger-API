@@ -13,22 +13,50 @@ import java.util.Base64;
  */
 class B4_NodeGeneration {
     private static final Logger log = Logger.getLogger(B4_NodeGeneration.class);
-    private final String nodeID;
-    private final PublicKey publicKey;
-    private final NodeCryptography nodeCryptography;
-    private final byte[] signatureData;
-    private final String hashID;
+    private  String nodeID;
+    private  PublicKey publicKey;
+    private PrivateKey privateKey;
+    private  NodeCryptography nodeCryptography;
+    private static B4_NodeGeneration b4_nodeGeneration;
+
+    public void setNodeID(String nodeID) {
+        this.nodeID = nodeID;
+    }
+
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public void setSignatureData(byte[] signatureData) {
+        this.signatureData = signatureData;
+    }
+
+    public void setHashID(String hashID) {
+        this.hashID = hashID;
+    }
+
+    private  byte[] signatureData;
+    private  String hashID;
 
     /**
      * It is the default constructor of the class
      * Few functions are initialised/fetched using this constructor are NodeCryptography,publicKey,nodeID, SignatureDate,hashID
      */
-    B4_NodeGeneration() {
+    private B4_NodeGeneration() {}
+
+    public void initiateNodeGenerationProcess(){
         nodeCryptography = NodeCryptography.getInstance();
         publicKey = nodeCryptography.getPublicKey();
         nodeID = generateNodeId();
         signatureData = signNodeIdUsingPvtKey();
         hashID = generateHashID();
+    }
+
+    public static synchronized B4_NodeGeneration getInstance() {
+        if (b4_nodeGeneration == null) {
+            b4_nodeGeneration = new B4_NodeGeneration();
+        }
+        return b4_nodeGeneration;
     }
 
     /**
@@ -37,13 +65,13 @@ class B4_NodeGeneration {
      * @param publicKey - publicKey associated with the node.
      * @param hashID - hashID associated with the node.
      */
-    B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
-        nodeCryptography = NodeCryptography.getInstance();
-        this.nodeID = nodeID;
-        this.publicKey = publicKey;
-        this.hashID = hashID;
-        signatureData = signNodeIdUsingPvtKey();
-    }
+//    B4_NodeGeneration(String nodeID, PublicKey publicKey, String hashID) {
+//        nodeCryptography = NodeCryptography.getInstance();
+//        this.nodeID = nodeID;
+//        this.publicKey = publicKey;
+//        this.hashID = hashID;
+//        signatureData = signNodeIdUsingPvtKey();
+//    }
 
     /**
      * @return - It will generate nodeID for the Node.
@@ -146,6 +174,14 @@ class B4_NodeGeneration {
      */
     PublicKey getPublicKey() {
         return publicKey;
+    }
+    public void newNodeGenProcess(){
+        nodeCryptography = NodeCryptography.getInstance();
+        publicKey = nodeCryptography.getPublicKey();
+        privateKey = nodeCryptography.getFromKeyStore();
+        nodeID = generateNodeId();
+        signatureData = signNodeIdUsingPvtKey();
+        hashID = generateHashID();
     }
 
 }

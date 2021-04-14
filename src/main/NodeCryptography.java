@@ -214,7 +214,7 @@ class NodeCryptography {
         KeyStore.ProtectionParameter protectionParameter = new KeyStore.PasswordProtection(keyPassword);
         KeyStore.PrivateKeyEntry privateKeyEntry = null;
         try {
-            privateKeyEntry = (KeyStore.PrivateKeyEntry) nodeCryptography.getKeyStore().getEntry("Private Key", protectionParameter);
+            privateKeyEntry = (KeyStore.PrivateKeyEntry) getKeyStore().getEntry("Private Key", protectionParameter);
         } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableEntryException e) {
             log.error("Exception Occurred", e);
         }
@@ -257,6 +257,21 @@ class NodeCryptography {
             log.error("Exception Occurred", e);
         }
         return isUpdated;
+    }
+
+    public void newNodeIDProcess(){
+
+        try {
+            keyPairGeneration();
+            keyStore = KeyStore.getInstance("JCEKS");
+            keyStore.load(null, null);
+            saveToKeyStore();
+            saveKeyStore();
+
+        } catch (KeyStoreException | NoSuchAlgorithmException | IOException | CertificateException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

@@ -14,7 +14,7 @@ import java.security.cert.X509Certificate;
 public class TestingModule {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();
-        rt.createNewLayer("MessageRoutingTable");
+//        rt.createNewLayer("MessageRoutingTable");
 //        CreateRoutingTablesForTesting xm = new CreateRoutingTablesForTesting();
 //        rt.addFileToInputBuffer(CreateRoutingTablesForTesting.createXML("BaseRoutingTable",0));
 //        CommunicationManagerSimulator in = new CommunicationManagerSimulator();
@@ -43,6 +43,23 @@ public class TestingModule {
 //        } catch (KeyStoreException e) {
 //            e.printStackTrace();
 //        }
+
+        System.out.println(rt.getNodeID());
+        System.out.println(rt.getHashID());
+
+
+        rt.generateNewNodeID();
+        System.out.println(rt.getNodeID());
+        System.out.println(rt.getHashID());
+
+
+
+
+
+
+
+
+
         System.out.println("The NodeID is verified as - "+rt.verifySignature(rt.getHashID(),rt.getPublicKey(),rt.getNodeID()));
 //rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());
 

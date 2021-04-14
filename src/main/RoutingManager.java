@@ -80,9 +80,10 @@ public class RoutingManager {
         boolean nodeDetailsExists;
         File nodeFile = new File(nodeDetailFilePath);
         nodeDetailsExists = nodeFile.exists();
+        b4_nodeGeneration = B4_NodeGeneration.getInstance();
         if (!nodeDetailsExists) {
+           b4_nodeGeneration.initiateNodeGenerationProcess();
             utility = new Utility();
-            b4_nodeGeneration = new B4_NodeGeneration();
             try {
                 selfIPAddress = getSystemIP();
                 selfPortAddress = String.valueOf(config.getPortAddress());
@@ -115,7 +116,9 @@ public class RoutingManager {
                 selfPortAddress = properties.getProperty("PortAddress");
                 selfTransportAddress = properties.getProperty("TransportAddress");
                 utility = new Utility();
-                b4_nodeGeneration = new B4_NodeGeneration(selfNodeID, utility.strToPub(selfPublicKey), selfHashID);
+                b4_nodeGeneration.setNodeID(selfNodeID);
+                b4_nodeGeneration.setPublicKey( utility.strToPub(selfPublicKey));
+                b4_nodeGeneration.setHashID(selfHashID);
             } catch (IOException e) {
                 log.error("NodeDetails File not Found or Issue in file fetching\n", e);
             }
@@ -1242,4 +1245,43 @@ public class RoutingManager {
     public KeyStore getKeystore(){
         return nodeCryptography.getKeyStore();
     }
+
+    public void generateNewNodeID() {
+        String filePath = "KeyStore.ks";
+        File keyStoreFile = new File(filePath);
+        boolean keyStoreFileExist = keyStoreFile.exists();
+        if (keyStoreFileExist) keyStoreFile.delete();
+
+        String nodeDetailFilePath = config.getValue("NodeDetailsPath");
+        File nodeFile = new File(nodeDetailFilePath);
+        boolean nodeDetailsExists;
+        nodeDetailsExists = nodeFile.exists();
+        if (nodeDetailsExists) nodeFile.delete();
+
+        nodeCryptography.newNodeIDProcess();
+        b4_nodeGeneration.newNodeGenProcess();
+
+        try {
+            selfIPAddress = getSystemIP();
+            selfPortAddress = String.valueOf(config.getPortAddress());
+            selfTransportAddress = config.getTransportAddress();
+            FileWriter writer = new FileWriter(nodeDetailFilePath);
+            PrintWriter printWriter = new PrintWriter(writer);
+            printWriter.println("#  Self Node Details  #");
+            printWriter.println("..................................");
+            printWriter.println("NodeID=" + b4_nodeGeneration.getNodeID());
+            printWriter.println("PublicKey=" + utility.pubToStr(b4_nodeGeneration.getPublicKey()));
+            printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
+            printWriter.println("IPAddress=" + selfIPAddress);
+            printWriter.println("PortAddress=" + selfPortAddress);
+            printWriter.println("TransportAddress=" + selfTransportAddress);
+            printWriter.flush();
+            printWriter.close();
+            log.debug("NodeDetail File created successfully");
+        } catch (IOException e) {
+            log.error("Exception Occurred", e);
+        }
+        setLocalNode();
+    }
+
 }
