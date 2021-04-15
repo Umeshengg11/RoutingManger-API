@@ -12,7 +12,7 @@ import java.io.IOException;
 public class TestingModule {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();
-//        rt.createNewLayer("MessageRoutingTable");
+        rt.createNewLayer("MessageRoutingTable");
 //        CreateRoutingTablesForTesting xm = new CreateRoutingTablesForTesting();
 //        rt.addFileToInputBuffer(CreateRoutingTablesForTesting.createXML("BaseRoutingTable",0));
 //        CommunicationManagerSimulator in = new CommunicationManagerSimulator();
@@ -30,17 +30,9 @@ public class TestingModule {
 //
 //            }
 //        });th.start();
-////        B4_Node b4_node = rt.getLocalNode();
-////        rt.dateTimeCheck();
-//        try {
-//            X509Certificate certificate = (X509Certificate) rt.getKeystore().getCertificate("Certificate");
-//            System.out.println("Old date "+certificate.getNotAfter());
-//            rt.renewSelfSignedCertificate();
-//            X509Certificate certificate1 = (X509Certificate) rt.getKeystore().getCertificate("Certificate");
-//            System.out.println("New Date "+certificate1.getNotAfter());
-//        } catch (KeyStoreException e) {
-//            e.printStackTrace();
-//        }
+//        B4_Node b4_node = rt.getLocalNode();
+//        rt.dateTimeCheck();
+
 
         System.out.println(rt.getNodeID());
         System.out.println(rt.getHashID());
@@ -49,21 +41,21 @@ public class TestingModule {
         rt.generateNewNodeID();
         System.out.println(rt.getNodeID());
         System.out.println(rt.getHashID());
-
-
-        for (int i = 0; i <16 ; i++) {
-          B4_Node b4_Node[]= rt.getNeighbourTable(0);
-          b4_Node[i].getB4node().getNodeID();
-        }
-
-
-
-
-
-
-
+//
+//
+//        for (int i = 0; i <16 ; i++) {
+//          B4_Node b4_Node[]= rt.getNeighbourTable(0);
+//          b4_Node[i].getB4node().getNodeID();
+//        }
+//
+//        System.out.println(rt.getSystemIP());
+//
+//
+//
+//
+//
         System.out.println("The NodeID is verified as - "+rt.verifySignature(rt.getHashID(),rt.getPublicKey(),rt.getNodeID()));
-//rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());
+////rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());
 
     }
 }

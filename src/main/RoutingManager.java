@@ -49,10 +49,10 @@ public class RoutingManager {
     private final long incrementTime;
     private final long sleepTime;
     private final DateTimeCheck dateTimeCheck;
-    private Utility utility;
-    private B4_Node localNode;
     private final NodeCryptography nodeCryptography;
     private final B4_NodeGeneration b4_nodeGeneration;
+    private Utility utility;
+    private B4_Node localNode;
     private String selfIPAddress;
     private String selfTransportAddress;
     private String selfPortAddress;
@@ -80,28 +80,12 @@ public class RoutingManager {
         nodeDetailsExists = nodeFile.exists();
         b4_nodeGeneration = B4_NodeGeneration.getInstance();
         if (!nodeDetailsExists) {
-           b4_nodeGeneration.initiateNodeGenerationProcess();
+            b4_nodeGeneration.initiateNodeGenerationProcess();
             utility = new Utility();
-            try {
-                selfIPAddress = getSystemIP();
-                selfPortAddress = String.valueOf(config.getPortAddress());
-                selfTransportAddress = config.getTransportAddress();
-                FileWriter writer = new FileWriter(nodeDetailFilePath);
-                PrintWriter printWriter = new PrintWriter(writer);
-                printWriter.println("#  Self Node Details  #");
-                printWriter.println("..................................");
-                printWriter.println("NodeID=" + b4_nodeGeneration.getNodeID());
-                printWriter.println("PublicKey=" + utility.pubToStr(b4_nodeGeneration.getPublicKey()));
-                printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
-                printWriter.println("IPAddress=" + selfIPAddress);
-                printWriter.println("PortAddress=" + selfPortAddress);
-                printWriter.println("TransportAddress=" + selfTransportAddress);
-                printWriter.flush();
-                printWriter.close();
-                log.debug("NodeDetail File created successfully");
-            } catch (IOException e) {
-                log.error("Exception Occurred", e);
-            }
+            selfIPAddress = getSystemIP();
+            selfPortAddress = String.valueOf(config.getPortAddress());
+            selfTransportAddress = config.getTransportAddress();
+            generateNodeDetailsFile(nodeDetailFilePath);
         } else {
             try {
                 FileReader reader = new FileReader(nodeDetailFilePath);
@@ -115,7 +99,7 @@ public class RoutingManager {
                 selfTransportAddress = properties.getProperty("TransportAddress");
                 utility = new Utility();
                 b4_nodeGeneration.setNodeID(selfNodeID);
-                b4_nodeGeneration.setPublicKey( utility.strToPub(selfPublicKey));
+                b4_nodeGeneration.setPublicKey(utility.strToPub(selfPublicKey));
                 b4_nodeGeneration.setHashID(selfHashID);
             } catch (IOException e) {
                 log.error("NodeDetails File not Found or Issue in file fetching\n", e);
@@ -604,14 +588,14 @@ public class RoutingManager {
                 selfIPAddress = InetAddress.getLocalHost().getHostAddress();
             } else {
                 try {
-                    for (Enumeration interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements(); ) {
-                        networkInterface = (NetworkInterface) interfaces.nextElement();
+                    for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements(); ) {
+                        networkInterface = interfaces.nextElement();
                         ethernet = networkInterface.getDisplayName();
                         if (!(ethernet.equals("lo"))) {
                             if (!(ethernet.contains("br"))) {
                                 InetAddress inetAddress = null;
-                                for (Enumeration ips = networkInterface.getInetAddresses(); ips.hasMoreElements(); ) {
-                                    inetAddress = (InetAddress) ips.nextElement();
+                                for (Enumeration<InetAddress> ips = networkInterface.getInetAddresses(); ips.hasMoreElements(); ) {
+                                    inetAddress = ips.nextElement();
                                     if (Pattern.matches(regex, inetAddress.getCanonicalHostName())) {
                                         selfIPAddress = inetAddress.getCanonicalHostName();
                                         return selfIPAddress;
@@ -711,6 +695,79 @@ public class RoutingManager {
 
     public B4_Node[] getNeighbourTable(int layerID) {
         return routingTables.get(layerID).getNeighbourTable();
+    }
+
+    public boolean dateTimeCheck() {
+        return dateTimeCheck.checkDateTime();
+    }
+
+    public String getCurrentDateTime() {
+        return dateTimeCheck.getCurrentDateTime();
+    }
+
+    public String getLastLogoutTime() {
+        return dateTimeCheck.getLastLogoutTime();
+    }
+
+    public boolean renewSelfSignedCertificate() {
+        return nodeCryptography.updateCertificate();
+    }
+
+    public KeyStore getKeystore() {
+        return nodeCryptography.getKeyStore();
+    }
+
+    public void generateNewNodeID() {
+        String filePath = "KeyStore.ks";
+        File keyStoreFile = new File(filePath);
+        boolean keyStoreFileExist = keyStoreFile.exists();
+        if (keyStoreFileExist) {
+            boolean isDeleted = keyStoreFile.delete();
+            if (isDeleted) log.debug("Keystore file deleted");
+        }
+        String nodeDetailFilePath = config.getValue("NodeDetailsPath");
+        File nodeFile = new File(nodeDetailFilePath);
+        boolean nodeDetailsExists;
+        nodeDetailsExists = nodeFile.exists();
+        if (nodeDetailsExists) {
+            boolean isDeleted = nodeFile.delete();
+            if (isDeleted) log.debug("NodeDetails file deleted");
+        }
+        nodeCryptography.newNodeIDProcess();
+        b4_nodeGeneration.newNodeGenProcess();
+        generateNodeDetailsFile(nodeDetailFilePath);
+        B4_Layer b4_layer = new B4_Layer();
+        int maxLayerID = b4_layer.fetchMaxLayerID();
+        for (int i = 0; i <= maxLayerID; i++) {
+            String layerName = b4_layer.getLayerName(i);
+            File fileRoutingTable = getRoutingTableFile(layerName, i);
+            boolean isRTFileDeleted = fileRoutingTable.delete();
+            if (isRTFileDeleted) log.debug("Initial "+ layerName +" file deleted");
+        }
+        setLocalNode();
+        addToArrayList();
+        initialLayerLoading();
+        getFileFromInputBuffer();
+    }
+
+    private void generateNodeDetailsFile(String nodeDetailFilePath) {
+        try {
+            FileWriter writer = new FileWriter(nodeDetailFilePath);
+            PrintWriter printWriter = new PrintWriter(writer);
+            printWriter.println("#  Self Node Details  #");
+            printWriter.println("..................................");
+            printWriter.println("NodeID=" + b4_nodeGeneration.getNodeID());
+            printWriter.println("PublicKey=" + utility.pubToStr(b4_nodeGeneration.getPublicKey()));
+            printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
+            printWriter.println("IPAddress=" + selfIPAddress);
+            printWriter.println("PortAddress=" + selfPortAddress);
+            printWriter.println("TransportAddress=" + selfTransportAddress);
+            printWriter.flush();
+            printWriter.close();
+            log.debug("NodeDetail File created successfully");
+        } catch (IOException e) {
+            log.error("Exception Occurred", e);
+        }
     }
 
     /**
@@ -1062,7 +1119,7 @@ public class RoutingManager {
                 String layerName = properties.getProperty("" + i + "");
                 boolean access = config.isLayerAccess(layerName);
                 if (access)
-                init(layerName, i + "_" + layerName + "_" + nodeID, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
+                    init(layerName, i + "_" + layerName + "_" + nodeID, routingTables.get(i).getRoutingTable(), routingTables.get(i).getNeighbourTable());
             } catch (IOException e) {
                 log.error("Exception Occurred", e);
             }
@@ -1134,18 +1191,16 @@ public class RoutingManager {
         }
     }
 
-    public File getRoutingTableFile(String routingTableName,int layerID) {
-        File routingTableFile = new File(layerID+"_"+routingTableName+"_"+localNode.getB4node().getNodeID()+".xml");
-        System.out.println(layerID+"_"+routingTableName+"_"+localNode.getB4node().getNodeID()+".xml");
+    public File getRoutingTableFile(String routingTableName, int layerID) {
+        File routingTableFile = new File(layerID + "_" + routingTableName + "_" + localNode.getB4node().getNodeID() + ".xml");
         boolean isExist = routingTableFile.exists();
         if (isExist) return routingTableFile;
         else return null;
     }
 
     /**
-
      * @param mergerTableDataFile The routingTable file for which the rtt value of the neighbour table need to be calculated. <br>
-     * @param layerID layer Id on which the operation needs to be performed.
+     * @param layerID             layer Id on which the operation needs to be performed.
      * @return getRTT file is created, containing only the neighbour table nodeIDs for which the rtt needs to be found.
      */
     private File getRTTMergerTable(File mergerTableDataFile, int layerID) {
@@ -1221,77 +1276,6 @@ public class RoutingManager {
         return file1;
     }
 
-    private RoutingManagerBuffer getRoutingManagerBuffer() {
-        return routingManagerBuffer;
-    }
 
-    public boolean dateTimeCheck() {
-        return dateTimeCheck.checkDateTime();
-    }
-
-    public String getCurrentDateTime() {
-        return dateTimeCheck.getCurrentDateTime();
-    }
-
-    public String getLastLogoutTime() {
-        return dateTimeCheck.getLastLogoutTime();
-    }
-
-    public boolean renewSelfSignedCertificate(){
-        return nodeCryptography.updateCertificate();
-    }
-
-    public KeyStore getKeystore(){
-        return nodeCryptography.getKeyStore();
-    }
-
-    public void generateNewNodeID() {
-        String filePath = "KeyStore.ks";
-        File keyStoreFile = new File(filePath);
-        boolean keyStoreFileExist = keyStoreFile.exists();
-        if (keyStoreFileExist) keyStoreFile.delete();
-
-        String nodeDetailFilePath = config.getValue("NodeDetailsPath");
-        File nodeFile = new File(nodeDetailFilePath);
-        boolean nodeDetailsExists;
-        nodeDetailsExists = nodeFile.exists();
-        if (nodeDetailsExists) nodeFile.delete();
-
-        nodeCryptography.newNodeIDProcess();
-        b4_nodeGeneration.newNodeGenProcess();
-
-        try {
-            selfIPAddress = getSystemIP();
-            selfPortAddress = String.valueOf(config.getPortAddress());
-            selfTransportAddress = config.getTransportAddress();
-            FileWriter writer = new FileWriter(nodeDetailFilePath);
-            PrintWriter printWriter = new PrintWriter(writer);
-            printWriter.println("#  Self Node Details  #");
-            printWriter.println("..................................");
-            printWriter.println("NodeID=" + b4_nodeGeneration.getNodeID());
-            printWriter.println("PublicKey=" + utility.pubToStr(b4_nodeGeneration.getPublicKey()));
-            printWriter.println("HashID=" + b4_nodeGeneration.getHashID());
-            printWriter.println("IPAddress=" + selfIPAddress);
-            printWriter.println("PortAddress=" + selfPortAddress);
-            printWriter.println("TransportAddress=" + selfTransportAddress);
-            printWriter.flush();
-            printWriter.close();
-            log.debug("NodeDetail File created successfully");
-        } catch (IOException e) {
-            log.error("Exception Occurred", e);
-        }
-        File fileBaseRoutingTable = getRoutingTableFile("BaseRoutingTable",0);
-        File fileStorageRoutingTable = getRoutingTableFile("StorageRoutingTable",1);
-        System.out.println(fileBaseRoutingTable);
-        System.out.println(fileStorageRoutingTable);
-        fileBaseRoutingTable.delete();
-        fileStorageRoutingTable.delete();
-        setLocalNode();
-        addToArrayList();
-        initialLayerLoading();
-        getFileFromInputBuffer();
-
-
-    }
 
 }
