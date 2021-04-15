@@ -34,8 +34,6 @@ import java.util.regex.Pattern;
  * <br> Few  layers were implemented as default:-
  * <br> 1. BaseRoutingTable - LayerID = 0
  * <br> 2. StorageRoutingTable - LayerID = 1
- * <br> 3. VoipRoutingTable - LayerID = 2
- * <br> 4. MailRoutingTable - LayerID = 3
  * <br> Excess to this layers except base layer can be changed in the config.properties file.
  * <br> New Layer can also be added by calling createNewLayer() function in the routing table manger API
  */
@@ -1136,16 +1134,18 @@ public class RoutingManager {
         }
     }
 
-    public File getRoutingTableFile(String routingTableName) {
-        File routingTableFile = new File(routingTableName);
+    public File getRoutingTableFile(String routingTableName,int layerID) {
+        File routingTableFile = new File(layerID+"_"+routingTableName+"_"+localNode.getB4node().getNodeID()+".xml");
+        System.out.println(layerID+"_"+routingTableName+"_"+localNode.getB4node().getNodeID()+".xml");
         boolean isExist = routingTableFile.exists();
         if (isExist) return routingTableFile;
         else return null;
     }
 
     /**
+
      * @param mergerTableDataFile The routingTable file for which the rtt value of the neighbour table need to be calculated. <br>
-     * @param layerID             layer Id on which the operation needs to be performed.
+     * @param layerID layer Id on which the operation needs to be performed.
      * @return getRTT file is created, containing only the neighbour table nodeIDs for which the rtt needs to be found.
      */
     private File getRTTMergerTable(File mergerTableDataFile, int layerID) {
@@ -1280,10 +1280,18 @@ public class RoutingManager {
         } catch (IOException e) {
             log.error("Exception Occurred", e);
         }
+        File fileBaseRoutingTable = getRoutingTableFile("BaseRoutingTable",0);
+        File fileStorageRoutingTable = getRoutingTableFile("StorageRoutingTable",1);
+        System.out.println(fileBaseRoutingTable);
+        System.out.println(fileStorageRoutingTable);
+        fileBaseRoutingTable.delete();
+        fileStorageRoutingTable.delete();
         setLocalNode();
         addToArrayList();
         initialLayerLoading();
         getFileFromInputBuffer();
+
+
     }
 
 }

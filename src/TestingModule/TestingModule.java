@@ -1,5 +1,6 @@
 package TestingModule;
 
+import main.B4_Node;
 import main.RoutingManager;
 
 import java.io.IOException;
@@ -50,6 +51,10 @@ public class TestingModule {
         System.out.println(rt.getHashID());
 
 
+        for (int i = 0; i <16 ; i++) {
+          B4_Node b4_Node[]= rt.getNeighbourTable(0);
+          b4_Node[i].getB4node().getNodeID();
+        }
 
 
 
