@@ -1200,7 +1200,7 @@ public class RoutingManager {
 
     /**
      * @param mergerTableDataFile The routingTable file for which the rtt value of the neighbour table need to be calculated. <br>
-     * @param layerID             layer Id on which the operation needs to be performed.
+     * @param layerID layer Id on which the operation needs to be performed.
      * @return getRTT file is created, containing only the neighbour table nodeIDs for which the rtt needs to be found.
      */
     private File getRTTMergerTable(File mergerTableDataFile, int layerID) {
@@ -1276,6 +1276,41 @@ public class RoutingManager {
         return file1;
     }
 
+public void resultForIndexingManager(){
 
+    try {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.newDocument();
+        //create root Element
+        Element root = doc.createElement("CheckingRootNodeForIndex");
+        doc.appendChild(root);
+        root.setAttribute("LayerID", selfNodeIdMerger);
+
+        for (int i = 1; i <= tableLength; i++) {
+            Element row1 = doc.createElement("DATA");
+            root.appendChild(row1);
+            row1.setAttribute("INDEX", "[" + i + "]");
+
+            Element nodeID = doc.createElement("KEY");
+            nodeID.appendChild(doc.createTextNode(key);
+            row1.appendChild(nodeID);
+
+            Element nodePub = doc.createElement("NEXTHOP");
+            nodePub.appendChild(doc.createTextNode(""));
+            row1.appendChild(nodePub);
+
+        }
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource domSource = new DOMSource(doc);
+
+        StreamResult streamResult = new StreamResult(new File(layerID+"RootNodeCheck"+ ".xml"));
+        transformer.transform(domSource, streamResult);
+        System.out.println("Root Node checking file is generated");
+    } catch (ParserConfigurationException | TransformerException e) {
+        log.error("Exception Occurred", e);
+    }
+}
 
 }

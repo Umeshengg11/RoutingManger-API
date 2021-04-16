@@ -242,6 +242,9 @@ class NodeCryptography {
             String filePath = "KeyStore.ks";
             File keyStoreFile = new File(filePath);
             boolean isDeleted = keyStoreFile.delete();
+            if (isDeleted){
+                log.info("The keystore file is deleted");
+            }
             keyStore = KeyStore.getInstance("JCEKS");
             keyStore.load(null, null);
             saveToKeyStore();
@@ -259,19 +262,16 @@ class NodeCryptography {
         return isUpdated;
     }
 
-    public void newNodeIDProcess(){
-
+    void newNodeIDProcess(){
         try {
             keyPairGeneration();
             keyStore = KeyStore.getInstance("JCEKS");
             keyStore.load(null, null);
             saveToKeyStore();
             saveKeyStore();
-
         } catch (KeyStoreException | NoSuchAlgorithmException | IOException | CertificateException e) {
             e.printStackTrace();
         }
-
     }
 
 }
