@@ -1277,7 +1277,6 @@ public class RoutingManager {
     }
 
 public void resultForIndexingManager(){
-
     try {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -1299,7 +1298,6 @@ public void resultForIndexingManager(){
             Element nodePub = doc.createElement("NEXTHOP");
             nodePub.appendChild(doc.createTextNode(""));
             row1.appendChild(nodePub);
-
         }
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
