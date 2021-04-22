@@ -16,6 +16,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -24,6 +25,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -538,7 +540,7 @@ public class RoutingManager {
                             boolean isAccess = config.isLayerAccess(b4_layer.getLayerName(i));
                             if (isAccess) {
                                 mergeRoutingTable(file, i);
-                                getRTTMergerTable(file, i);
+                                generateRTTMergerTable(file, i);
                             }
                         }
                         if (file.getName().startsWith("RcvRTT_" + i)) {
@@ -1203,7 +1205,7 @@ public class RoutingManager {
      * @param layerID layer Id on which the operation needs to be performed.
      * @return getRTT file is created, containing only the neighbour table nodeIDs for which the rtt needs to be found.
      */
-    private File getRTTMergerTable(File mergerTableDataFile, int layerID) {
+    private File generateRTTMergerTable(File mergerTableDataFile, int layerID) {
         B4_Node selfNodeOfMergerTable = getSelfNodeOfMergerTable(mergerTableDataFile.getName());
         B4_Node[] mergerNeighbourTable = getMergerNeighbourTable(mergerTableDataFile.getName());
         String selfNodeIdMerger = selfNodeOfMergerTable.getB4node().getNodeID();
@@ -1276,39 +1278,49 @@ public class RoutingManager {
         return file1;
     }
 
-public void resultForIndexingManager(){
-    try {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.newDocument();
-        //create root Element
-        Element root = doc.createElement("CheckingRootNodeForIndex");
-        doc.appendChild(root);
-        root.setAttribute("LayerID", selfNodeIdMerger);
-
-        for (int i = 1; i <= tableLength; i++) {
-            Element row1 = doc.createElement("DATA");
-            root.appendChild(row1);
-            row1.setAttribute("INDEX", "[" + i + "]");
-
-            Element nodeID = doc.createElement("KEY");
-            nodeID.appendChild(doc.createTextNode(key);
-            row1.appendChild(nodeID);
-
-            Element nodePub = doc.createElement("NEXTHOP");
-            nodePub.appendChild(doc.createTextNode(""));
-            row1.appendChild(nodePub);
-        }
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource domSource = new DOMSource(doc);
-
-        StreamResult streamResult = new StreamResult(new File(layerID+"RootNodeCheck"+ ".xml"));
-        transformer.transform(domSource, streamResult);
-        System.out.println("Root Node checking file is generated");
-    } catch (ParserConfigurationException | TransformerException e) {
-        log.error("Exception Occurred", e);
+    public File generateRoutingTableFile(){
+//        The work need to be done
+     return new File("");
     }
-}
 
+    public File generateNeigbourTableFile(){
+//        The work need to be done in function
+        return new File("");
+    }
+
+    public File responseForIndexingManager(String indexFileName){
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = null;
+        String selfNodeID = null;
+        try {
+            documentBuilder = builderFactory.newDocumentBuilder();
+            Document doc = documentBuilder.parse(new File(indexFileName ));
+            doc.getDocumentElement().normalize();
+            String rootElement = doc.getDocumentElement().getNodeName();
+            String layerIDS = doc.getDocumentElement().getAttribute("LayerID");
+            int layerID = Integer.parseInt(layerIDS);
+            NodeList nodeList1 = doc.getElementsByTagName("DATA");
+            for (int i = 0; i < nodeList1.getLength(); i++) {
+                Node node = nodeList1.item(i);
+
+                if (node.getNodeType() == node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+                    String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
+
+                    //Get value of all sub-Elements
+                    String key = element.getElementsByTagName("KEY").item(0).getTextContent();
+                    element.getElementsByTagName("HASHID").item(0).setTextContent(findNextHop(key,layerID).getB4node().getNodeID());
+                }
+            }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource domSource = new DOMSource(doc);
+            StreamResult streamResult = new StreamResult(new File("ResponseToIndexM.xml"));
+            transformer.transform(domSource, streamResult);
+            log.debug("ResponseToIndexM.xml" + "file updated");
+        } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
+            log.error("Exception Occurred",e);
+        }
+        return new File("ResponseToIndexM.xml");
+    }
 }
