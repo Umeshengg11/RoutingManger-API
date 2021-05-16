@@ -16,7 +16,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -25,19 +24,21 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Created by S/L Umesh U Nair
  * <p>
- * <br> Aim is to create an Routing Manager API for Brihaspati-4
+ * <br> Aim is to create a Routing Manager API for Brihaspati-4
+ * <br> This is the main class.
+ * <br> The functions associated with the routing manager API can be accessed using this class.
  * <br> Few  layers were implemented as default:-
  * <br> 1. BaseRoutingTable - LayerID = 0
  * <br> 2. StorageRoutingTable - LayerID = 1
- * <br> Excess to this layers except base layer can be changed in the config.properties file.
- * <br> New Layer can also be added by calling createNewLayer() function in the routing table manger API
+ * <br> Rest of the layer will be created as per the requirement of the user.
+ * <br> Access to various layers can be controlled through the config.properties file.
+ * <br> New Layer can be added by calling createNewLayer() method in the RoutingManager.
  */
 public class RoutingManager {
     private static final Logger log = Logger.getLogger(RoutingManager.class);
@@ -62,7 +63,8 @@ public class RoutingManager {
     /**
      * Constructor
      * <br> Main job of constructor are as follows:-
-     * <br> Check NodeDetails file exits from the previous login, if true take data from the file else generate nodeDetails and write it into a file.
+     * <br> Check NodeDetails.txt file exits from the previous login, if true take data from the file else generate nodeDetails.txt file and nodeDetails generated for future use.
+     * <br> NodeDetails.txt file contain all the information about the node which is generated from the previous login.
      * <br> Check routing table and neighbour table exist from the previous login(ie to check RoutingTable.xml is available in the path).
      * <br> If RT exists then data is taken from the xml file and added to the localBaseRoutingTable(which is the routingTable for current node)
      * and to the localBaseNeighbourTable(which is the neighbourTable for current node).
@@ -127,6 +129,7 @@ public class RoutingManager {
      * @return RoutingManger Object
      * <br>This method is required to create an instance of RoutingManager.
      * <br>Instance of RoutingManager will be obtained by calling this function.
+     * <br>Only one Instance will be created for RoutingManager class.
      */
     public static synchronized RoutingManager getInstance() {
         if (routingManager == null) {
@@ -185,7 +188,7 @@ public class RoutingManager {
      *                 <br>Initial merging of localBaseRoutingTable happens with the routing Table obtained from the Bootstrap Node.
      *                 <br>Nibble wise comparison is done(b/w mergerTableNodeId and localNodeID) to obtain the column in localBaseRoutingTable
      *                 Array at which the data is to be updated.
-     *                 <br>Based on the algorithm the main.resources.B4_Node will be place in the predecessor, successor or middle row of the obtained column.
+     *                 <br>Based on the algorithm the B4_Node will be place in the predecessor, successor or middle row of the obtained column.
      */
 
     public void mergeRoutingTable(File fileName, int layerID) {
@@ -506,6 +509,7 @@ public class RoutingManager {
     /**
      * @param file File needs to be added to the inputBuffer.
      * @return True if file is added successfully.
+     * <br> This method is used to add a file to the input buffer.This method will be called by the glue code to add the file to the input buffer.
      */
     public boolean addFileToInputBuffer(File file) {
         boolean isAdded = false;
@@ -516,6 +520,8 @@ public class RoutingManager {
     /**
      * @param file File needs to be added to the outputBuffer.
      * @return True if file is added successfully.
+     * <br> This method is used to add file to the output buffer.
+     * <br> The file added to the output buffer will be take by the glue code and send it to the intended external module.
      */
     public boolean addFileToOutputBuffer(File file) {
         boolean isAdded = false;
@@ -524,7 +530,9 @@ public class RoutingManager {
     }
 
     /**
-     * This method is used to fetch file from the input buffer one by one.
+     * <br> This method is used to fetch file from the input buffer one by one.
+     * <br> When this method is called a separate thread will run which will continuously scan input buffer for any file.
+     * <br> If any file is found it will be fetch and given to respective functions for execution.
      */
     public void getFileFromInputBuffer() {
         Thread fetchThread = new Thread(() -> {
@@ -560,6 +568,10 @@ public class RoutingManager {
         fetchThread.start();
     }
 
+    /**
+     * @return File
+     * <br> This function can be used by the glue code to fetch file from the output buffer in a sequential order.
+     */
     public File getFileFromOutputBuffer() {
         return routingManagerBuffer.fetchFromOutputBuffer();
     }
@@ -569,6 +581,8 @@ public class RoutingManager {
      * @param publicKey        Public key as input argument.
      * @param nodeID           NodeID as input argument.
      * @return True if the signature is verified successfully.
+     * <br> This function verify a node for its authentication.
+     * <br> The function is implemented internally.It can only be accessed from the routingManager class.
      */
     public boolean verifySignature(String digitalSignature, PublicKey publicKey, String nodeID) {
         boolean verify;
@@ -624,7 +638,7 @@ public class RoutingManager {
     }
 
     /**
-     * @return System MAC Address.
+     * @return System MAC Address in String.
      */
     public String getSystemMACAddress() {
         String macaddr = "";
@@ -647,6 +661,7 @@ public class RoutingManager {
     /**
      * @param layerName Layer name is given as input argument.
      * @return True if the layer is created successfully.
+     * <br> This function is used to create a new layer.
      */
     public int createNewLayer(String layerName) {
         boolean hasAccess;
@@ -667,58 +682,104 @@ public class RoutingManager {
         return layerID;
     }
 
+    /**
+     * @return IP Address of the local Node in String.
+     */
     public String getIPAddress() {
         return localNode.getIpAddress();
     }
 
+    /**
+     * @return NodeID of the local Node in String.
+     */
     public String getNodeID() {
         return localNode.getB4node().getNodeID();
     }
 
+    /**
+     * @return PortAddress of the local Node in String.
+     */
     public String getPortAddress() {
         return localNode.getPortAddress();
     }
 
+    /**
+     * @return Rtt Value of the local Node in float.
+     */
     public float getRTT() {
         return localNode.getRtt();
     }
 
+    /**
+     * @return HashID of the local Node in String.
+     */
     public String getHashID() {
         return localNode.getB4node().getHashID();
     }
 
+    /**
+     * @return PublicKey of local Node.
+     */
     public PublicKey getPublicKey() {
         return localNode.getB4node().getPublicKey();
     }
 
+    /**
+     * @param layerID LayerID is given as the input argument.
+     * @return Routing Table of local node in B4_Node[][].
+     */
     public B4_Node[][] getRoutingTable(int layerID) {
         return routingTables.get(layerID).getRoutingTable();
     }
 
+    /**
+     * @param layerID LayerID is given as the input argument.
+     * @return Neighbour Table of local Node in B4_Node[].
+     */
     public B4_Node[] getNeighbourTable(int layerID) {
         return routingTables.get(layerID).getNeighbourTable();
     }
 
+    /**
+     * @return True if date and time of the system matched with the authentication server.
+     */
     public boolean dateTimeCheck() {
         return dateTimeCheck.checkDateTime();
     }
 
+    /**
+     * @return current date and time in String format.
+     */
     public String getCurrentDateTime() {
         return dateTimeCheck.getCurrentDateTime();
     }
 
+    /**
+     * @return last logout time of the node from the network.
+     */
     public String getLastLogoutTime() {
         return dateTimeCheck.getLastLogoutTime();
     }
 
+    /**
+     * @return True if the self signed certificate is renewed.
+     */
     public boolean renewSelfSignedCertificate() {
         return nodeCryptography.updateCertificate();
     }
 
+    /**
+     * @return Keystore of the local node.
+     */
     public KeyStore getKeystore() {
         return nodeCryptography.getKeyStore();
     }
 
+    /**
+     * <br> If the initial generated nodeId is already available in the network then this function can be called and
+     * a new nodeID will be created.
+     * <br> It also update the nodeDetails.txt file and old nodeID details will be deleted.
+     */
     public void generateNewNodeID() {
         String filePath = "KeyStore.ks";
         File keyStoreFile = new File(filePath);
@@ -744,7 +805,7 @@ public class RoutingManager {
             String layerName = b4_layer.getLayerName(i);
             File fileRoutingTable = getRoutingTableFile(layerName, i);
             boolean isRTFileDeleted = fileRoutingTable.delete();
-            if (isRTFileDeleted) log.debug("Initial "+ layerName +" file deleted");
+            if (isRTFileDeleted) log.debug("Initial " + layerName + " file deleted");
         }
         setLocalNode();
         addToArrayList();
@@ -752,6 +813,81 @@ public class RoutingManager {
         getFileFromInputBuffer();
     }
 
+    /**
+     * @param routingTableName Name of the routingTable
+     * @param layerID          Layer which want to access.
+     * @return File - The XML file of routingTable and NeighbourTable of local node of respective layer.
+     * <br> The glue code can send this file other node for merging.
+     */
+    public File getRoutingTableFile(String routingTableName, int layerID) {
+        File routingTableFile = new File(layerID + "_" + routingTableName + "_" + localNode.getB4node().getNodeID() + ".xml");
+        boolean isExist = routingTableFile.exists();
+        if (isExist) return routingTableFile;
+        else return null;
+    }
+
+    /**
+     * @return
+     */
+    public File generateRoutingTableFile() {
+//        The work need to be done
+        return new File("");
+    }
+
+    /**
+     * @return
+     */
+    public File generateNeigbourTableFile() {
+//        The work need to be done in function
+        return new File("");
+    }
+
+    /**
+     * @param indexFileName
+     * @return
+     */
+    public File responseForIndexingManager(String indexFileName) {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = null;
+        String selfNodeID = null;
+        try {
+            documentBuilder = builderFactory.newDocumentBuilder();
+            Document doc = documentBuilder.parse(new File(indexFileName));
+            doc.getDocumentElement().normalize();
+            String rootElement = doc.getDocumentElement().getNodeName();
+            String layerIDS = doc.getDocumentElement().getAttribute("LayerID");
+            int layerID = Integer.parseInt(layerIDS);
+            NodeList nodeList1 = doc.getElementsByTagName("DATA");
+            for (int i = 0; i < nodeList1.getLength(); i++) {
+                Node node = nodeList1.item(i);
+
+                if (node.getNodeType() == node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+                    String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
+
+                    //Get value of all sub-Elements
+                    String key = element.getElementsByTagName("KEY").item(0).getTextContent();
+                    element.getElementsByTagName("HASHID").item(0).setTextContent(findNextHop(key, layerID).getB4node().getNodeID());
+                }
+            }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource domSource = new DOMSource(doc);
+            StreamResult streamResult = new StreamResult(new File("ResponseToIndexM.xml"));
+            transformer.transform(domSource, streamResult);
+            log.debug("ResponseToIndexM.xml" + "file updated");
+        } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
+            log.error("Exception Occurred", e);
+        }
+        return new File("ResponseToIndexM.xml");
+    }
+
+    /**
+     * @param nodeDetailFilePath File path.
+     *                           <p>
+     *                           <br> This function is private. Cannot be accessed by outside world.
+     *                           <br> It will populate initial entry in to NodeDetails.txt file.
+     */
     private void generateNodeDetailsFile(String nodeDetailFilePath) {
         try {
             FileWriter writer = new FileWriter(nodeDetailFilePath);
@@ -773,7 +909,7 @@ public class RoutingManager {
     }
 
     /**
-     * This method is used for setting Local Node information.
+     * <br>This method is used for setting Local Node information.
      * <br>Presently it is hardcoded (will be amended later).
      */
     private void setLocalNode() {
@@ -1193,16 +1329,9 @@ public class RoutingManager {
         }
     }
 
-    public File getRoutingTableFile(String routingTableName, int layerID) {
-        File routingTableFile = new File(layerID + "_" + routingTableName + "_" + localNode.getB4node().getNodeID() + ".xml");
-        boolean isExist = routingTableFile.exists();
-        if (isExist) return routingTableFile;
-        else return null;
-    }
-
     /**
      * @param mergerTableDataFile The routingTable file for which the rtt value of the neighbour table need to be calculated. <br>
-     * @param layerID layer Id on which the operation needs to be performed.
+     * @param layerID             layer Id on which the operation needs to be performed.
      * @return getRTT file is created, containing only the neighbour table nodeIDs for which the rtt needs to be found.
      */
     private File generateRTTMergerTable(File mergerTableDataFile, int layerID) {
@@ -1276,51 +1405,5 @@ public class RoutingManager {
         File file1 = new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml");
         addFileToOutputBuffer(file1);
         return file1;
-    }
-
-    public File generateRoutingTableFile(){
-//        The work need to be done
-     return new File("");
-    }
-
-    public File generateNeigbourTableFile(){
-//        The work need to be done in function
-        return new File("");
-    }
-
-    public File responseForIndexingManager(String indexFileName){
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder = null;
-        String selfNodeID = null;
-        try {
-            documentBuilder = builderFactory.newDocumentBuilder();
-            Document doc = documentBuilder.parse(new File(indexFileName ));
-            doc.getDocumentElement().normalize();
-            String rootElement = doc.getDocumentElement().getNodeName();
-            String layerIDS = doc.getDocumentElement().getAttribute("LayerID");
-            int layerID = Integer.parseInt(layerIDS);
-            NodeList nodeList1 = doc.getElementsByTagName("DATA");
-            for (int i = 0; i < nodeList1.getLength(); i++) {
-                Node node = nodeList1.item(i);
-
-                if (node.getNodeType() == node.ELEMENT_NODE) {
-                    Element element = (Element) node;
-                    String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
-
-                    //Get value of all sub-Elements
-                    String key = element.getElementsByTagName("KEY").item(0).getTextContent();
-                    element.getElementsByTagName("HASHID").item(0).setTextContent(findNextHop(key,layerID).getB4node().getNodeID());
-                }
-            }
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource domSource = new DOMSource(doc);
-            StreamResult streamResult = new StreamResult(new File("ResponseToIndexM.xml"));
-            transformer.transform(domSource, streamResult);
-            log.debug("ResponseToIndexM.xml" + "file updated");
-        } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
-            log.error("Exception Occurred",e);
-        }
-        return new File("ResponseToIndexM.xml");
     }
 }
