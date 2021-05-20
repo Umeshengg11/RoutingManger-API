@@ -803,7 +803,7 @@ public class RoutingManager {
         int maxLayerID = b4_layer.fetchMaxLayerID();
         for (int i = 0; i <= maxLayerID; i++) {
             String layerName = b4_layer.getLayerName(i);
-            File fileRoutingTable = getRoutingTableFile(layerName, i);
+            File fileRoutingTable = getRoutingXMLFile(layerName, i);
             boolean isRTFileDeleted = fileRoutingTable.delete();
             if (isRTFileDeleted) log.debug("Initial " + layerName + " file deleted");
         }
@@ -819,7 +819,7 @@ public class RoutingManager {
      * @return File - The XML file of routingTable and NeighbourTable of local node of respective layer.
      * <br> The glue code can send this file other node for merging.
      */
-    public File getRoutingTableFile(String routingTableName, int layerID) {
+    public File getRoutingXMLFile(String routingTableName, int layerID) {
         File routingTableFile = new File(layerID + "_" + routingTableName + "_" + localNode.getB4node().getNodeID() + ".xml");
         boolean isExist = routingTableFile.exists();
         if (isExist) return routingTableFile;
@@ -827,47 +827,56 @@ public class RoutingManager {
     }
 
     /**
-     * @return
+     * @return File Object of routingTable.
      */
-    public File generateRoutingTableFile() {
-//        The work need to be done
-        return new File("");
+    public File getRoutingTableXMLFile(String XMLTag, String fileName, B4_Node[][] routingTable) {
+        File file = routingTable1ToXML(XMLTag, fileName, routingTable);
+        boolean isDeleted = file.delete();
+        if (!isDeleted)
+            log.debug("NodeDetails file not deleted");
+        return file;
     }
 
     /**
-     * @return
+     * @return File Object of NeighbourTable.
      */
-    public File generateNeigbourTableFile() {
-//        The work need to be done in function
-        return new File("");
+    public File getNeighbourTableXMLFile(String XMLTag, String fileName, B4_Node[] neighbourTable) {
+        File file = neighbourTableToXML(XMLTag, fileName, neighbourTable);
+        boolean isDeleted = file.delete();
+        if (!isDeleted)
+            log.debug("NodeDetails file not deleted");
+        return file;
     }
 
     /**
-     * @param indexFileName
-     * @return
+     * @param indexFile Name of the Index file whose response needs to be send.
+     * @return response in XML File for indexingManger
      */
-    public File responseForIndexingManager(String indexFileName) {
+    public File responseForIndexingManager(String indexFile) {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = null;
         String selfNodeID = null;
         try {
             documentBuilder = builderFactory.newDocumentBuilder();
-            Document doc = documentBuilder.parse(new File(indexFileName));
+            Document doc = documentBuilder.parse(new File(indexFile));
             doc.getDocumentElement().normalize();
             String rootElement = doc.getDocumentElement().getNodeName();
+            System.out.println("RootElement is " + rootElement);
             String layerIDS = doc.getDocumentElement().getAttribute("LayerID");
+            System.out.println("LayerId is " + layerIDS);
             int layerID = Integer.parseInt(layerIDS);
             NodeList nodeList1 = doc.getElementsByTagName("DATA");
             for (int i = 0; i < nodeList1.getLength(); i++) {
                 Node node = nodeList1.item(i);
-
                 if (node.getNodeType() == node.ELEMENT_NODE) {
                     Element element = (Element) node;
                     String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
-
-                    //Get value of all sub-Elements
                     String key = element.getElementsByTagName("KEY").item(0).getTextContent();
-                    element.getElementsByTagName("HASHID").item(0).setTextContent(findNextHop(key, layerID).getB4node().getNodeID());
+                    System.out.println(key);
+                    if (findNextHop(key, layerID)==null)
+                        element.getElementsByTagName("NEXTHOP").item(0).setTextContent("RootNode");
+                    else
+                       element.getElementsByTagName("NEXTHOP").item(0).setTextContent(findNextHop(key,layerID).getB4node().getNodeID());
                 }
             }
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -1405,5 +1414,140 @@ public class RoutingManager {
         File file1 = new File("GetRTT_" + layerID + "_" + selfNodeIdMerger + ".xml");
         addFileToOutputBuffer(file1);
         return file1;
+    }
+
+    private File routingTable1ToXML(String rtTag, String fileName, B4_Node[][] routingTable) {
+        File file = null;
+        String selfNodeId = localNode.getB4node().getNodeID();
+        String selfNodePub = utility.pubToStr(localNode.getB4node().getPublicKey());
+        String selfHashID = localNode.getB4node().getHashID();
+        String selfIPAddress = localNode.getIpAddress();
+        String selfPortAddress = localNode.getPortAddress();
+        String selfTransport = localNode.getTransport();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.newDocument();
+
+            //create root Element
+            Element root = doc.createElement(rtTag);
+            doc.appendChild(root);
+            root.setAttribute("SELF_NODE_ID", selfNodeId);
+            root.setAttribute("SELF_PUBLIC_KEY", selfNodePub);
+            root.setAttribute("SELF_HASHID", selfHashID);
+            root.setAttribute("SELF_IP_ADDRESS", selfIPAddress);
+            root.setAttribute("SELF_PORT_ADDRESS", selfPortAddress);
+            root.setAttribute("SELF_TRANSPORT", selfTransport);
+
+            for (int i = 0; i < rt_dimension; i++) {
+                for (int j = 0; j < 3; j++) {
+                    Element row = doc.createElement("B4_Node");
+                    root.appendChild(row);
+                    row.setAttribute("INDEX", "[" + i + "]" + "[" + j + "]");
+
+                    Element nodeID = doc.createElement("NODEID");
+                    nodeID.appendChild(doc.createTextNode(routingTable[i][j].getB4node().getNodeID()));
+                    row.appendChild(nodeID);
+
+                    Element nodePub = doc.createElement("PUBLICKEY");
+                    nodePub.appendChild(doc.createTextNode(utility.pubToStr(routingTable[i][j].getB4node().getPublicKey())));
+                    row.appendChild(nodePub);
+
+                    Element hashID = doc.createElement("HASHID");
+                    hashID.appendChild(doc.createTextNode(routingTable[i][j].getB4node().getHashID()));
+                    row.appendChild(hashID);
+
+                    Element nodeIP = doc.createElement("NODEIP");
+                    nodeIP.appendChild(doc.createTextNode(routingTable[i][j].getIpAddress()));
+                    row.appendChild(nodeIP);
+
+                    Element nodePort = doc.createElement("NODEPORT");
+                    nodePort.appendChild(doc.createTextNode(routingTable[i][j].getPortAddress()));
+                    row.appendChild(nodePort);
+
+                    Element nodeTransport = doc.createElement("NODETRANSPORT");
+                    nodeTransport.appendChild(doc.createTextNode(routingTable[i][j].getTransport()));
+                    row.appendChild(nodeTransport);
+                }
+            }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource domSource = new DOMSource(doc);
+            file = new File(fileName + ".xml");
+            StreamResult streamResult = new StreamResult(file);
+            transformer.transform(domSource, streamResult);
+            log.debug(fileName + " file updated");
+        } catch (ParserConfigurationException | TransformerException e) {
+            log.error("Exception Occurred", e);
+        }
+        return file;
+    }
+
+    private File neighbourTableToXML(String rtTag, String fileName, B4_Node[] neighbourTable) {
+        File file = null;
+        String selfNodeId = localNode.getB4node().getNodeID();
+        String selfNodePub = utility.pubToStr(localNode.getB4node().getPublicKey());
+        String selfHashID = localNode.getB4node().getHashID();
+        String selfIPAddress = localNode.getIpAddress();
+        String selfPortAddress = localNode.getPortAddress();
+        String selfTransport = localNode.getTransport();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.newDocument();
+
+            //create root Element
+            Element root = doc.createElement(rtTag);
+            doc.appendChild(root);
+            root.setAttribute("SELF_NODE_ID", selfNodeId);
+            root.setAttribute("SELF_PUBLIC_KEY", selfNodePub);
+            root.setAttribute("SELF_HASHID", selfHashID);
+            root.setAttribute("SELF_IP_ADDRESS", selfIPAddress);
+            root.setAttribute("SELF_PORT_ADDRESS", selfPortAddress);
+            root.setAttribute("SELF_TRANSPORT", selfTransport);
+            for (int i = 0; i < nt_dimension; i++) {
+                Element row1 = doc.createElement("NEIGHBOUR");
+                root.appendChild(row1);
+                row1.setAttribute("INDEX", "[" + i + "]");
+
+                Element nodeID = doc.createElement("NODEID");
+                nodeID.appendChild(doc.createTextNode(neighbourTable[i].getB4node().getNodeID()));
+                row1.appendChild(nodeID);
+
+                Element nodePub = doc.createElement("PUBLICKEY");
+                nodePub.appendChild(doc.createTextNode(utility.pubToStr(neighbourTable[i].getB4node().getPublicKey())));
+                row1.appendChild(nodePub);
+
+                Element hashID = doc.createElement("HASHID");
+                hashID.appendChild(doc.createTextNode(neighbourTable[i].getB4node().getHashID()));
+                row1.appendChild(hashID);
+
+                Element nodeIP = doc.createElement("NODEIP");
+                nodeIP.appendChild(doc.createTextNode(neighbourTable[i].getIpAddress()));
+                row1.appendChild(nodeIP);
+
+                Element nodePort = doc.createElement("NODEPORT");
+                nodePort.appendChild(doc.createTextNode(neighbourTable[i].getPortAddress()));
+                row1.appendChild(nodePort);
+
+                Element nodeTransport = doc.createElement("NODETRANSPORT");
+                nodeTransport.appendChild(doc.createTextNode(neighbourTable[i].getTransport()));
+                row1.appendChild(nodeTransport);
+
+                Element nodeRTT = doc.createElement("NODERTT");
+                nodeRTT.appendChild(doc.createTextNode(String.valueOf(neighbourTable[i].getRtt())));
+                row1.appendChild(nodeRTT);
+            }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource domSource = new DOMSource(doc);
+            file = new File(fileName + ".xml");
+            StreamResult streamResult = new StreamResult(file);
+            transformer.transform(domSource, streamResult);
+            log.debug(fileName + " file updated");
+        } catch (ParserConfigurationException | TransformerException e) {
+            log.error("Exception Occurred", e);
+        }
+        return file;
     }
 }
