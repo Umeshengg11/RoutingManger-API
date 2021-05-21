@@ -1,10 +1,7 @@
 package main;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -549,13 +546,18 @@ public class RoutingManager {
                             if (isAccess) {
                                 mergeRoutingTable(file, i);
                                 generateRTTMergerTable(file, i);
+                                log.info("Routing Table Updated !!!");
                             }
                         }
                         if (file.getName().startsWith("RcvRTT_" + i)) {
                             mergeNeighbourTable(file, i);
+                            log.info("Neighbour Table updated !!!");
+                        }
+                        if (file.getName().startsWith("Table"+i)){
+                            responseForIndexingManager("Table"+i+"_RootNodeCheck.xml");
+                            log.info("Indexing response Generation completed !!!");
                         }
                     }
-                    log.info("Routing Table updated !!!");
                 }
                 try {
                     Thread.sleep(5000);
@@ -564,7 +566,6 @@ public class RoutingManager {
                 }
             }
         });
-
         fetchThread.start();
     }
 
@@ -852,19 +853,29 @@ public class RoutingManager {
      * @param indexFile Name of the Index file whose response needs to be send.
      * @return response in XML File for indexingManger
      */
-    public File responseForIndexingManager(String indexFile) {
+    public boolean responseForIndexingManager(String indexFile) {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = null;
-        String selfNodeID = null;
+        File file = null;
+        boolean fileAdded= false;
         try {
             documentBuilder = builderFactory.newDocumentBuilder();
             Document doc = documentBuilder.parse(new File(indexFile));
             doc.getDocumentElement().normalize();
-            String rootElement = doc.getDocumentElement().getNodeName();
-            System.out.println("RootElement is " + rootElement);
+            Element element1 = doc.getDocumentElement();
+            Element element2 = doc.createElement("ResponseToIndexingManager");
             String layerIDS = doc.getDocumentElement().getAttribute("LayerID");
-            System.out.println("LayerId is " + layerIDS);
             int layerID = Integer.parseInt(layerIDS);
+            NamedNodeMap attrs = element1.getAttributes();
+            for (int i = 0; i < attrs.getLength(); i++) {
+                Attr attr2 = (Attr) doc.importNode(attrs.item(i), true);
+                element2.getAttributes().setNamedItem(attr2);
+            }
+            while ((element1.hasChildNodes())) {
+                element2.appendChild(element1.getFirstChild());
+            }
+            element1.getParentNode().replaceChild(element2, element1);
+
             NodeList nodeList1 = doc.getElementsByTagName("DATA");
             for (int i = 0; i < nodeList1.getLength(); i++) {
                 Node node = nodeList1.item(i);
@@ -872,23 +883,27 @@ public class RoutingManager {
                     Element element = (Element) node;
                     String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
                     String key = element.getElementsByTagName("KEY").item(0).getTextContent();
-                    System.out.println(key);
-                    if (findNextHop(key, layerID)==null)
+                    if (findNextHop(key, layerID) == null) {
                         element.getElementsByTagName("NEXTHOP").item(0).setTextContent("RootNode");
-                    else
-                       element.getElementsByTagName("NEXTHOP").item(0).setTextContent(findNextHop(key,layerID).getB4node().getNodeID());
+                    } else {
+                        element.getElementsByTagName("NEXTHOP").item(0).setTextContent(findNextHop(key, layerID).getB4node().getNodeID());
+                    }
                 }
             }
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(doc);
-            StreamResult streamResult = new StreamResult(new File("ResponseToIndexM.xml"));
+            file = new File("ResponseToIndexManager.xml");
+            StreamResult streamResult = new StreamResult(file);
             transformer.transform(domSource, streamResult);
-            log.debug("ResponseToIndexM.xml" + "file updated");
+            log.debug("ResponseToIndexManager.xml" + "file created");
+            addFileToOutputBuffer(file);
+            fileAdded=true;
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
             log.error("Exception Occurred", e);
         }
-        return new File("ResponseToIndexM.xml");
+        log.info("ResponseToIndexManager.xml" + "file send to output buffer");
+        return fileAdded;
     }
 
     /**
