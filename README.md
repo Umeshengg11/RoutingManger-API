@@ -39,4 +39,38 @@ Dynamic Layering is an important concept related to this API. Few layers impleme
 
 **createNewLayer(String layerName)**:-This method takes one argument, i.e. layer Name; It is the name that the user wants to give to the new Layer. This function will return a “True” value when the Layer created successfully. Thereafter the routing table and neighbour table for that particular Layer will be generated.
 
+**getIPAddress()**:-This method will return the IPAddress of the current Node.
+
+**getNodeID()**:-This method will return the NodeID of the current Node.
+
+**getPortAddress()**:-This method will return the Port Address of the current Node.
+
+**getRTT()**:-This method will return the RTT Value of the current Node.
+
+**getHashID()**:-This method will return the HashID of the current Node.
+
+**getPublicKey()**:-This method will return the Public Address of the current Node.
+
+**getRoutingTable(int layerID)**:-This method will return the Object of RoutingTable specified by the layerID.
+
+**getNeighbourTable(int layerID)**:-This method will return the Object of NeighbourTable specified by the layerID.
+
+**dateTimeCheck()**:-
+
+**getCurrentDateTime()**:-
+
+**getLastLogoutTime()**:-
+
+**renewSelfSignedCertificate()**:-
+
+**generateNewNodeID()**:-
+
+**getRoutingXMLFile(String routingTableName, int layerID)**:-
+
+**getRoutingTableXMLFile(String XMLTag, String fileName, B4_Node[][] routingTable)**:-
+
+**getNeighbourTableXMLFile(String XMLTag, String fileName, B4_Node[] neighbourTable)**:-
+
+**responseForIndexingManager(String indexFile)**:-
+
 
