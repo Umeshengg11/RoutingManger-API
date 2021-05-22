@@ -13,23 +13,26 @@ import java.io.IOException;
 public class TestingModule {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();
-        File file = new File("Table0_RootNodeCheck.xml");
-       rt.addFileToInputBuffer(file);
+//        File file = new File("Table0_RootNodeCheck.xml");
+//       rt.addFileToInputBuffer(file);
 
 //       File file= rt.getRoutingTableXMLFile("BaseRT","BaseRT",rt.getRoutingTable(0));
 //        rt.addFileToInputBuffer(file);
        // rt.getNeighbourTableXMLFile("BaseNT","BaseNT",rt.getNeighbourTable(0));
 //        rt.createNewLayer("MessageRoutingTable");
-//        CreateRoutingTablesForTesting xm = new CreateRoutingTablesForTesting();
-//        rt.addFileToInputBuffer(CreateRoutingTablesForTesting.createXML("BaseRoutingTable",0));
-//        CommunicationManagerSimulator in = new CommunicationManagerSimulator();
+        CreateRoutingTablesForTesting xm = new CreateRoutingTablesForTesting();
+        rt.addFileToInputBuffer(CreateRoutingTablesForTesting.createXML("BaseRoutingTable",0));
+        CommunicationManagerSimulator in = new CommunicationManagerSimulator();
         Thread th = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true){
                    File file= rt.getFileFromOutputBuffer();
-                   if (file!=null)
-                    System.out.println(file.getName());
+                   if (file!=null){
+                       System.out.println(file.getName());
+                       if (file.getName().startsWith("GetRTT"))
+                           in.returnRTTData(file,rt);
+                   }
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {

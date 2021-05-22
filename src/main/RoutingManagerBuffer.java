@@ -83,7 +83,7 @@ class RoutingManagerBuffer {
         outputBufferLock.lock();
         outputRoutingBuffer.add(file);
         log.debug("File added to Output buffer");
-        file.deleteOnExit();
+        //file.deleteOnExit();
         outputBufferLock.unlock();
         return true;
     }
