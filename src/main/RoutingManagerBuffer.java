@@ -52,7 +52,7 @@ class RoutingManagerBuffer {
     boolean addToInputBuffer(File file) {
         inputBufferLock.lock();
         inputRoutingBuffer.add(file);
-        file.deleteOnExit();
+        //file.deleteOnExit();
         log.debug("File added to Input buffer");
         inputBufferLock.unlock();
         return true;

@@ -21,7 +21,8 @@ public class TestingModule {
        // rt.getNeighbourTableXMLFile("BaseNT","BaseNT",rt.getNeighbourTable(0));
 //        rt.createNewLayer("MessageRoutingTable");
         CreateRoutingTablesForTesting xm = new CreateRoutingTablesForTesting();
-        rt.addFileToInputBuffer(CreateRoutingTablesForTesting.createXML("BaseRoutingTable",0));
+        rt.addFileToInputBuffer(xm.createXML("BaseRoutingTable",0));
+        rt.addFileToInputBuffer(xm.simulatedDiffTable("DiffR",0));
         CommunicationManagerSimulator in = new CommunicationManagerSimulator();
         Thread th = new Thread(new Runnable() {
             @Override

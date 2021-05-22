@@ -44,6 +44,7 @@ public class RoutingManager {
     private static ConfigData config;
     private final ArrayList<B4_RoutingTable> routingTables;
     private final ArrayList<B4_Node> differentialNodes;
+    private  ArrayList<B4_Node> receivedDifferentialNodes;
     private final String layerFile;
     private final int rt_dimension;
     private final int nt_dimension;
@@ -52,6 +53,7 @@ public class RoutingManager {
     private final DateTimeCheck dateTimeCheck;
     private final NodeCryptography nodeCryptography;
     private final B4_NodeGeneration b4_nodeGeneration;
+    private B4_Node diffSelfMergerNode;
     private Utility utility;
     private B4_Node localNode;
     private String selfIPAddress;
@@ -204,8 +206,8 @@ public class RoutingManager {
         String layerName = b4_layer.getLayerName(layerID);
         routingTableToXML(layerName, layerID + "_" + layerName + "_" + localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         log.info(layerName + " Merging completed Successfully");
-        String selfNodeID=getNodeID();
-        File file = createDifferentialTable("DifferentialRoutingTableNodes","DiffR_"+layerID+"_RoutingTable_"+selfNodeID);
+        String selfNodeID = getNodeID();
+        File file = createDifferentialTable("DifferentialRoutingTableNodes", "DiffR_" + layerID + "_RoutingTable_" + selfNodeID);
         addFileToOutputBuffer(file);
         log.info(layerName + " Differential Routing Table File added to the Output Buffer");
     }
@@ -559,12 +561,13 @@ public class RoutingManager {
                             mergeNeighbourTable(file, i);
                             log.info("Neighbour Table updated !!!");
                         }
-                        if (file.getName().startsWith("Table"+i)){
-                            responseForIndexingManager("Table"+i+"_RootNodeCheck.xml");
+                        if (file.getName().startsWith("Table" + i)) {
+                            responseForIndexingManager("Table" + i + "_RootNodeCheck.xml");
                             log.info("Indexing response Generation completed !!!");
                         }
-                        if(file.getName().startsWith(("DiffR_"+i))){
-
+                        if (file.getName().startsWith(("DiffR_" + i))) {
+                            convertDiffRTFile(file.getName());
+                            mergeDifferentialRoutingTable(file,i);
                             log.info("Routing Table Updated !!!");
                         }
                     }
@@ -867,7 +870,7 @@ public class RoutingManager {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = null;
         File file = null;
-        boolean fileAdded= false;
+        boolean fileAdded = false;
         try {
             documentBuilder = builderFactory.newDocumentBuilder();
             Document doc = documentBuilder.parse(new File(indexFile));
@@ -908,7 +911,7 @@ public class RoutingManager {
             transformer.transform(domSource, streamResult);
             log.debug("ResponseToIndexManager.xml" + "file created");
             addFileToOutputBuffer(file);
-            fileAdded=true;
+            fileAdded = true;
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
             log.error("Exception Occurred", e);
         }
@@ -1588,7 +1591,7 @@ public class RoutingManager {
         return file;
     }
 
-    private File createDifferentialTable(String rtTag,String fileName){
+    private File createDifferentialTable(String rtTag, String fileName) {
         File file = null;
         String selfNodeId = localNode.getB4node().getNodeID();
         String selfNodePub = utility.pubToStr(localNode.getB4node().getPublicKey());
@@ -1644,6 +1647,7 @@ public class RoutingManager {
                 nodeRTT.appendChild(doc.createTextNode(String.valueOf(differentialNodes.get(i).getRtt())));
                 row1.appendChild(nodeRTT);
             }
+            differentialNodes.clear();
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(doc);
@@ -1655,6 +1659,64 @@ public class RoutingManager {
             log.error("Exception Occurred", e);
         }
         return file;
+    }
 
+    private void convertDiffRTFile(String mergerRTFile) {
+        receivedDifferentialNodes=new ArrayList<>();
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = builderFactory.newDocumentBuilder();
+            Document doc = documentBuilder.parse(new File(mergerRTFile));
+            doc.getDocumentElement().normalize();
+            String selfNodeID = doc.getDocumentElement().getAttribute("SELF_NODE_ID");
+            String selfNodePub = doc.getDocumentElement().getAttribute("SELF_PUBLIC_KEY");
+            String selfHashID = doc.getDocumentElement().getAttribute("SELF_HASHID");
+            String selfIPAddress = doc.getDocumentElement().getAttribute("SELF_IP_ADDRESS");
+            String selfPortAddress = doc.getDocumentElement().getAttribute("SELF_PORT_ADDRESS");
+            String selfTransport = doc.getDocumentElement().getAttribute("SELF_TRANSPORT");
+            diffSelfMergerNode = new B4_Node(new B4_NodeTuple(selfNodeID, utility.strToPub(selfNodePub), selfHashID), selfIPAddress, selfPortAddress, selfTransport);
+
+            NodeList nodeList1 = doc.getElementsByTagName("DIFFNODES");
+            for (int i = 0; i < nodeList1.getLength(); i++) {
+                Node node = nodeList1.item(i);
+                if (node.getNodeType() == node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+
+                    //Get the value of ID attribute
+                    String index = node.getAttributes().getNamedItem("INDEX").getNodeValue();
+                    //Get value of all sub-Elements
+                    String nodeID = element.getElementsByTagName("NODEID").item(0).getTextContent();
+                    String nodePub = element.getElementsByTagName("PUBLICKEY").item(0).getTextContent();
+                    String hashID = element.getElementsByTagName("HASHID").item(0).getTextContent();
+                    String nodeIP = element.getElementsByTagName("NODEIP").item(0).getTextContent();
+                    String nodePort = element.getElementsByTagName("NODEPORT").item(0).getTextContent();
+                    String nodeTransport = element.getElementsByTagName("NODETRANSPORT").item(0).getTextContent();
+                    String nodeRTT = element.getElementsByTagName("NODERTT").item(0).getTextContent();
+                    System.out.println(i+"\n"+nodeID+"\n"+nodePub+"\n"+hashID+"\n"+nodeIP+"\n"+nodePort+"\n"+nodeTransport+"\n"+nodeRTT+"\n\n");
+                    receivedDifferentialNodes.add(new B4_Node(new B4_NodeTuple(nodeID, utility.strToPub(nodePub), hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT)));
+                }
+            }
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void mergeDifferentialRoutingTable(File fileName, int layerID){
+        B4_Node[][] routingTableLayer = routingTables.get(layerID).getRoutingTable();
+        B4_Node selfNodeOfMergerTable = diffSelfMergerNode;
+        mergerRT(selfNodeOfMergerTable, routingTableLayer);
+        for (B4_Node receivedDifferentialNode : receivedDifferentialNodes) {
+            mergerRT(receivedDifferentialNode, routingTableLayer);
+        }
+        receivedDifferentialNodes.clear();
+        B4_Layer b4_layer = new B4_Layer();
+        String layerName = b4_layer.getLayerName(layerID);
+        routingTableToXML(layerName, layerID + "_" + layerName + "_" + localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
+        log.info(layerName + " Merging completed Successfully");
+        String selfNodeID = getNodeID();
+        File file = createDifferentialTable("DifferentialRoutingTableNodes", "DiffR_" + layerID + "_RoutingTable_" + selfNodeID);
+        addFileToOutputBuffer(file);
+        log.info(layerName + " Differential Routing Table File added to the Output Buffer");
     }
 }
