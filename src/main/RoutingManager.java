@@ -205,7 +205,7 @@ public class RoutingManager {
         routingTableToXML(layerName, layerID + "_" + layerName + "_" + localNode.getB4node().getNodeID(), routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         log.info(layerName + " Merging completed Successfully");
         String selfNodeID=getNodeID();
-        File file = createDifferentialTable("DifferentialRoutingTableNodes",layerID+"_DifferentialRoutingTable_"+selfNodeID);
+        File file = createDifferentialTable("DifferentialRoutingTableNodes","DiffR_"+layerID+"_RoutingTable_"+selfNodeID);
         addFileToOutputBuffer(file);
         log.info(layerName + " Differential Routing Table File added to the Output Buffer");
     }
@@ -562,6 +562,10 @@ public class RoutingManager {
                         if (file.getName().startsWith("Table"+i)){
                             responseForIndexingManager("Table"+i+"_RootNodeCheck.xml");
                             log.info("Indexing response Generation completed !!!");
+                        }
+                        if(file.getName().startsWith(("DiffR_"+i))){
+
+                            log.info("Routing Table Updated !!!");
                         }
                     }
                 }

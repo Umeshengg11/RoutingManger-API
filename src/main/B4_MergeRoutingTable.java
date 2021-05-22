@@ -49,7 +49,7 @@ public class B4_MergeRoutingTable {
             doc = documentBuilder.parse(new File(mergerRTFile));
             doc.getDocumentElement().normalize();
             //String rootElement = doc.getDocumentElement().getNodeName();
-            NodeList nodeList = doc.getElementsByTagName("NODE");
+            NodeList nodeList = doc.getElementsByTagName("B4_Node");
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 if (node.getNodeType() == node.ELEMENT_NODE) {

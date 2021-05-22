@@ -75,7 +75,7 @@ public class CreateRoutingTablesForTesting {
 
             for (int i = 0; i < 40; i++) {
                 for (int j = 0; j < 3; j++) {
-                    Element row = doc.createElement("NODE");
+                    Element row = doc.createElement("B4_Node");
                     root.appendChild(row);
                     row.setAttribute("INDEX", "[" + i + "]" + "[" + j + "]");
 
