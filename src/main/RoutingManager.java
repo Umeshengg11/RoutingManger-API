@@ -264,7 +264,7 @@ public class RoutingManager {
                         Matcher matcher = pattern.matcher(index);
                         matcher.find();
                         index1 = Integer.parseInt(matcher.group(1));
-                        System.out.println(index1);
+                        //System.out.println(index1);
                         mergerNeighbourTable[index1] = new B4_Node(new B4_NodeTuple(nodeID, utility.strToPub(nodePub), hashID), nodeIP, nodePort, nodeTransport, Float.parseFloat(nodeRTT));
                     }
                 }
@@ -443,10 +443,12 @@ public class RoutingManager {
                                 try {
                                     InetAddress ping = InetAddress.getByName(ipAddressBase);
                                     if (ping.isReachable(1000)) {
-                                        System.out.println("Host is Reachable");
+                                        //System.out.println("Host is Reachable");
+                                        log.info("Host is Reachable");
                                         counter_rtable[i][j] = 0;
                                     } else {
-                                        System.out.println("Not reachable");
+                                        //System.out.println("Not reachable");
+                                        log.info("Not reachable");
                                         counter_rtable[i][j] = counter_rtable[i][j] + 1;
                                     }
                                 } catch (IOException e) {
@@ -455,7 +457,8 @@ public class RoutingManager {
                             }
                             if (counter_rtable[i][j] == purgeLoopCount) {
                                 routingTable[i][j] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "");
-                                System.out.println("Data is purged");
+                                //System.out.println("Data is purged");
+                                log.info("Data is purged");
                                 dataPurged_RT = dataPurged_RT + 1;
                                 counter_rtable[i][j] = 0;
                             }
@@ -467,10 +470,12 @@ public class RoutingManager {
                             try {
                                 InetAddress ping = InetAddress.getByName(ipAddressNeighbour);
                                 if (ping.isReachable(1000)) {
-                                    System.out.println("Host is Reachable");
+                                    //System.out.println("Host is Reachable");
+                                    log.info("Host is Reachable");
                                     counter_neighbour[k] = 0;
                                 } else {
-                                    System.out.println("Not reachable");
+                                    //System.out.println("Not reachable");
+                                    log.info("Not reachable");
                                     counter_neighbour[k] = counter_neighbour[k] + 1;
                                 }
                             } catch (IOException e) {
@@ -479,7 +484,8 @@ public class RoutingManager {
                         }
                         if (counter_neighbour[k] == purgeLoopCount) {
                             neighbourTable[k] = new B4_Node(new B4_NodeTuple("", null, ""), "", "", "", -1);
-                            System.out.println("Data is purged");
+                            //System.out.println("Data is purged");
+                            log.info("Data is purged");
                             dataPurged_Neighbour = dataPurged_Neighbour + 1;
                             counter_neighbour[k] = 0;
                         }
@@ -501,7 +507,7 @@ public class RoutingManager {
                 } else {
                     try {
                         sleepingTime = sleepTime;
-                        System.out.println("going for sleeping for " + sleepingTime);
+                        log.info("Going for sleeping for " + sleepingTime);
                         Thread.sleep(sleepingTime);
                         dataPurged_Neighbour = 0;
                         dataPurged_RT = 0;
@@ -695,7 +701,7 @@ public class RoutingManager {
                 config.addToConfigFile(layerName);
             }
             layerID = addNewLayerToArrayList();
-            System.out.println(layerID + "_" + layerName + "_" + nodeID);
+            //log.info(layerID + "_" + layerName + "_" + nodeID);
             init(layerName, layerID + "_" + layerName + "_" + nodeID, routingTables.get(layerID).getRoutingTable(), routingTables.get(layerID).getNeighbourTable());
         }
         return layerID;
