@@ -1,4 +1,4 @@
-package main;
+package com.ehelpy.brihaspati4.routingManagerAPI;
 
 /**
  * This class is used to create an object of B4_routingTable.

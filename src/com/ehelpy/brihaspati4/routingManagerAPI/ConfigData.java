@@ -1,4 +1,4 @@
-package main;
+package com.ehelpy.brihaspati4.routingManagerAPI;
 
 import org.apache.log4j.Logger;
 
@@ -12,9 +12,9 @@ class ConfigData {
     private static final Logger log = Logger.getLogger(ConfigData.class);
     private static ConfigData config;
     private static Utility utility;
-    private final String path = "src/configuration/config.properties";
-    private final String path1 = "src/configuration";
-    private final String path2 = "src/LogFiles";
+    private final String path = "configuration/config.properties";
+    private final String path1 = "configuration";
+    private final String path2 = "LogFiles";
     private B4_Node bootStrapNode;
     private FileReader reader;
     private Properties properties;
@@ -230,8 +230,8 @@ class ConfigData {
         properties.setProperty("BootstrapND", "ED38EE69F98BDF529CC05E34A19D04647A487B71");
         properties.setProperty("BootstrapPubKey", "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDJtY6SHzQ1fIpQxflwvbQpNfOS9ul0XJBHq42vFafTaVNZaTi9f1YZfybvGY67zPw2jmrW/jx89HnyMfzld/nSDzS8xRltjzIqxck+Xg5n0aWTTyt0zv/uO6pVDiecgJ9j46YsevJ/zf85hC3fL/jl6nhLdV0zaHyZGcCms/J1JQIDAQAB");
         properties.setProperty("BootstrapHashID", "E5B9ABAA1234ABA1234591111ABCDFE1234567897589ABAA1234ABA1234591111ABCDFE123456789");
-        properties.setProperty("LayerDetailsPath", "src/configuration/LayerDetails.txt");
-        properties.setProperty("NodeDetailsPath", "src/configuration/NodeDetails.txt");
+        properties.setProperty("LayerDetailsPath", "configuration/LayerDetails.txt");
+        properties.setProperty("NodeDetailsPath", "configuration/NodeDetails.txt");
         properties.setProperty("PurgeLoopCount", "4");
         properties.setProperty("BootstrapPvtIP", "172.20.160.56");
         properties.setProperty("BootstrapPort", "1022");

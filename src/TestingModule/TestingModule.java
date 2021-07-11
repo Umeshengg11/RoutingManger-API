@@ -1,8 +1,6 @@
 package TestingModule;
 
-import main.B4_Node;
-import main.RoutingManager;
-
+import com.ehelpy.brihaspati4.routingManagerAPI.RoutingManager;
 import java.io.File;
 import java.io.IOException;
 
@@ -13,27 +11,41 @@ import java.io.IOException;
 public class TestingModule {
     public static void main(String[] args) throws IOException, InterruptedException {
         RoutingManager rt = RoutingManager.getInstance();
-//        File file = new File("Table0_RootNodeCheck.xml");
-//       rt.addFileToInputBuffer(file);
 
-//       File file= rt.getRoutingTableXMLFile("BaseRT","BaseRT",rt.getRoutingTable(0));
+
+        /* IndexingManager file Check for root node */
+//        File file = new File("Table0_RootNodeCheck.xml");
 //        rt.addFileToInputBuffer(file);
-       // rt.getNeighbourTableXMLFile("BaseNT","BaseNT",rt.getNeighbourTable(0));
-//        rt.createNewLayer("MessageRoutingTable");
+
+        /*Generate Routing Table file */
+        File file1 = rt.getRoutingTableXMLFile("BaseRT", "BaseRT", rt.getRoutingTable(0));
+
+        /*Adding file to InputBuffer*/
+        rt.addFileToInputBuffer(file1);
+
+        /*Generate Neighbour Table File*/
+        rt.getNeighbourTableXMLFile("BaseNT", "BaseNT", rt.getNeighbourTable(0));
+
+        /*Creating New Layer*/
+        rt.createNewLayer("MessageRoutingTable");
+
+        /*Creating routing and differential table for merging*/
         CreateRoutingTablesForTesting xm = new CreateRoutingTablesForTesting();
-        rt.addFileToInputBuffer(xm.createXML("BaseRoutingTable",0));
-        rt.addFileToInputBuffer(xm.simulatedDiffTable("DiffR",0));
+        rt.addFileToInputBuffer(xm.createXML("BaseRoutingTable", 0));
+        rt.addFileToInputBuffer(xm.simulatedDiffTable("DiffR", 0));
+
+        /*Work done by simulated communication manger and generating RcvRTT file*/
         CommunicationManagerSimulator in = new CommunicationManagerSimulator();
         Thread th = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true){
-                   File file= rt.getFileFromOutputBuffer();
-                   if (file!=null){
-                       System.out.println(file.getName());
-                       if (file.getName().startsWith("GetRTT"))
-                           in.returnRTTData(file,rt);
-                   }
+                while (true) {
+                    File file = rt.getFileFromOutputBuffer();
+                    if (file != null) {
+                        System.out.println(file.getName());
+                        if (file.getName().startsWith("GetRTT"))
+                            in.returnRTTData(file, rt);
+                    }
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -42,9 +54,13 @@ public class TestingModule {
                 }
 
             }
-        });th.start();
+        });
+        th.start();
+
+
 //        B4_Node b4_node = rt.getLocalNode();
-//        rt.dateTimeCheck();
+
+       // rt.dateTimeCheck();
 
 
 //        System.out.println(rt.getNodeID());
@@ -62,10 +78,7 @@ public class TestingModule {
 //        }
 //
 //        System.out.println(rt.getSystemIP());
-//
-//
-//
-//
+
 //
 //        System.out.println("The NodeID is verified as - "+rt.verifySignature(rt.getHashID(),rt.getPublicKey(),rt.getNodeID()));
 ////rt.purgeRTEntry("BaseRoutingTable",rt.getLocalBaseRoutingTable(),rt.getLocalBaseNeighbourTable());

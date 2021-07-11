@@ -1,6 +1,7 @@
 package TestingModule;
 
-import main.B4_NodeTuple;
+
+import com.ehelpy.brihaspati4.routingManagerAPI.B4_NodeTuple;
 
 /**
  * This is simulation class used for testing purpose.

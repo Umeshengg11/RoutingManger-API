@@ -1,4 +1,4 @@
-package main;
+package com.ehelpy.brihaspati4.routingManagerAPI;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
@@ -169,7 +169,7 @@ public class RoutingManager {
             routingTableToXML(rtTag, rtFileName, routingTable, neighbourTable);
         } else {
             fetchFromXML(rtFileName, routingTable, neighbourTable);
-            log.info(rtFileName + " file created for future use");
+            log.info(rtFileName + " RT loaded from existing file");
         }
     }
 
@@ -550,9 +550,12 @@ public class RoutingManager {
      */
     public void getFileFromInputBuffer() {
         Thread fetchThread = new Thread(() -> {
+            int sleepTime=5000;
             while (true) {
+               int count=0;
                 File file = routingManagerBuffer.fetchFromInputBuffer();
                 if (!(file == null)) {
+                    count++;
                     log.debug(file.getName());
                     log.debug("New file fetched from InputBuffer");
                     B4_Layer b4_layer = new B4_Layer();
@@ -584,7 +587,15 @@ public class RoutingManager {
                     }
                 }
                 try {
-                    Thread.sleep(5000);
+                    if(sleepTime>=300000)
+                        sleepTime=5000;
+                    if(count==0){
+                        Thread.sleep(sleepTime);
+                        sleepTime = sleepTime+5000;
+                    } else
+                        sleepTime=1000;
+                        Thread.sleep(sleepTime);
+
                 } catch (InterruptedException e) {
                     log.error("Exception Occurred", e);
                 }
